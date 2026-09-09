@@ -7,12 +7,12 @@ export async function buildAll(ctx) {
   const nCh = cur.CHAPTERS.length;
 
   /* ============================================================ home ==== */
-  const heroDiagram = C.svg(760, 320, `
+  const heroDiagram = C.svg(760, 340, `
   <text x="14" y="18" class="d-ttl">ONE AGENT TURN — AND THE FOUR PLACES IT BREAKS</text>
   ${C.box(14, 46, 120, 54, 'user task', '"book my flight"', 'd-sunk')}
   ${C.box(174, 46, 120, 54, 'context', 'prompt + history')}
   ${C.box(334, 46, 120, 54, 'model', 'plan next action')}
-  ${C.box(494, 46, 120, 54, 'tool call', 'fetch / write / send')}
+  ${C.box(494, 46, 120, 54, 'tool call', 'runs for real')}
   ${C.box(494, 176, 120, 54, 'world', 'web · files · APIs', 'd-sunk')}
   ${C.box(174, 176, 240, 54, 'tool result appended to context', 'untrusted bytes, same token stream', 'd-attack')}
   ${C.arrow(134, 73, 172, 73)}
@@ -22,14 +22,17 @@ export async function buildAll(ctx) {
   ${C.arrow(494, 203, 416, 203, '', 'd-attack-l')}
   <path d="M174 203 L120 203 L120 100" class="d-arrow" marker-end="url(#ah)" fill="none"/>
   <text x="96" y="150" text-anchor="end" class="d-sub">loop</text>
-  <g class="pulse">
-  ${C.svgText(294, 262, '① attacker text enters here and is read as intent', 'd-attack-t')}
-  </g>
-  ${C.svgText(120, 290, '② the model cannot tell it apart', 'd-sub', 'start')}
-  ${C.svgText(400, 290, '③ the tool runs with your credentials', 'd-sub', 'start')}
-  ${C.svgText(400, 306, '④ the result leaves on an outbound call', 'd-sub', 'start')}
   <rect x="160" y="30" width="470" height="220" rx="8" class="d-bnd"/>
   ${C.svgText(636, 26, 'TRUST BOUNDARY', 'd-bnd-t', 'end')}
+  <line x1="14" y1="274" x2="746" y2="274" stroke="var(--border)" stroke-width="1"/>
+  ${C.svgText(14, 298, '① attacker text enters here', 'd-attack-t', 'start')}
+  ${C.svgText(14, 316, 'and is read as intent', 'd-sub', 'start')}
+  ${C.svgText(200, 298, '② the model cannot', 'd-attack-t', 'start')}
+  ${C.svgText(200, 316, 'tell it apart', 'd-sub', 'start')}
+  ${C.svgText(386, 298, '③ the tool runs with', 'd-attack-t', 'start')}
+  ${C.svgText(386, 316, 'your credentials', 'd-sub', 'start')}
+  ${C.svgText(572, 298, '④ the result leaves on', 'd-attack-t', 'start')}
+  ${C.svgText(572, 316, 'an outbound call', 'd-sub', 'start')}
   `, { label: 'An agent turn with the four points of compromise marked' });
 
   const partCards = cur.PARTS.map(p => {
