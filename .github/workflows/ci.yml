@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  code:
+    name: code/ — 27 chapters must pass
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # The claim the course is built on: every chapter file ends in assertions
+      # that verify the claims made in its chapter text. Standard library only,
+      # so there is nothing to install.
+      - name: Run all 27 chapters
+        run: python code/run_all.py
+
+      # Pinned: an unpinned ruff picks up new rules on its own schedule and
+      # fails a build that nobody changed.
+      - name: Install ruff
+        run: pip install ruff==0.16.2
+
+      - name: Lint Python
+        run: ruff check code/
+
+  site:
+    name: site — build and link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # No dependencies. The builder is plain ESM against the Node standard
+      # library, so there is no install step and nothing to audit.
+      - name: Build
+        run: node build.mjs
+
+      - name: Check every page for balanced tags and dead internal links
+        run: node scripts/check.mjs

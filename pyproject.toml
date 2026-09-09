@@ -1,0 +1,39 @@
+# Tooling only. The chapter files in code/ are standalone scripts run directly
+# (`python code/a01_agent_loop.py`), not an installable package. Standard
+# library only — there are no runtime dependencies to declare.
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["code"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # bugbear
+    "SIM",  # simplify
+    "RUF",
+]
+ignore = [
+    "E501",    # long lines are usually a printed table; keep them readable
+    "E741",    # `l` is the name the loop variable wants in a few tables
+    "RUF001",  # the prose uses typographic punctuation (— × ≈ ✓) on purpose
+    "RUF002",
+    "RUF003",
+    # --- deliberate house style: these chapters are read more than they are run ---
+    "RUF005",  # `a + [b]` reads better than `[*a, b]` for a reader following along
+    "B905",    # zip(..., strict=) adds noise to lines that are already dense
+    "B007",    # `for phase, step, flag in ...` documents the tuple shape even when unused
+    "RUF059",  # same, for deliberately-named throwaway unpacking
+    "E402",    # every chapter file inserts code/ on sys.path before importing agentlib
+    "SIM108",  # an explicit if/else is clearer than a ternary in a teaching file
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["agentlib"]
+
+[tool.ruff.format]
+quote-style = "double"

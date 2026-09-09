@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# GITHUB_TOKEN needs to mint an id-token for the Pages deployment.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race. Queue instead of cancelling, so a push that lands
+# mid-deploy still ends up published rather than silently dropped.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build static site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/configure-pages@v5
+
+      # Served from a custom domain at its origin root, so there is no path
+      # prefix. The domain itself is written into dist/CNAME by build.mjs so it
+      # survives every deploy; canonicals and the sitemap are absolute and baked
+      # in at build time from SITE.url in site/lib/layout.mjs.
+      - name: Build
+        run: node build.mjs
+
+      - name: Verify the build
+        run: node scripts/check.mjs
+
+      # Pages serves the artifact as-is, but a stray Jekyll pass would drop any
+      # underscore-prefixed path. One empty file makes that impossible.
+      # (build.mjs writes it; this is belt and braces.)
+      - name: Disable Jekyll
+        run: touch dist/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

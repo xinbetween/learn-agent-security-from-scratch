@@ -1,0 +1,54 @@
+#!/usr/bin/env node
+/* Post-build verification. Balanced tags, no template leakage, no dead
+   internal links. Runs in CI; exits non-zero on any finding. */
+import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+const OUT = 'dist';
+if (!existsSync(OUT)) { console.error('dist/ not found — run `node build.mjs` first'); process.exit(1); }
+
+const walk = (d, out = []) => {
+  for (const f of readdirSync(d)) {
+    const p = join(d, f);
+    if (statSync(p).isDirectory()) walk(p, out);
+    else if (f.endsWith('.html')) out.push(p);
+  }
+  return out;
+};
+
+const pages = walk(OUT);
+const targets = new Set(pages.map(f => '/' + f.slice(OUT.length + 1).replace(/index\.html$/, '')));
+const problems = [];
+
+const PAIRS = [
+  ['div', /<div[\s>]/g, /<\/div>/g], ['section', /<section[\s>]/g, /<\/section>/g],
+  ['p', /<p[\s>]/g, /<\/p>/g], ['li', /<li[\s>]/g, /<\/li>/g],
+  ['td', /<td[\s>]/g, /<\/td>/g], ['ul', /<ul[\s>]/g, /<\/ul>/g],
+  ['ol', /<ol[\s>]/g, /<\/ol>/g], ['table', /<table[\s>]/g, /<\/table>/g],
+];
+
+for (const f of pages) {
+  const rel = f.slice(OUT.length);
+  const h = readFileSync(f, 'utf8');
+
+  for (const [name, open, close] of PAIRS) {
+    const a = (h.match(open) || []).length, b = (h.match(close) || []).length;
+    if (a !== b) problems.push(`${rel}: unbalanced <${name}> ${a} open / ${b} close`);
+  }
+  if (!/<title>[^<]{5,}<\/title>/.test(h)) problems.push(`${rel}: missing or empty <title>`);
+  if (h.includes('[object Object]')) problems.push(`${rel}: unrendered object in output`);
+  if (/\$\{/.test(h)) problems.push(`${rel}: unevaluated template literal`);
+
+  for (const m of h.matchAll(/href="(\/[^"#?]*)"/g)) {
+    const t = m[1];
+    if (t.startsWith('/assets') || t.startsWith('/code') || /\.[a-z0-9]{2,4}$/i.test(t)) continue;
+    if (!targets.has(t)) problems.push(`${rel}: dead internal link → ${t}`);
+  }
+}
+
+if (problems.length) {
+  console.error(problems.join('\n'));
+  console.error(`\n${problems.length} problem(s) across ${pages.length} pages`);
+  process.exit(1);
+}
+console.log(`✓ ${pages.length} pages: tags balanced, no dead internal links, no template leakage`);

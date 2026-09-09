@@ -1,0 +1,11 @@
+dist/
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+.ruff_cache/
+
+# Working copies of third-party source documents (the SEI SoK, the CrowdStrike
+# white paper, scraped awesome-lists). They are cited throughout the course and
+# linked from the references page; they are not ours to redistribute.
+refs/
