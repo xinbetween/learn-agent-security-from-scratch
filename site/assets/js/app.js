@@ -69,6 +69,11 @@
   document.querySelectorAll('.quiz').forEach(function (quiz) {
     var total = quiz.querySelectorAll('.q').length, done = 0, right = 0;
     var score = quiz.querySelector('.quiz-score');
+    // templates carry {d}/{t}/{r} placeholders so the wording stays translatable
+    var tplScore = quiz.getAttribute('data-quiz-score') || '{d} of {t} answered · {r} correct';
+    var fill = function (tpl) {
+      return tpl.replace('{d}', done).replace('{t}', total).replace('{r}', right);
+    };
     quiz.addEventListener('click', function (e) {
       var b = e.target.closest('.opt'); if (!b) return;
       var q = b.closest('.q'); if (q.classList.contains('answered')) return;
@@ -80,7 +85,7 @@
       });
       if (!ok) b.classList.add('wrong');
       done++; if (ok) right++;
-      if (score) score.textContent = done + ' of ' + total + ' answered · ' + right + ' correct';
+      if (score) score.textContent = fill(tplScore);
     });
   });
 
@@ -137,14 +142,20 @@
     var isMac = /Mac|iPhone|iPad/.test(navigator.platform || '');
     document.querySelectorAll('[data-search-kbd]').forEach(function (k) { k.textContent = isMac ? '⌘K' : 'Ctrl K'; });
 
-    var GROUPS = [['chapter', 'Chapters'], ['section', 'In chapters'], ['glossary', 'Glossary'], ['page', 'Elsewhere']];
+    // Locale strings and the locale's index path, written into the markup by layout.mjs.
+    var S; try { S = JSON.parse(dlg.getAttribute('data-search-i18n')) || {}; } catch (e) { S = {}; }
+    S.groups = S.groups || { chapter: 'Chapters', section: 'In chapters', glossary: 'Glossary', page: 'Elsewhere' };
+    S.base = S.base || '';
+
+    var GROUPS = [['chapter', S.groups.chapter], ['section', S.groups.section],
+                  ['glossary', S.groups.glossary], ['page', S.groups.page]];
     var TYPE_W = { chapter: 40, glossary: 24, section: 12, page: 8 };
     var GROUP_CAP = { chapter: 6, section: 12, glossary: 6, page: 8 };
 
     function load() {
       if (INDEX) return Promise.resolve(INDEX);
       if (!loading) {
-        loading = fetch('/search-index.json').then(function (r) {
+        loading = fetch(S.base + '/search-index.json').then(function (r) {
           if (!r.ok) throw new Error(r.status);
           return r.json();
         }).then(function (j) {
@@ -158,8 +169,16 @@
       return loading;
     }
 
+    var CJK = /[\u3400-\u9fff\uf900-\ufaff\u3040-\u30ff]/;
     function tokens(q) {
-      return q.toLowerCase().split(/[\s,;:]+/).filter(Boolean);
+      return q.toLowerCase().split(/[\s,;:，、；：]+/).filter(Boolean);
+    }
+    // Fallback for CJK, which has no word spaces: overlapping bigrams, most of
+    // which must appear. Lets "提示注入攻击" still find "提示注入" prose.
+    function bigrams(q) {
+      var out = [];
+      for (var i = 0; i + 1 < q.length; i++) out.push(q.substr(i, 2));
+      return out;
     }
     var reEsc = function (s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
     function mark(text, toks) {
@@ -174,8 +193,9 @@
       var pos = -1;
       for (var i = 0; i < toks.length && pos === -1; i++) pos = e.xl.indexOf(toks[i]);
       if (pos === -1 || pos < 90) return x.slice(0, 180);
-      var start = x.lastIndexOf(' ', pos - 60); if (start < 0) start = pos - 60;
-      return '…' + x.slice(start + 1, start + 200);
+      var sp = x.lastIndexOf(' ', pos - 60);          // -1 in CJK text, which has no spaces
+      var start = sp < 0 ? pos - 60 : sp + 1;
+      return '…' + x.slice(start, start + 200);
     }
 
     function search(q) {
@@ -198,6 +218,17 @@
         score += TYPE_W[e.t] || 0;
         out.push({ e: e, s: score });
       }
+      if (!out.length && CJK.test(ql) && ql.length >= 3) {
+        var bg = bigrams(ql), need = Math.max(1, Math.ceil(bg.length * 0.6));
+        for (var m = 0; m < INDEX.length; m++) {
+          var en = INDEX[m], got = 0, sc = 0;
+          for (var b = 0; b < bg.length; b++) {
+            if (en.hl.indexOf(bg[b]) !== -1) { got++; sc += 8; }
+            else if (en.xl.indexOf(bg[b]) !== -1 || en.kl.indexOf(bg[b]) !== -1) { got++; sc += 2; }
+          }
+          if (got >= need) out.push({ e: en, s: sc + (TYPE_W[en.t] || 0) });
+        }
+      }
       out.sort(function (a, b) { return b.s - a.s; });
       var per = {}, res = [];
       for (var k = 0; k < out.length; k++) {
@@ -209,13 +240,15 @@
 
     function render(q) {
       var toks = tokens(q);
-      if (!INDEX) { list.innerHTML = '<div class="empty">Building the index…</div>'; count.textContent = ''; hits = []; active = -1; return; }
+      if (!INDEX) { list.innerHTML = '<div class="empty">' + esc(S.loading || '') + '</div>'; count.textContent = ''; hits = []; active = -1; return; }
       hits = toks.length ? search(q) : INDEX.filter(function (e) { return e.t === 'chapter'; });
       var html = '', n = 0;
       if (!hits.length) {
-        html = '<div class="empty">Nothing matches <b>“' + esc(q.trim()) + '”</b>. Try fewer words, or a term from the <a href="/glossary/">glossary</a>.</div>';
+        html = '<div class="empty">' + esc(S.noResultsBefore || '') + ' <b>“' + esc(q.trim()) + '”</b>' +
+               (S.noResultsAfter ? esc(S.noResultsAfter) : '') +
+               ' <a href="' + S.base + '/glossary/">' + esc(S.glossaryWord || 'glossary') + '</a>.</div>';
       } else if (!toks.length) {
-        html += '<div class="grp">Jump to a chapter</div>';
+        html += '<div class="grp">' + esc(S.browse || '') + '</div>';
         hits.forEach(function (e) { html += hit(e, n++, toks); });
       } else {
         GROUPS.forEach(function (g) {
@@ -228,7 +261,9 @@
         hits = GROUPS.reduce(function (acc, g) { return acc.concat(hits.filter(function (e) { return e.t === g[0]; })); }, []);
       }
       list.innerHTML = html;
-      count.textContent = toks.length && hits.length ? (hits.length === 1 ? '1 result' : hits.length + ' results') : '';
+      count.textContent = toks.length && hits.length
+        ? (hits.length === 1 ? (S.one || '1 result') : String(S.many || '{n} results').replace('{n}', hits.length))
+        : '';
       setActive(hits.length ? 0 : -1, false);
     }
     function hit(e, i, toks) {
@@ -265,7 +300,11 @@
       input.value = ''; render('');
       input.focus();
       load().then(function () { if (!dlg.hidden) render(input.value); })
-        .catch(function () { list.innerHTML = '<div class="empty">The search index could not be loaded. Try the <a href="/curriculum/">curriculum</a> or the <a href="/glossary/">glossary</a>.</div>'; });
+        .catch(function () {
+          list.innerHTML = '<div class="empty">' + esc(S.failed || '') +
+            ' <a href="' + S.base + '/curriculum/">' + esc(S.curriculumWord || 'curriculum') + '</a> ' +
+            esc(S.failedOr || '') + ' <a href="' + S.base + '/glossary/">' + esc(S.glossaryWord || 'glossary') + '</a>.</div>';
+        });
     }
     function close() {
       if (dlg.hidden) return;

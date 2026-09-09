@@ -5,6 +5,7 @@
    markup and capped, so the whole course indexes to a few hundred kilobytes. */
 
 import { slug } from './components.mjs';
+import { tightenCJK } from './i18n.mjs';
 
 const TEXT_CAP = 1600;
 
@@ -12,7 +13,7 @@ const decode = (s) => s
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<')
   .replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 
-export const strip = (html = '') => decode(String(html)
+export const strip = (html = '') => decode(tightenCJK(String(html))
   .replace(/<script[\s\S]*?<\/script>/gi, ' ')
   .replace(/<style[\s\S]*?<\/style>/gi, ' ')
   .replace(/<svg[\s\S]*?<\/svg>/gi, ' ')
@@ -41,15 +42,17 @@ export function sections(html = '') {
   return out;
 }
 
-export function buildSearchIndex({ cur, loaded, TERMS, SURFACES, CONTROLS, EVENTS, PROJECT_BODIES, CAPSTONE_BODY }) {
+export function buildSearchIndex({ cur, loaded, TERMS, SURFACES, CONTROLS, EVENTS, PROJECT_BODIES, CAPSTONE_BODY, L, base = '' }) {
   const idx = [];
-  const add = (t, u, h, k, x = '') => idx.push({ t, u, h, k, x: cap(strip(x)) });
+  // `base` is the locale prefix ('' for English, '/zh' for Chinese) so a hit
+  // always navigates within the language the reader is already reading.
+  const add = (t, u, h, k, x = '') => idx.push({ t, u: base + u, h, k, x: cap(strip(x)) });
 
   // chapters and their sections
   for (const ch of cur.CHAPTERS) {
     const mod = loaded.get(ch.id);
     const part = cur.partOf(ch);
-    const kicker = `${ch.id.toUpperCase()} · Part ${part.id}`;
+    const kicker = `${ch.id.toUpperCase()} · ${L.chapter.part(part.id, part.title)}`;
     add('chapter', `/chapters/${ch.id}/`, ch.title, kicker, `${ch.sub}. ${ch.desc}`);
     if (!mod) continue;
     for (const s of sections(mod.body)) {
@@ -59,7 +62,8 @@ export function buildSearchIndex({ cur, loaded, TERMS, SURFACES, CONTROLS, EVENT
 
   // glossary
   for (const [term, , def, ch] of TERMS) {
-    add('glossary', `/glossary/#term-${slug(term)}`, term, ch ? `Glossary · taught in ${ch.toUpperCase()}` : 'Glossary', def);
+    add('glossary', `/glossary/#term-${slug(term)}`, term,
+        ch ? `${L.nav.glossary} · ${ch.toUpperCase()}` : L.nav.glossary, def);
   }
 
   // projects and the capstone
@@ -68,37 +72,37 @@ export function buildSearchIndex({ cur, loaded, TERMS, SURFACES, CONTROLS, EVENT
     const b = PROJECT_BODIES[p.id];
     if (b) for (const s of sections(b.body)) add('page', `/projects/${p.id}/#${s.id}`, s.heading, `${p.tag} · ${p.title}`, s.text);
   }
-  add('page', '/capstone/', cur.CAPSTONE.title, `Capstone · ${cur.CAPSTONE.hours}`, `${cur.CAPSTONE.sub}. ${cur.CAPSTONE.desc}`);
-  for (const s of sections(CAPSTONE_BODY.body)) add('page', `/capstone/#${s.id}`, s.heading, 'Capstone', s.text);
+  add('page', '/capstone/', cur.CAPSTONE.title, `${L.footer.capstone} · ${cur.CAPSTONE.hours}`, `${cur.CAPSTONE.sub}. ${cur.CAPSTONE.desc}`);
+  for (const s of sections(CAPSTONE_BODY.body)) add('page', `/capstone/#${s.id}`, s.heading, L.footer.capstone, s.text);
 
   // threat map, defence map, timeline
   for (const s of SURFACES) {
-    add('page', `/threats/#${slug(s.n + ' ' + s.title)}`, s.title, `Threat map · ${s.n}`, s.blurb);
+    add('page', `/threats/#${slug(s.n + ' ' + s.title)}`, s.title, `${L.nav.threats} · ${s.n}`, s.blurb);
     for (const [name, what, ch] of s.classes) {
-      add('page', `/threats/#${slug(name)}`, name, `Threat map · ${s.n} ${s.title}${ch ? ' · ' + ch.toUpperCase() : ''}`, what);
+      add('page', `/threats/#${slug(name)}`, name, `${L.nav.threats} · ${s.n} ${s.title}${ch ? ' · ' + ch.toUpperCase() : ''}`, what);
     }
   }
   for (const g of CONTROLS) {
-    add('page', `/defenses/#${slug(g.stage + ' ' + g.title)}`, g.title, `Defence map · ${g.stage}`, g.blurb);
+    add('page', `/defenses/#${slug(g.stage + ' ' + g.title)}`, g.title, `${L.footer.defenses} · ${g.stage}`, g.blurb);
     for (const [name, what, strength, ch] of g.items) {
-      add('page', `/defenses/#${slug(name)}`, name, `Defence map · ${g.stage} · ${strength}${ch ? ' · ' + ch.toUpperCase() : ''}`, what);
+      add('page', `/defenses/#${slug(name)}`, name, `${L.footer.defenses} · ${g.stage} · ${strength}${ch ? ' · ' + ch.toUpperCase() : ''}`, what);
     }
   }
   for (const [date, kind, title, desc, ch] of EVENTS) {
-    add('page', `/timeline/#${slug(date + ' ' + title)}`, title, `Timeline · ${date} · ${kind}${ch ? ' · ' + ch.toUpperCase() : ''}`, desc);
+    add('page', `/timeline/#${slug(date + ' ' + title)}`, title, `${L.nav.timeline} · ${date} · ${kind}${ch ? ' · ' + ch.toUpperCase() : ''}`, desc);
   }
 
   // the remaining reference pages
-  add('page', '/curriculum/', 'Curriculum', 'All chapters, six parts, the projects and the capstone',
-      cur.PARTS.map(p => `Part ${p.id} ${p.title}. ${p.blurb}`).join(' '));
-  add('page', '/projects/', 'Projects', 'Five graded builds and a capstone', cur.PROJECTS.map(p => p.title).join(', '));
-  add('page', '/threats/', 'Threat map', 'Six surfaces, twenty-five vulnerability classes', SURFACES.map(s => s.title).join(', '));
-  add('page', '/defenses/', 'Defence map', 'Thirty-three controls across design, development and operations', CONTROLS.map(c => c.title).join(', '));
-  add('page', '/glossary/', 'Glossary', `${TERMS.length} terms`, TERMS.map(t => t[0]).join(', '));
-  add('page', '/timeline/', 'Timeline', `${EVENTS.length} landmarks, 2022 to 2026`, EVENTS.map(e => e[2]).join(', '));
-  add('page', '/references/', 'References', 'Every paper and post the course was built from', 'bibliography credits sources authors papers');
-  add('page', '/sources/', 'Source lists', 'The awesome-lists and surveys behind the reference pages', 'Awesome-Agent-Security, Awesome Agent Skills Security, Awesome AI Agent Papers, SoK');
-  add('page', '/setup/', 'Local setup', 'Run the code and the site on your machine', 'python uv ruff node build install clone quickstart no dependencies no API key');
+  add('page', '/curriculum/', L.nav.curriculum, L.searchKicker.curriculum,
+      cur.PARTS.map(p => `${L.chapter.part(p.id, p.title)}. ${p.blurb}`).join(' '));
+  add('page', '/projects/', L.nav.projects, L.searchKicker.projects, cur.PROJECTS.map(p => p.title).join(', '));
+  add('page', '/threats/', L.nav.threats, L.searchKicker.threats, SURFACES.map(s => s.title).join(', '));
+  add('page', '/defenses/', L.footer.defenses, L.searchKicker.defenses, CONTROLS.map(c => c.title).join(', '));
+  add('page', '/glossary/', L.nav.glossary, L.searchKicker.glossary(TERMS.length), TERMS.map(t => t[0]).join(', '));
+  add('page', '/timeline/', L.nav.timeline, L.searchKicker.timeline(EVENTS.length), EVENTS.map(e => e[2]).join(', '));
+  add('page', '/references/', L.nav.references, L.searchKicker.references, L.searchWords.references);
+  add('page', '/sources/', L.footer.sourceLists, L.searchKicker.sources, 'Awesome-Agent-Security, Awesome Agent Skills Security, Awesome AI Agent Papers, SoK');
+  add('page', '/setup/', L.footer.setup, L.searchKicker.setup, L.searchWords.setup);
 
   return idx;
 }

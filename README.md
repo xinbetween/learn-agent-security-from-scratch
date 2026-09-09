@@ -225,18 +225,24 @@ site/
     defensemap.mjs          33 control categories, each graded bounds/raises
     glossary.mjs            52 terms, each linked to the chapter that teaches it
     timeline.mjs            37 dated landmarks, 2022–2026
+    pagecopy.mjs            the prose that lives on the derived pages, so that
+                            pages.mjs stays one shared template
+    zh/                     the same tree again in Simplified Chinese
   lib/
     components.mjs          callout(), figure(), svg(), sim(), table() …
+    i18n.mjs                the locale table and every UI string: nav, footer,
+                            pager, quiz labels, the search palette
     layout.mjs              the page shell, nav, footer, search palette, SEO
-    pages.mjs               every derived page
-    search.mjs              builds dist/search-index.json: chapters, sections,
-                            glossary terms, projects, threat and defence maps
+    pages.mjs               every derived page, rendered once per locale
+    search.mjs              builds one search index per locale: chapters,
+                            sections, glossary terms, projects, both maps
   assets/
     css/app.css             the design system — Flexoki palette plus four
                             semantic roles: attack, defense, boundary, trust
     js/app.js               theme, quiz, highlighter, simulator registry,
                             global search (⌘K / Ctrl K / "/")
     js/sims/a01..a27.js     one interactive lab per chapter
+    js/sims/zh/             the same labs with translated strings
 build.mjs                   the whole build. Zero dependencies, Node 18+
 scripts/check.mjs           post-build verification, run in CI
 ```
@@ -244,6 +250,26 @@ scripts/check.mjs           post-build verification, run in CI
 The site is a static build with **no dependencies at all** — `build.mjs` is plain
 ESM against the Node standard library and emits a folder of HTML you can host
 anywhere. There is no framework, no bundler and nothing to audit.
+
+### Languages
+
+The course is published in English and Simplified Chinese. English is served
+from the origin root and Chinese from `/zh/`, so every URL that existed before
+the site had a second language still resolves. Each locale gets its own search
+index, its own `hreflang` alternates and its own sitemap entries, and
+`scripts/check.mjs` fails the build if the two locales fall out of parity or if
+a Chinese chapter page comes out mostly English.
+
+Everything a reader sees is translated: chapter prose, quizzes, diagram labels,
+the interactive labs, the glossary, both maps, the timeline and the page
+furniture. Citations are not. Author names, paper titles and venues stay in the
+language they were published in, which is what a reader needs in order to find
+the original.
+
+To add a third language, append it to `LOCALES` in
+[`site/lib/i18n.mjs`](site/lib/i18n.mjs), add a `UI` block with the same keys,
+and mirror `site/content/` under its code. `build.mjs` picks it up from there,
+and skips any locale whose content tree is not present yet.
 
 Every push to `main` builds and publishes to GitHub Pages via
 [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml); no build output is
@@ -275,7 +301,11 @@ the spine.
    chapter makes, because `run_all.py` runs it in CI.
 4. Optionally add `site/assets/js/sims/aNN.js` and register it with
    `registerSim('name', fn)`.
-5. `node build.mjs && node scripts/check.mjs`.
+5. Mirror steps 1, 2 and 4 under `site/content/zh/` and `site/assets/js/sims/zh/`.
+   Keep every `h2`/`h3` anchor id, quiz answer index and simulator name identical
+   to the English; `scripts/check.mjs` compares the two locales and fails if they
+   drift. Citations stay in their original language.
+6. `node build.mjs && node scripts/check.mjs`.
 
 **House rules.** A control is described as *bounding damage* only if it holds when
 the model is fully compromised; everything else *raises cost*, and the chapter says

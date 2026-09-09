@@ -42,11 +42,15 @@ export const table = (headers, rows) => `<div class="tablewrap"><table>
 
 /* --- code --------------------------------------------------------------- */
 
-/** code(src, {lang, file, tag}) — tag: 'vuln' | 'safe' | any label */
-export const code = (src, { lang = 'py', file = '', tag = '' } = {}) => {
+/** code(src, {lang, file, tag, tagText}) — tag: 'vuln' | 'safe' | any label.
+    `tagText` overrides the rendered label while keeping the colour that `tag`
+    selects, so a translated chapter can name the state in its own language. */
+export const code = (src, { lang = 'py', file = '', tag = '', tagText = '' } = {}) => {
+  const kind = /^(vuln|safe)$/.test(tag) ? tag : '';
+  const label = tagText || (tag === 'vuln' ? 'vulnerable' : tag === 'safe' ? 'hardened' : tag);
   const head = (file || tag)
     ? `<div class="cb-head"><span>${esc(file)}</span>${tag
-        ? `<span class="tag ${/^(vuln|safe)$/.test(tag) ? tag : ''}">${tag === 'vuln' ? 'vulnerable' : tag === 'safe' ? 'hardened' : esc(tag)}</span>`
+        ? `<span class="tag ${kind}">${esc(label)}</span>`
         : ''}</div>`
     : '';
   return `<div class="codeblock">${head}<pre><code data-lang="${lang}">${esc(src.replace(/^\n/, '').replace(/\s+$/, ''))}</code></pre></div>`;

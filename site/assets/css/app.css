@@ -628,3 +628,18 @@ h2:hover .anchor, h3:hover .anchor { opacity: 1; }
 @media (max-width: 480px) { .search-foot span:not(.count) { display: none; } .search-foot .count { margin-left: 0; } }
 body.search-open { overflow: hidden; }
 tr:has([id]:target) > td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+
+/* language switch */
+.langsw { display: inline-flex; align-items: center; border: 1px solid var(--border);
+  background: var(--panel); border-radius: var(--radius-sm); padding: 1px; }
+.langsw > * { font-family: var(--font-mono); font-size: .68rem; line-height: 1;
+  padding: .32rem .42rem; border-radius: 3px; color: var(--fg-faint); text-decoration: none; }
+.langsw > a:hover { color: var(--fg); text-decoration: none; }
+.langsw > .on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+@media (max-width: 420px) { .langsw { display: none; } }
+/* CJK reads better with a little more air and a font stack that has the glyphs */
+html[lang^="zh"] { --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC",
+  "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; }
+html[lang^="zh"] body { line-height: 1.8; letter-spacing: .01em; }
+html[lang^="zh"] .prose p, html[lang^="zh"] .prose li { text-align: justify; }
+html[lang^="zh"] h1, html[lang^="zh"] h2, html[lang^="zh"] h3 { letter-spacing: 0; }
