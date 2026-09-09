@@ -278,12 +278,12 @@ are this course's.</p></header>
 <div class="prose-wide">
 <input class="searchbox" data-filter="#tmap" placeholder="Filter threats — “injection”, “memory”, “DoS”, “backdoor”…">
 <div id="tmap">
-${SURFACES.map(s => `<section class="part" data-group>
+${SURFACES.map(s => `<section class="part" data-group id="${C.slug(s.n + ' ' + s.title)}">
   <div class="part-head"><span class="part-num" style="color:var(--attack);border-color:var(--attack)">${s.n}</span>
   <h3>${s.title}</h3><span class="chap-part">${s.sources}</span></div>
   <p class="part-blurb">${s.blurb}</p>
   ${C.table(['Vulnerability class', 'What the attacker does', 'Chapter'], s.classes.map(c =>
-    [`<span data-search="${C.esc(c[0] + ' ' + c[1])}">${c[0]}</span>`, c[1],
+    [`<span id="${C.slug(c[0])}" data-search="${C.esc(c[0] + ' ' + c[1])}">${c[0]}</span>`, c[1],
      c[2] ? `<a href="/chapters/${c[2]}/">${c[2].toUpperCase()}</a>` : '—']))}
 </section>`).join('')}
 </div>
@@ -303,12 +303,12 @@ course's judgement of what each control actually buys you against a motivated at
 <div class="prose-wide">
 <input class="searchbox" data-filter="#dmap" placeholder="Filter controls — “sandbox”, “identity”, “logging”…">
 <div id="dmap">
-${CONTROLS.map(g => `<section class="part" data-group>
+${CONTROLS.map(g => `<section class="part" data-group id="${C.slug(g.stage + ' ' + g.title)}">
   <div class="part-head"><span class="part-num" style="color:var(--defense);border-color:var(--defense)">${g.stage}</span>
   <h3>${g.title}</h3></div>
   <p class="part-blurb">${g.blurb}</p>
   ${C.table(['Control', 'What it does', 'Strength', 'Chapter'], g.items.map(i =>
-    [`<span data-search="${C.esc(i[0] + ' ' + i[1])}">${i[0]}</span>`, i[1],
+    [`<span id="${C.slug(i[0])}" data-search="${C.esc(i[0] + ' ' + i[1])}">${i[0]}</span>`, i[1],
      `<span class="pill ${i[2] === 'bound' ? 'defense' : i[2] === 'raise' ? 'warn' : 'neutral'}">${
        i[2] === 'bound' ? 'bounds damage' : i[2] === 'raise' ? 'raises cost' : 'supports'}</span>`,
      i[3] ? `<a href="/chapters/${i[3]}/">${i[3].toUpperCase()}</a>` : '—']))}
@@ -340,7 +340,7 @@ ${Object.entries(groups).map(([k, label]) => {
   if (!t.length) return '';
   return `<section class="part" data-group><div class="part-head"><h3>${label}</h3></div>
   ${C.table(['Term', 'Definition', 'Ch.'], t.map(([term, , def, ch]) =>
-    [`<b data-search="${C.esc(term + ' ' + def)}">${term}</b>`, def,
+    [`<b id="term-${C.slug(term)}" data-search="${C.esc(term + ' ' + def)}">${term}</b>`, def,
      ch ? `<a href="/chapters/${ch}/">${ch.toUpperCase()}</a>` : '—']))}</section>`;
 }).join('')}
 </div></div></div>`});
@@ -361,7 +361,7 @@ gap between a published defence and an adaptive attack that beats it is measured
 ${C.table(['Date', 'Kind', 'Event', 'Ch.'], EVENTS.slice().sort((a, b) => a[0].localeCompare(b[0])).map(([d, k, t, desc, ch]) =>
   [`<span style="font-family:var(--font-mono);font-size:.8rem;white-space:nowrap">${d}</span>`,
    `<span class="pill ${kindPill[k]}">${k}</span>`,
-   `<span data-search="${C.esc(d + ' ' + k + ' ' + t + ' ' + desc)}"><b>${t}</b><br><span style="color:var(--fg-muted)">${desc}</span></span>`,
+   `<span id="${C.slug(d + ' ' + t)}" data-search="${C.esc(d + ' ' + k + ' ' + t + ' ' + desc)}"><b>${t}</b><br><span style="color:var(--fg-muted)">${desc}</span></span>`,
    ch ? `<a href="/chapters/${ch}/">${ch.toUpperCase()}</a>` : '—']))}
 </div></div></div>`});
 

@@ -122,7 +122,197 @@
     h.appendChild(a);
   });
 
-  /* ------------------------------------------------------------ search */
+  /* ------------------------------------------------- global search palette
+     Index is built by build.mjs into /search-index.json and fetched the first
+     time the palette opens. Scoring is plain substring matching per token,
+     weighted by where the token lands (title > kicker > body) and by entry
+     type, so a chapter always outranks the section that merely mentions it. */
+  var dlg = document.querySelector('[data-search-dlg]');
+  if (dlg) {
+    var input = dlg.querySelector('[data-search-input]');
+    var list = dlg.querySelector('[data-search-results]');
+    var count = dlg.querySelector('[data-search-count]');
+    var openers = document.querySelectorAll('[data-search-open]');
+    var INDEX = null, loading = null, hits = [], active = -1, lastFocus = null;
+    var isMac = /Mac|iPhone|iPad/.test(navigator.platform || '');
+    document.querySelectorAll('[data-search-kbd]').forEach(function (k) { k.textContent = isMac ? '⌘K' : 'Ctrl K'; });
+
+    var GROUPS = [['chapter', 'Chapters'], ['section', 'In chapters'], ['glossary', 'Glossary'], ['page', 'Elsewhere']];
+    var TYPE_W = { chapter: 40, glossary: 24, section: 12, page: 8 };
+    var GROUP_CAP = { chapter: 6, section: 12, glossary: 6, page: 8 };
+
+    function load() {
+      if (INDEX) return Promise.resolve(INDEX);
+      if (!loading) {
+        loading = fetch('/search-index.json').then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.json();
+        }).then(function (j) {
+          INDEX = j.map(function (e) {
+            return { t: e.t, u: e.u, h: e.h, k: e.k || '', x: e.x || '',
+                     hl: e.h.toLowerCase(), kl: (e.k || '').toLowerCase(), xl: (e.x || '').toLowerCase() };
+          });
+          return INDEX;
+        }).catch(function (err) { loading = null; throw err; });
+      }
+      return loading;
+    }
+
+    function tokens(q) {
+      return q.toLowerCase().split(/[\s,;:]+/).filter(Boolean);
+    }
+    var reEsc = function (s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
+    function mark(text, toks) {
+      if (!toks.length) return esc(text);
+      var re = new RegExp('(' + toks.map(reEsc).join('|') + ')', 'ig');
+      return text.split(re).map(function (part, i) {
+        return i % 2 ? '<mark>' + esc(part) + '</mark>' : esc(part);
+      }).join('');
+    }
+    function snippet(e, toks) {
+      var x = e.x; if (!x) return '';
+      var pos = -1;
+      for (var i = 0; i < toks.length && pos === -1; i++) pos = e.xl.indexOf(toks[i]);
+      if (pos === -1 || pos < 90) return x.slice(0, 180);
+      var start = x.lastIndexOf(' ', pos - 60); if (start < 0) start = pos - 60;
+      return '…' + x.slice(start + 1, start + 200);
+    }
+
+    function search(q) {
+      var toks = tokens(q); if (!toks.length) return [];
+      var ql = q.trim().toLowerCase(), out = [];
+      for (var i = 0; i < INDEX.length; i++) {
+        var e = INDEX[i], score = 0, ok = true;
+        for (var j = 0; j < toks.length; j++) {
+          var t = toks[j], s = 0;
+          if (e.hl.indexOf(t) !== -1) s += 30 + (e.hl.indexOf(t) === 0 ? 10 : 0);
+          if (e.kl.indexOf(t) !== -1) s += 10;
+          if (e.xl.indexOf(t) !== -1) s += 4;
+          if (!s) { ok = false; break; }
+          score += s;
+        }
+        if (!ok) continue;
+        if (e.hl === ql) score += 80;
+        else if (e.hl.indexOf(ql) !== -1) score += 30;
+        else if (e.xl.indexOf(ql) !== -1) score += 8;
+        score += TYPE_W[e.t] || 0;
+        out.push({ e: e, s: score });
+      }
+      out.sort(function (a, b) { return b.s - a.s; });
+      var per = {}, res = [];
+      for (var k = 0; k < out.length; k++) {
+        var ty = out[k].e.t; per[ty] = (per[ty] || 0) + 1;
+        if (per[ty] <= GROUP_CAP[ty]) res.push(out[k].e);
+      }
+      return res;
+    }
+
+    function render(q) {
+      var toks = tokens(q);
+      if (!INDEX) { list.innerHTML = '<div class="empty">Building the index…</div>'; count.textContent = ''; hits = []; active = -1; return; }
+      hits = toks.length ? search(q) : INDEX.filter(function (e) { return e.t === 'chapter'; });
+      var html = '', n = 0;
+      if (!hits.length) {
+        html = '<div class="empty">Nothing matches <b>“' + esc(q.trim()) + '”</b>. Try fewer words, or a term from the <a href="/glossary/">glossary</a>.</div>';
+      } else if (!toks.length) {
+        html += '<div class="grp">Jump to a chapter</div>';
+        hits.forEach(function (e) { html += hit(e, n++, toks); });
+      } else {
+        GROUPS.forEach(function (g) {
+          var these = hits.filter(function (e) { return e.t === g[0]; });
+          if (!these.length) return;
+          html += '<div class="grp">' + g[1] + '</div>';
+          these.forEach(function (e) { html += hit(e, n++, toks); });
+        });
+        // keep `hits` in rendered order so the keyboard index lines up
+        hits = GROUPS.reduce(function (acc, g) { return acc.concat(hits.filter(function (e) { return e.t === g[0]; })); }, []);
+      }
+      list.innerHTML = html;
+      count.textContent = toks.length && hits.length ? (hits.length === 1 ? '1 result' : hits.length + ' results') : '';
+      setActive(hits.length ? 0 : -1, false);
+    }
+    function hit(e, i, toks) {
+      var sn = toks.length ? snippet(e, toks) : e.x.slice(0, 140);
+      return '<a class="hit" role="option" id="sr-' + i + '" data-i="' + i + '" href="' + e.u + '" aria-selected="false">' +
+        '<span class="hrow"><span class="ht">' + mark(e.h, toks) + '</span>' +
+        (e.k ? '<span class="hk">' + mark(e.k, toks) + '</span>' : '') + '</span>' +
+        (sn ? '<span class="hs">' + mark(sn, toks) + '</span>' : '') + '</a>';
+    }
+    function setActive(i, scroll) {
+      active = i;
+      var rows = list.querySelectorAll('.hit');
+      rows.forEach(function (r, j) { r.setAttribute('aria-selected', j === i ? 'true' : 'false'); });
+      input.setAttribute('aria-activedescendant', i >= 0 ? 'sr-' + i : '');
+      if (scroll !== false && i >= 0 && rows[i]) rows[i].scrollIntoView({ block: 'nearest' });
+    }
+    function go(i) {
+      var e = hits[i]; if (!e) return;
+      close();
+      var same = e.u.split('#')[0] === location.pathname;
+      location.href = e.u;
+      if (same && e.u.indexOf('#') !== -1) {           // same page: the hash change alone may not scroll
+        var el = document.getElementById(e.u.split('#')[1]);
+        if (el) el.scrollIntoView({ block: 'start' });
+      }
+    }
+
+    function open() {
+      if (!dlg.hidden) return;
+      lastFocus = document.activeElement;
+      dlg.hidden = false;
+      document.body.classList.add('search-open');
+      openers.forEach(function (b) { b.setAttribute('aria-expanded', 'true'); });
+      input.value = ''; render('');
+      input.focus();
+      load().then(function () { if (!dlg.hidden) render(input.value); })
+        .catch(function () { list.innerHTML = '<div class="empty">The search index could not be loaded. Try the <a href="/curriculum/">curriculum</a> or the <a href="/glossary/">glossary</a>.</div>'; });
+    }
+    function close() {
+      if (dlg.hidden) return;
+      dlg.hidden = true;
+      document.body.classList.remove('search-open');
+      openers.forEach(function (b) { b.setAttribute('aria-expanded', 'false'); });
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    openers.forEach(function (b) { b.addEventListener('click', open); });
+    dlg.querySelectorAll('[data-search-close]').forEach(function (b) { b.addEventListener('click', close); });
+    input.addEventListener('input', function () { render(input.value); });
+    list.addEventListener('mousemove', function (e) {
+      var a = e.target.closest('.hit'); if (a && +a.dataset.i !== active) setActive(+a.dataset.i, false);
+    });
+    list.addEventListener('click', function (e) {
+      var a = e.target.closest('.hit'); if (!a) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;   // let the browser open it in a new tab
+      e.preventDefault(); go(+a.dataset.i);
+    });
+    dlg.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { e.preventDefault(); close(); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); if (hits.length) setActive((active + 1) % hits.length); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); if (hits.length) setActive((active - 1 + hits.length) % hits.length); }
+      else if (e.key === 'Home' && e.target === input && !input.value) { e.preventDefault(); setActive(0); }
+      else if (e.key === 'End' && e.target === input && !input.value) { e.preventDefault(); setActive(hits.length - 1); }
+      else if (e.key === 'Enter') { e.preventDefault(); go(active); }
+      else if (e.key === 'Tab') {                       // keep focus inside the palette
+        var f = dlg.querySelectorAll('input, button, a.hit');
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && e.key.toLowerCase() === 'k') {
+        e.preventDefault(); dlg.hidden ? open() : close(); return;
+      }
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey && dlg.hidden) {
+        var t = e.target;
+        if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+        e.preventDefault(); open();
+      }
+    });
+  }
+
+  /* --------------------------------------------------- per-page filter box */
   var sb = document.querySelector('[data-filter]');
   if (sb) {
     var scope = document.querySelector(sb.dataset.filter);

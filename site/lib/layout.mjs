@@ -28,6 +28,32 @@ const nav = (active) => {
   ).join('');
 };
 
+const SEARCH_ICON = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 L21 21"/></svg>`;
+
+/* The palette. Markup is static; app.js fills the results and fetches
+   /search-index.json the first time it opens. Hidden until then, and the page
+   reads fine without JS because the button simply does nothing. */
+const searchDialog = () => `
+<div class="search-dlg" data-search-dlg hidden>
+  <div class="search-backdrop" data-search-close></div>
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="Search the course">
+    <form class="search-in" role="search" onsubmit="return false">
+      ${SEARCH_ICON}
+      <input type="search" data-search-input placeholder="Search chapters, glossary, references…"
+             aria-label="Search" autocomplete="off" autocapitalize="off" spellcheck="false"
+             role="combobox" aria-expanded="true" aria-controls="search-results" aria-autocomplete="list">
+      <button type="button" class="search-esc" data-search-close aria-label="Close search">esc</button>
+    </form>
+    <div class="search-results" id="search-results" role="listbox" data-search-results></div>
+    <div class="search-foot">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span><kbd>esc</kbd> close</span>
+      <span class="count" data-search-count aria-live="polite"></span>
+    </div>
+  </div>
+</div>`;
+
 const foot = () => `
 <footer class="sitefoot"><div class="wrap"><div class="cols">
 <div>
@@ -97,6 +123,8 @@ ${head}
   <a class="brand" href="/"><span class="brand-mark">▲</span> Agent Security</a>
   <nav class="topnav">
     ${nav(path)}
+    <button class="searchbtn" type="button" data-search-open aria-label="Search the course" aria-haspopup="dialog" aria-expanded="false" title="Search (⌘K)">
+      ${SEARCH_ICON}<span class="lbl">Search</span><kbd class="kb" data-search-kbd>⌘K</kbd></button>
     <button class="iconbtn" data-theme-toggle aria-label="Toggle colour theme" title="Toggle theme">◐</button>
   </nav>
 </div></header>
@@ -104,6 +132,7 @@ ${head}
 ${body}
 </main>
 ${foot()}
+${searchDialog()}
 <script src="/assets/js/app.js"></script>
 ${scripts.map(s => `<script src="${s}"></script>`).join('\n')}
 </body>

@@ -46,9 +46,32 @@ for (const f of pages) {
   }
 }
 
+// search index: present, parseable, and every entry points at a real page
+const idxFile = join(OUT, 'search-index.json');
+if (!existsSync(idxFile)) problems.push('search-index.json missing');
+else {
+  let idx = [];
+  try { idx = JSON.parse(readFileSync(idxFile, 'utf8')); }
+  catch (e) { problems.push(`search-index.json: ${e.message}`); }
+  if (idx.length < 100) problems.push(`search-index.json: only ${idx.length} entries`);
+  const anchors = new Map();
+  for (const e of idx) {
+    if (!e.u || !e.h || !e.t) { problems.push(`search-index.json: malformed entry ${JSON.stringify(e).slice(0, 80)}`); continue; }
+    const [path, hash] = e.u.split('#');
+    if (!targets.has(path)) { problems.push(`search-index.json: dead target → ${e.u}`); continue; }
+    if (hash) {
+      if (!anchors.has(path)) {
+        const h = readFileSync(join(OUT, path.slice(1), 'index.html'), 'utf8');
+        anchors.set(path, new Set([...h.matchAll(/\sid="([^"]+)"/g)].map(m => m[1])));
+      }
+      if (!anchors.get(path).has(hash)) problems.push(`search-index.json: dead anchor → ${e.u}`);
+    }
+  }
+}
+
 if (problems.length) {
   console.error(problems.join('\n'));
   console.error(`\n${problems.length} problem(s) across ${pages.length} pages`);
   process.exit(1);
 }
-console.log(`✓ ${pages.length} pages: tags balanced, no dead internal links, no template leakage`);
+console.log(`✓ ${pages.length} pages: tags balanced, no dead internal links, no template leakage, search index resolves`);

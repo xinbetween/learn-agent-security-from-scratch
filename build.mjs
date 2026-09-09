@@ -160,6 +160,21 @@ async function build() {
     await emit(path, html);
   }
 
+  // search index — one JSON file, fetched by the palette on first open
+  const { buildSearchIndex } = await import('./site/lib/search.mjs');
+  const idx = buildSearchIndex({
+    cur, loaded,
+    TERMS: (await import('./site/content/glossary.mjs')).TERMS,
+    SURFACES: (await import('./site/content/threatmap.mjs')).SURFACES,
+    CONTROLS: (await import('./site/content/defensemap.mjs')).CONTROLS,
+    EVENTS: (await import('./site/content/timeline.mjs')).EVENTS,
+    PROJECT_BODIES: (await import('./site/content/projects/index.mjs')).PROJECT_BODIES,
+    CAPSTONE_BODY: (await import('./site/content/projects/capstone.mjs')).CAPSTONE_BODY,
+  });
+  const idxJson = JSON.stringify(idx);
+  await writeFile(join(OUT, 'search-index.json'), idxJson);
+  console.log(`  search index: ${idx.length} entries · ${(idxJson.length / 1024).toFixed(0)} KB`);
+
   await writeFile(join(OUT, 'CNAME'), 'agentsecurity.xinbetween.com\n');
   await writeFile(join(OUT, 'robots.txt'),
     `User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`);
