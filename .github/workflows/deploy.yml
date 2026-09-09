@@ -28,7 +28,9 @@ jobs:
         with:
           node-version: "22"
 
-      - uses: actions/configure-pages@v5
+      # No actions/configure-pages step: it exists to inject framework config
+      # (a Next.js basePath, say), and this build is a plain folder of HTML.
+      # upload-pages-artifact and deploy-pages are all a static site needs.
 
       # Served from a custom domain at its origin root, so there is no path
       # prefix. The domain itself is written into dist/CNAME by build.mjs so it
