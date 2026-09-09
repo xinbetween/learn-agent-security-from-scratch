@@ -73,17 +73,11 @@ print(f"  most industry-leaning surface: {acad_lean[-1][0]}")
 
 rule("no single source covers the map")
 
-print("""  The SEI review found 25 distinct threat categories across 173 sources.
-  The distribution of how many categories each source mentioned:
-
-      1-5 categories    ############################  ~30 sources
-      6-10              ##############                ~15
-      11-15             ######                         ~7
-      16-20             ##                             ~3
-      21-25             (none)                          0
-
-  No source mentioned all 25. The same held for best practices: 33 leaf
-  categories, and no single document covered them all -- the widest covered 16.
+print("""  The SEI review found 25 distinct threat categories across 173 sources,
+  and reports (its Figures 5 and 6) that no single source mentioned all 25,
+  and no single source covered all 33 best-practice categories either. Of the
+  academic surveys it compared side by side, the broadest reached 16 of the 33
+  best-practice categories and most reached fewer than ten.
 
   Practical consequence: a threat model derived from one paper, one vendor's
   guidance, or one framework will be missing categories, and you will not know

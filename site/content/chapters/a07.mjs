@@ -311,7 +311,7 @@ export const refs = [
   { authors: 'Sahar Abdelnabi, Aideen Fay, Giovanni Cherubin, Ahmed Salem, Mario Fritz, Andrew Paverd',
     title: 'Get My Drift? Catching LLM Task Drift with Activation Deltas', venue: 'IEEE SaTML, 2025',
     url: 'https://arxiv.org/abs/2406.00799' },
-  { authors: 'Microsoft AI Red Team and colleagues',
+  { authors: 'Sahar Abdelnabi, Aideen Fay, Ahmed Salem, Egor Zverev and colleagues (Microsoft)',
     title: 'LLMail-Inject: A Dataset from a Realistic Adaptive Prompt Injection Challenge',
     venue: 'arXiv, 2025', url: 'https://arxiv.org/abs/2506.09956' },
   { authors: 'Google DeepMind Security and Privacy Research',

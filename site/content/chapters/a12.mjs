@@ -44,8 +44,9 @@ being a bullet in A07.`)}
 
 ${h2('The attacker\'s real problem is ranking, not persuasion', 'ranking')}
 
-${p(`A poisoned document that never gets retrieved is inert, so roughly half of a PoisonedRAG-style
-payload is keyword bait. The attacker needs two properties at once: rank highly for a target query,
+${p(`A poisoned document that never gets retrieved is inert, so a PoisonedRAG-style payload has two parts: text that wins
+retrieval — in the paper, the target question itself, prepended verbatim — and the text that does
+the damage. The attacker needs two properties at once: rank highly for a target query,
 and dictate the answer once retrieved.`)}
 
 ${code(`POISON = {"id": "kb-999", "src": "wiki", "text":
@@ -156,7 +157,7 @@ ${ul([
 
 export const quiz = [
   {
-    q: `Why does roughly half of a PoisonedRAG-style document consist of repeated query keywords?`,
+    q: `Why does a PoisonedRAG-style document begin with text closely matching the target query — in the paper, the question itself?`,
     options: [
       `To confuse the language model.`,
       `Because a document that is never retrieved cannot do anything — the attacker must first win ranking, then dictate the answer.`,
@@ -165,9 +166,9 @@ export const quiz = [
     ],
     answer: 1,
     explain: `Retrieval is the gate. The attack has two independent requirements — rank highly for the
-      target query, and control the answer once retrieved — and the keyword stuffing serves only the
-      first. It is worth noticing that this creates a detection opportunity: unnatural term repetition
-      is measurable. It is also why a fluent, non-stuffed payload is a harder problem, since it trades
+      target query, and control the answer once retrieved — and the prepended query text serves only the
+      first. It is worth noticing that this creates a detection opportunity: a document that opens by
+      restating a user's question is unusual, and the lab's cruder keyword-stuffed variant is easier still. It is also why a fluent, non-stuffed payload is a harder problem, since it trades
       rank against a keyword retriever for rank against a semantic one.`,
   },
   {

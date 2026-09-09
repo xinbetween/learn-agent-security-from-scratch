@@ -252,7 +252,7 @@ export const refs = [
     note: 'the original memo; still the fastest useful threat model in existence' },
   { authors: 'Adam Shostack', title: 'Threat Modeling: Designing for Security', venue: 'Wiley, 2014',
     url: 'https://shostack.org/books/threat-modeling-book' },
-  { authors: 'Ken Huang, Vineeth Sai Narajala, John Yeoh, Ron F. Del Rosario and the CSA AI Safety Initiative',
+  { authors: 'Ken Huang and the Cloud Security Alliance AI Safety Initiative',
     title: 'Agentic AI Threat Modeling Framework: MAESTRO', venue: 'Cloud Security Alliance, 2025',
     url: 'https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro' },
   { authors: 'OWASP Top 10 for LLM Applications team (Steve Wilson, Ads Dawson and contributors)',
@@ -269,7 +269,7 @@ export const refs = [
   { authors: 'National Institute of Standards and Technology',
     title: 'SP 800-218A: Secure Software Development Practices for Generative AI and Dual-Use Foundation Models',
     venue: 'NIST, 2024', url: 'https://csrc.nist.gov/pubs/sp/800/218/a/final' },
-  { authors: 'Vineeth Sai Narajala, Ken Huang, Idan Habler',
+  { authors: 'Vineeth Sai Narajala and colleagues',
     title: 'Securing Agentic AI: A Comprehensive Threat Model and Mitigation Framework for Generative AI Agents',
     venue: 'arXiv, 2025', url: 'https://arxiv.org/abs/2504.19956' },
 ];

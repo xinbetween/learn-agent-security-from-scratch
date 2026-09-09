@@ -53,7 +53,7 @@ registerSim('a05frameworks', function (el) {
     f[1].forEach(function (r) {
       h += '  <span class="bnd">' + simUtil.esc(r[0]) + '</span>\n     ' + simUtil.esc(r[1]) + '\n\n';
     });
-    if (s.value === 'unique') h += '<span class="dim">The union is 27 findings. The set difference is 5 — and those 5 are\nwhy multi-framework exercises are worth the hour they cost.</span>';
+    if (s.value === 'unique') h += '<span class="dim">The union is 28 findings. The set difference is 5 — and those 5 are\nwhy multi-framework exercises are worth the hour they cost.</span>';
     o.innerHTML = h;
   }
   s.onchange = render; render();

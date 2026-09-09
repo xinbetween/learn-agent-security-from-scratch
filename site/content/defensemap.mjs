@@ -46,8 +46,8 @@ export const CONTROLS = [
     stage: 'Design', title: 'Human–agent interaction',
     blurb: `Where a person is in the loop, and whether their presence is worth anything.`,
     items: [
-      ['Human-in-the-loop gates', 'Explicit confirmation before irreversible or high-blast-radius actions, with an always-available interrupt.', 'bound', 'a24'],
-      ['Reversibility grading', 'Classifying actions by how hard they are to undo and spending the interruption budget on the worst class.', 'bound', 'a24'],
+      ['Human-in-the-loop gates', 'Explicit confirmation before irreversible or high-blast-radius actions, with an always-available interrupt.', 'raise', 'a24'],
+      ['Reversibility grading', 'Classifying actions by how hard they are to undo and spending the interruption budget on the worst class.', 'support', 'a24'],
       ['Transparency', 'Showing the user the plan, the provenance of each input, and what a confirmation actually authorises.', 'support', 'a24'],
       ['Defence in depth', 'Layering heterogeneous controls so an attack missed by one is caught by another. The consensus position.', 'support', 'a20'],
     ],
@@ -89,7 +89,7 @@ export const CONTROLS = [
     items: [
       ['Trajectory logging', 'Immutable, tamper-evident records of prompts, tool calls, results and decisions. The unit of agent forensics.', 'support', 'a26'],
       ['Continual auditing', 'Ongoing evaluation against drift, new attacks and edge cases, feeding results back into policy.', 'support', 'a26'],
-      ['Runtime and endpoint detection', 'Watching what the agent actually does at the process, file and network layer where it executes.', 'bound', 'a26'],
+      ['Runtime and endpoint detection', 'Watching what the agent actually does at the process, file and network layer where it executes.', 'raise', 'a26'],
       ['Phased deployment', 'Widening scope in stages against safety metrics, with a rollback path at every stage.', 'bound', 'a27'],
       ['Incident response', 'Tested containment, eradication and recovery playbooks written for agent-specific failure modes.', 'support', 'a27'],
     ],

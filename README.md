@@ -2,7 +2,7 @@
 
 # Learn Agent Security From Scratch
 
-**Twenty-seven chapters, six projects, one capstone. The sentence that breaks every AI agent, and the architectures that survive it.**
+**Twenty-seven chapters, five projects, one capstone. The sentence that breaks every AI agent, and the architectures that survive it.**
 
 Read the diagram → break the lab → take the quiz → run the code.
 
@@ -11,7 +11,7 @@ Read the diagram → break the lab → take the quiz → run the code.
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-4b8bbe.svg?style=flat-square)](https://www.python.org/)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-16a34a.svg?style=flat-square)](code/)
 [![API key required: none](https://img.shields.io/badge/API_key_required-none-16a34a.svg?style=flat-square)](code/agentlib.py)
-[![References: 182](https://img.shields.io/badge/references-182-f59e0b.svg?style=flat-square)](https://agentsecurity.xinbetween.com/references/)
+[![References: 181](https://img.shields.io/badge/references-181-f59e0b.svg?style=flat-square)](https://agentsecurity.xinbetween.com/references/)
 
 [**Read it →**](https://agentsecurity.xinbetween.com/) &nbsp;·&nbsp;
 [**Star on GitHub**](https://github.com/xinbetween/learn-agent-security-from-scratch) &nbsp;·&nbsp;
@@ -55,7 +55,7 @@ on a laptop in under a second.
 | --- | --- |
 | **You are shipping an agent** and need a defence stack you can justify to a reviewer. | Parts 1, 4 and 5 — with the honest limits of each layer. |
 | **You are securing someone else's.** | Parts 2, 3 and 6 are the offensive curriculum and the harness that turns it into a report. |
-| **You are reading the literature and drowning.** | 182 sources, indexed by the threat they address, credited to their authors. |
+| **You are reading the literature and drowning.** | 181 sources, indexed by the threat they address, credited to their authors. |
 | **You learn by breaking things.** | Twenty-seven in-browser labs. Land the attack, then watch it fail against the fix. |
 
 Prerequisites: you can read Python and you have used an AI agent once. Not
@@ -227,12 +227,15 @@ site/
     timeline.mjs            37 dated landmarks, 2022–2026
   lib/
     components.mjs          callout(), figure(), svg(), sim(), table() …
-    layout.mjs              the page shell, nav, footer, SEO
+    layout.mjs              the page shell, nav, footer, search palette, SEO
     pages.mjs               every derived page
+    search.mjs              builds dist/search-index.json: chapters, sections,
+                            glossary terms, projects, threat and defence maps
   assets/
     css/app.css             the design system — Flexoki palette plus four
                             semantic roles: attack, defense, boundary, trust
-    js/app.js               theme, quiz, highlighter, simulator registry
+    js/app.js               theme, quiz, highlighter, simulator registry,
+                            global search (⌘K / Ctrl K / "/")
     js/sims/a01..a27.js     one interactive lab per chapter
 build.mjs                   the whole build. Zero dependencies, Node 18+
 scripts/check.mjs           post-build verification, run in CI
@@ -312,7 +315,7 @@ Sitawarin and Wagner for StruQ, SecAlign and Jatmo; Wallace and colleagues for t
 instruction hierarchy; and Zhan and colleagues for demonstrating that most published
 defences do not survive an adaptive attacker.
 
-The full list — 182 sources, sorted by first author — is on the
+The full list — 181 sources, sorted by first author — is on the
 [references page](https://agentsecurity.xinbetween.com/references/) and at the foot of
 every chapter that uses them.
 

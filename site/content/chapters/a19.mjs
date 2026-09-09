@@ -239,7 +239,7 @@ export const refs = [
     venue: 'arXiv, 2026', url: 'https://arxiv.org/pdf/2602.05746' },
   { authors: 'Authors of MAGIC', title: 'MAGIC: A Co-Evolving Attacker-Defender Adversarial Game for Robust LLM Safety',
     venue: 'arXiv, 2026', url: 'https://arxiv.org/pdf/2602.01539' },
-  { authors: 'Microsoft AI Red Team and colleagues',
+  { authors: 'Sahar Abdelnabi, Aideen Fay, Ahmed Salem, Egor Zverev and colleagues (Microsoft)',
     title: 'LLMail-Inject: A Dataset from a Realistic Adaptive Prompt Injection Challenge', venue: 'arXiv, 2025',
     url: 'https://arxiv.org/abs/2506.09956' },
   { authors: 'Keltin Grimes, Julie Lawler, Robert C. Garrett, Emil Mathew, Marco Christiani, Sara Kingsley, Zhiwei Steven Wu, Nathan VanHoudnos',

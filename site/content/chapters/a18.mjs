@@ -18,7 +18,7 @@ ${sim({
     select('a18-var', 'Variant', [
       ['none', 'None'],
       ['delimit', 'Delimiting — fixed fence'],
-      ['datamark', 'Datamarking — per-request random sentinel'],
+      ['datamark', 'Datamarking — per-request random marker'],
       ['encode', 'Encoding — base64 the untrusted span'],
     ], 'delimit'),
     select('a18-pay', 'Payload', [
@@ -47,7 +47,9 @@ ${callout('defense', 'Why the random sentinel is genuinely structural', `<p styl
 fixed delimiter can be forged: the attacker writes the closing fence into their own content and
 everything after it appears to have left the untrusted region. A per-request random sentinel cannot be
 forged, because the attacker composed their payload before the sentinel existed. That is a real
-property, not a probability — and it is the reason Microsoft's spotlighting work singles this variant
+property, not a probability . Spotlighting's own datamarking interleaves the random marker throughout the span rather than only
+at its edges, which also closes the trick of claiming a middle region is unmarked; the fence in the code
+is the simpler form of the same idea. That is what singles this variant
 out.</p>`)}
 
 ${h2('The payload that beats all three', 'polite')}

@@ -58,8 +58,8 @@ assert c["precision"] < 0.02, "high FPR at a low base rate destroys precision"
 
 rule("static evaluation vs adaptive attacker")
 
-STATIC = 0.98      # detection rate on the benchmark you shipped with
-ADAPTIVE = 0.35    # detection rate after a few hours of tuning against it
+STATIC = 0.98      # illustrative: detection rate on the benchmark you shipped with
+ADAPTIVE = 0.35    # illustrative: after the attacker tunes against it
 print(f"""  reported on a fixed benchmark      {STATIC:.0%} detected
   after adaptive tuning              {ADAPTIVE:.0%} detected
 

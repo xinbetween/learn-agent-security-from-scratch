@@ -228,7 +228,7 @@ export const refs = [
   { authors: 'Yifei Wang, Dizhan Xue, Shengjie Zhang, Shengsheng Qian',
     title: 'BadAgent: Inserting and Activating Backdoor Attacks in LLM Agents', venue: 'ACL, 2024',
     url: 'https://arxiv.org/abs/2406.03007' },
-  { authors: 'Yanjie Li, Bin Xie and colleagues',
+  { authors: 'Authors of "Navigation as Attackers Wish?"',
     title: 'Navigation as Attackers Wish? Towards Building Byzantine-Robust Embodied Agents under Federated Learning',
     venue: 'NAACL, 2024', url: 'https://arxiv.org/abs/2211.14769' },
   { authors: 'Authors of BackdoorAgent', title: 'BackdoorAgent: A Unified Framework for Backdoor Attacks on LLM-based Agents',

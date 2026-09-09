@@ -35,8 +35,8 @@ ${h2('And then the attacker adapts', 'adaptive')}
 
 ${p(`The 99% was measured against a fixed benchmark whose payloads were all written before your
 detector existed. Chapter A19 is entirely about this, but the headline is worth having now: published
-defences reporting single-digit attack success rates against static sets routinely return to 50–90%
-after a few hours of tuning against them.`)}
+defences reporting single-digit attack success rates against static sets have repeatedly been shown to
+lose most of that protection once the attacker tunes against them.`)}
 
 ${callout('warn', 'Per-attempt rates are not risk', `<p style="margin-bottom:0">At a 35% per-attempt
 detection rate, twenty attempts get through with probability 99.99%. Attempts are free. The honest way
@@ -217,7 +217,7 @@ export const quiz = [
 ];
 
 export const refs = [
-  { authors: 'Hugh Chen, Kai Greshake, and the authors of "How Not to Detect Prompt Injections with an LLM"',
+  { authors: 'Authors of "How Not to Detect Prompt Injections with an LLM"',
     title: 'How Not to Detect Prompt Injections with an LLM', venue: 'arXiv, 2025',
     url: 'https://arxiv.org/abs/2507.05630' },
   { authors: 'Hakan Inan, Kartikeya Upasani, Jianfeng Chi, Rashi Rungta, Krithika Iyer, Yuning Mao, Michael Tontchev, Qing Hu, Brian Fuller, Davide Testuggine, Madian Khabsa',
@@ -238,7 +238,7 @@ export const refs = [
   { authors: 'Kuo-Han Hung, Ching-Yun Ko, Ambrish Rawat, I-Hsin Chung, Winston H. Hsu, Pin-Yu Chen',
     title: 'Attention Tracker: Detecting Prompt Injection Attacks in LLMs', venue: 'NAACL Findings, 2025',
     url: 'https://aclanthology.org/2025.findings-naacl.123.pdf' },
-  { authors: 'Todd Kulesza, Simone Stumpf and colleagues; Adrienne Porter Felt, Alex Ainslie, Robert W. Reeder, Sunny Consolvo and colleagues',
+  { authors: 'Adrienne Porter Felt, Alex Ainslie, Robert W. Reeder, Sunny Consolvo, Somas Thyagaraja, Alan Bettes, Helen Harris, Jeff Grimes',
     title: 'Improving SSL Warnings: Comprehension and Adherence', venue: 'ACM CHI, 2015',
     url: 'https://research.google/pubs/pub43265/',
     note: 'the field data behind the alert-fatigue argument' },

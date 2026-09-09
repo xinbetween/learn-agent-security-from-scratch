@@ -109,8 +109,9 @@ notices until they matter enormously.</p>`)}
 ${h2('No source has the whole map', 'coverage')}
 
 ${p(`The review also measured how much of its own taxonomy each source covered. Across 173 documents,
-the widest single source touched 16 of 25 threat categories. Not one covered all of them. The same
-held for the best-practice taxonomy: 33 leaf categories, and no document covered more than 16.`)}
+not one source covered all 25 threat categories, and not one covered all 33 best-practice
+categories either. Among the academic surveys the review compared side by side, the broadest reached
+16 of the best-practice categories; most reached fewer than ten.`)}
 
 ${p(`The practical consequence is a process one. A threat model built by reading the best available
 paper on agent security will be missing categories, and — this is the part that hurts — you will not
@@ -197,8 +198,8 @@ export const quiz = [
       `Most sources are low quality.`,
     ],
     answer: 1,
-    explain: `The widest single source reached 16 of 25, and the same pattern held for best
-      practices. This is not a criticism of any source — surveys have scope — but it changes how you
+    explain: `No source covered all 25 threat categories, and the same held for the 33
+      best-practice categories. This is not a criticism of any source — surveys have scope — but it changes how you
       should use them. Reading the best paper leaves you with an incomplete model <em>and no list of
       what is missing</em>. Walking a full taxonomy category by category, and writing down why each
       one does not apply, surfaces exactly the assumptions you did not know you had made.`,
@@ -270,13 +271,13 @@ export const refs = [
   { authors: 'Mohamed Amine Ferrag, Norbert Tihanyi, Djallel Hamouda, Leandros Maglaras, Merouane Debbah',
     title: 'From Prompt Injections to Protocol Exploits: Threats in LLM-Powered AI Agent Workflows',
     venue: 'arXiv, 2025', url: 'https://arxiv.org/abs/2506.23260' },
-  { authors: 'Jeff Schmitz, Ben Bucknall, Robert Trager and colleagues',
+  { authors: 'Erik Miehling, Karthikeyan Natesan Ramamurthy, Kush R. Varshney and colleagues (IBM Research)',
     title: 'Agentic AI Needs a Systems Theory', venue: 'IBM Research, arXiv 2025',
     url: 'https://arxiv.org/abs/2503.00237' },
   { authors: 'Lilian Weng', title: 'LLM-Powered Autonomous Agents', venue: 'lilianweng.github.io, 2023',
     url: 'https://lilianweng.github.io/posts/2023-06-23-agent/',
     note: 'the component decomposition the reference architecture follows' },
-  { authors: 'Ken Huang, Vineeth Sai Narajala, John Yeoh, Ron F. Del Rosario and the CSA AI Safety Initiative',
+  { authors: 'Ken Huang and the Cloud Security Alliance AI Safety Initiative',
     title: 'Agentic AI Threat Modeling Framework: MAESTRO', venue: 'Cloud Security Alliance, 2025',
     url: 'https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro' },
 ];

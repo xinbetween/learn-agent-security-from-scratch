@@ -77,7 +77,7 @@ ${ul([
    cancelled orders. "System prompt" appears in questions from developers using your API. A filter
    tuned tight enough to be useful is tuned tight enough to be annoying.`,
   `<b>The attacker iterates faster than you do.</b> You ship a prompt change in a week. They try a
-   thousand payloads in an afternoon — and since 2024 they have not needed to write them by hand.`,
+   thousand payloads in an afternoon — and since GCG in 2023 they have not needed to write them by hand.`,
 ])}
 
 ${p(`That last point is the one that changed the game. Optimiser-driven attacks — gradient search in
@@ -218,7 +218,7 @@ export const quiz = [
       attempts are free and unlimited — 2% is not "safe", it is "fifty tries". Second and more
       seriously, the benchmark is static: every payload in it was written without knowledge of your
       defence. A19 covers the adaptive evaluation you actually need, where published defences
-      reporting single-digit ASR routinely return to 50–90% after a few hours of tuning.`,
+      reporting single-digit ASR have been shown to lose most of that protection under adaptive attack.`,
   },
   {
     q: `Which of these direct-injection techniques is specifically designed to defeat <em>human</em>
@@ -270,7 +270,7 @@ export const refs = [
   { authors: 'Andy Zou, Zifan Wang, Nicholas Carlini, Milad Nasr, J. Zico Kolter, Matt Fredrikson',
     title: 'Universal and Transferable Adversarial Attacks on Aligned Language Models', venue: 'arXiv, 2023',
     url: 'https://arxiv.org/abs/2307.15043', note: 'GCG — the gradient search that ended hand-written payloads' },
-  { authors: 'Jiawei Zhang, Shuang Yang, Bo Li and colleagues',
+  { authors: 'Jiawei Zhang, Shuang Yang, Bo Li',
     title: 'UDora: A Unified Red Teaming Framework against LLM Agents by Dynamically Hijacking Their Own Reasoning',
     venue: 'ICML, 2025', url: 'https://arxiv.org/abs/2503.01908' },
   { authors: 'Xiaogeng Liu, Zhiyuan Yu, Yizhe Zhang, Ning Zhang, Chaowei Xiao',
@@ -279,7 +279,7 @@ export const refs = [
   { authors: 'Sam Toyer, Olivia Watkins, Ethan Adrian Mendes, Justin Svegliato, Luke Bailey, Tiffany Wang, Isaac Ong, Karim Elmaaroufi, Pieter Abbeel, Trevor Darrell, Alan Ritter, Stuart Russell',
     title: 'Tensor Trust: Interpretable Prompt Injection Attacks from an Online Game', venue: 'ICLR, 2024',
     url: 'https://arxiv.org/abs/2311.01011' },
-  { authors: 'Xiaohan Fu, Zhihao Zhu, Shubham Ugare, Yuhao Wu, Earlence Fernandes and colleagues',
+  { authors: 'Xiaohan Fu, Shuyan Li, Zihan Wang, Yulin Liu, Rajesh K. Gupta, Taylor Berg-Kirkpatrick, Earlence Fernandes',
     title: 'Imprompter: Tricking LLM Agents into Improper Tool Use', venue: 'arXiv, 2024',
     url: 'https://arxiv.org/abs/2410.14923' },
 ];

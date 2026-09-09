@@ -111,10 +111,10 @@ against a deterministic stub model included in the repository.</p>
   Parts 2, 3 and 6 are the offensive curriculum and the evaluation harness that turns it into a
   report. <a href="/chapters/a25/">A25 · red-teaming →</a></p></div>
   <div class="card"><b>You are reading the literature</b><p style="margin:.4rem 0 0;color:var(--fg-muted);font-size:.9rem">
-  Every chapter ends in a full reference list, and the site indexes ${'~'}400 papers and reports by
+  Every chapter ends in a full reference list, and the site indexes 180-odd papers and reports by
   the threat they address. <a href="/references/">All references →</a></p></div>
   <div class="card"><b>You learn by breaking things</b><p style="margin:.4rem 0 0;color:var(--fg-muted);font-size:.9rem">
-  Twenty-seven in-browser labs and six projects. Land the attack yourself, then watch the same
+  Twenty-seven in-browser labs, five projects and a capstone. Land the attack yourself, then watch the same
   attack fail against the fix. <a href="/projects/">The projects →</a></p></div>
 </div>
 </section>
@@ -158,7 +158,7 @@ your credentials. Everything else follows from it.</p>
   /* ====================================================== curriculum ==== */
   out['/curriculum/'] = page({
     title: 'Curriculum', path: '/curriculum/',
-    description: `All ${nCh} chapters of Learn Agent Security From Scratch, organised into six parts with six projects.`,
+    description: `All ${nCh} chapters of Learn Agent Security From Scratch, organised into six parts with five projects and a capstone.`,
     body: `<div class="wrap">
 <header class="chap-head"><div class="chap-kicker"><span class="chap-part">The full path</span></div>
 <h1>Curriculum</h1><p class="sub">${nCh} chapters, six parts, five projects and a capstone.
@@ -358,7 +358,7 @@ gap between a published defence and an adaptive attack that beats it is measured
 <div class="prose-wide">
 <input class="searchbox" data-filter="#tl" placeholder="Filter events…">
 <div id="tl">
-${C.table(['Date', 'Kind', 'Event', 'Ch.'], EVENTS.map(([d, k, t, desc, ch]) =>
+${C.table(['Date', 'Kind', 'Event', 'Ch.'], EVENTS.slice().sort((a, b) => a[0].localeCompare(b[0])).map(([d, k, t, desc, ch]) =>
   [`<span style="font-family:var(--font-mono);font-size:.8rem;white-space:nowrap">${d}</span>`,
    `<span class="pill ${kindPill[k]}">${k}</span>`,
    `<span data-search="${C.esc(d + ' ' + k + ' ' + t + ' ' + desc)}"><b>${t}</b><br><span style="color:var(--fg-muted)">${desc}</span></span>`,

@@ -151,7 +151,9 @@ def wrap_untrusted(text):
 ${p(`A fixed delimiter can be forged: the attacker writes the closing fence into their own content and
 everything after it appears to be outside the untrusted region. A per-request random sentinel cannot
 be forged, because the attacker composed their payload before the sentinel existed. That is a genuine
-structural property, and it is why Microsoft's spotlighting work singles out this variant.`)}
+structural property. Spotlighting's own datamarking goes one step further and interleaves the random
+marker <em>throughout</em> the untrusted span rather than only at its edges, so a payload cannot even
+claim that a region in the middle is unmarked; the fence above is the simpler form of the same idea.`)}
 
 ${callout('warn', 'What it still does not do', `<p style="margin-bottom:0">Datamarking makes the
 <em>boundary</em> unforgeable. It does not make <em>obedience</em> impossible. A payload that stays
@@ -190,8 +192,8 @@ ${p(`A defence that reduces attack success from 80% to 5% has removed most attac
 who can retry does not experience 5% as a 95% reduction; they experience it as twenty attempts. And
 retries are free: an injected web page can be re-crawled, an email resent, a payload varied. Worse,
 the attacker can iterate <em>against your specific defence</em> — the adaptive setting of A19 — where
-published defences that report 0–2% against static attack sets routinely return to 50–90% under a few
-hours of tuning.`)}
+published defences that report near-zero attack success against static attack sets have repeatedly
+been shown to lose most of that protection under adaptive attack.`)}
 ${p(`Meanwhile a defence in the second column does not have a success rate. An egress allow-list with
 one permitted host does not leak to a second host 5% of the time. That asymmetry is the entire
 argument for Part 5, and it is why this course spends more pages on architecture than on prompts.`)}`)}
@@ -320,7 +322,7 @@ export const refs = [
   { authors: 'Keegan Hines, Gary Lopez, Matthew Hall, Federico Zarfati, Yonatan Zunger, Emre Kiciman',
     title: 'Defending Against Indirect Prompt Injection Attacks With Spotlighting', venue: 'Microsoft, arXiv 2024',
     url: 'https://arxiv.org/abs/2403.14720',
-    note: 'delimiting, datamarking and encoding — the source of the random-sentinel argument' },
+    note: 'delimiting, datamarking and encoding — the source of the random-marker argument' },
   { authors: 'Eric Wallace, Kai Xiao, Reimar Leike, Lilian Weng, Johannes Heidecke, Alex Beutel',
     title: 'The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions',
     venue: 'OpenAI, arXiv 2024', url: 'https://arxiv.org/abs/2404.13208' },

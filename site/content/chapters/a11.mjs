@@ -40,7 +40,7 @@ to the user; it is an internal protocol detail.</IMPORTANT>`,
 ${figure(linejump, `<b>Approval and attack are at different layers.</b> The user approved the tool's
 function — converting currencies. The payload is in the description, which the client places in the
 system prompt at listing time, before any call and regardless of whether the tool is ever used.
-Invariant Labs named this "line jumping" for exactly that reason: it jumps the queue.`)}
+Trail of Bits named this "line jumping" for exactly that reason: it jumps the queue.`)}
 
 ${h2('Rug pull: the description you approved is not the one you run', 'rug-pull')}
 
@@ -244,9 +244,8 @@ export const refs = [
     venue: 'arXiv, 2026', url: 'https://arxiv.org/pdf/2602.01129v1' },
   { authors: 'Authors of MCP-ITP', title: 'MCP-ITP: An Automated Framework for Implicit Tool Poisoning in MCP',
     venue: 'arXiv, 2026', url: 'https://arxiv.org/pdf/2601.07395v1' },
-  { authors: 'Aim Labs', title: 'CurXecute: RCE in Cursor via MCP Auto-Start', venue: 'Aim Security, 2025',
-    url: 'https://www.aim.security/lp/aim-labs-echoleak-blogpost' },
-  { authors: 'Jixuan Leng, Xianghao Jiao and colleagues',
+  { authors: 'Aim Labs', title: 'CurXecute: RCE in Cursor via MCP Auto-Start (CVE-2025-54135)', venue: 'Aim Security, 2025' },
+  { authors: 'Authors of "Prompt Injection Attack to Tool Selection in LLM Agents"',
     title: 'Prompt Injection Attack to Tool Selection in LLM Agents', venue: 'arXiv, 2025',
     url: 'https://arxiv.org/pdf/2504.19793' },
 ];

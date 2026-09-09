@@ -58,7 +58,7 @@ print("""
 # 3. the comparison that makes the point
 # ---------------------------------------------------------------------------
 
-rule("compare: SQL solved this problem in 1999")
+rule("compare: SQL solved this problem decades ago")
 
 print("""  String concatenation -- the vulnerable form:
 

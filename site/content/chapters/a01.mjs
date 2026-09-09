@@ -362,7 +362,4 @@ export const refs = [
     title: 'Model Context Protocol (MCP): Landscape, Security Threats, and Future Research Directions',
     venue: 'arXiv, 2025', url: 'https://arxiv.org/abs/2503.23278',
     note: 'for the shape of the modern tool-calling interface referenced in the loop' },
-  { authors: 'Yifan Zeng, Yiran Wu, Xiao Zhang, Huazheng Wang, Qingyun Wu',
-    title: 'AutoDefense: Multi-Agent LLM Defense against Jailbreak Attacks', venue: 'arXiv, 2024',
-    url: 'https://arxiv.org/abs/2403.04783' },
 ];

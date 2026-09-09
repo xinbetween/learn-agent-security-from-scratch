@@ -11,7 +11,7 @@ export const SITE = {
   description:
     'Learn AI agent security from scratch: prompt injection, tool poisoning, memory attacks, ' +
     'MCP supply chain, CaMeL, information-flow control, sandboxing and red-teaming. ' +
-    '27 chapters, runnable Python, interactive attack labs, six graded projects.',
+    '27 chapters, runnable Python, interactive attack labs, five projects and a capstone.',
 };
 
 const nav = (active) => {
@@ -32,7 +32,7 @@ const foot = () => `
 <footer class="sitefoot"><div class="wrap"><div class="cols">
 <div>
   <h5>${esc(SITE.title)}</h5>
-  <p class="note">27 chapters, six projects, and a capstone that builds an agent, breaks it,
+  <p class="note">27 chapters, five projects, and a capstone that builds an agent, breaks it,
   and then rebuilds it so the same attacks stop working. Every chapter closes with the papers
   it was built from, credited to their authors.</p>
   <p class="note"><a href="${SITE.repo}">Source on GitHub</a> · <a href="${SITE.sibling}">Sister course: Build an LLM Inference Engine</a></p>

@@ -267,7 +267,7 @@ export const refs = [
   { authors: 'Bytecode Alliance', title: 'WebAssembly System Interface: capability-based security',
     venue: 'WASI', url: 'https://wasi.dev/' },
   { authors: 'Google', title: 'gVisor: a container runtime sandbox', venue: 'Google', url: 'https://gvisor.dev/' },
-  { authors: 'Shengye Wan, Cyrus Nikolaidis, Daniel Song, David Molnar, James Crnkovich, Jayson Grace, Manish Bhatt and colleagues',
+  { authors: 'Manish Bhatt, Sahana Chennabasappa, Yue Li, Cyrus Nikolaidis, Daniel Song, Shengye Wan, Faizan Ahmad, Cornelius Aschermann, Yaohui Chen, Dhaval Kapil, David Molnar, Spencer Whitman, Joshua Saxe',
     title: 'CYBERSECEVAL 2: A Wide-Ranging Cybersecurity Evaluation Suite for Large Language Models',
     venue: 'Meta, arXiv 2024', url: 'https://arxiv.org/abs/2404.13161' },
 ];

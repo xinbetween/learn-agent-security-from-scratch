@@ -257,7 +257,7 @@ export const refs = [
   { authors: 'Johann Rehberger', title: 'ChatGPT Operator: Prompt Injection Exploits and Defenses',
     venue: 'Embrace The Red, February 2025',
     url: 'https://embracethered.com/blog/posts/2025/chatgpt-operator-prompt-injection-exploits/' },
-  { authors: 'Feng Yan, Chengyu Wang, Bo Liu, Jun Huang',
+  { authors: 'Yifeng He, Ethan Wang, Yuyang Rong, Zifei Cheng, Hao Chen',
     title: 'Security of AI Agents', venue: 'arXiv, 2024', url: 'https://arxiv.org/abs/2406.08689' },
   { authors: 'Keltin Grimes, Julie Lawler, Robert C. Garrett, Emil Mathew, Marco Christiani, Sara Kingsley, Zhiwei Steven Wu, Nathan VanHoudnos',
     title: 'SoK: Bridging Research and Practice in LLM Agent Security',

@@ -61,7 +61,7 @@ export const TERMS = [
   ['Guardrail', 'defense', `A filter on agent input, output or actions. May be a regex, a classifier,
     a policy engine or another model. Probabilistic, and bypassable by construction.`, 'a17'],
   ['Spotlighting', 'defense', `Marking untrusted content so the model can distinguish it — delimiters,
-    datamarking with a sentinel token, or encoding. Microsoft\'s framing of defensive prompting.`, 'a18'],
+    datamarking (a marker interleaved through the span), or encoding. Microsoft\'s framing of defensive prompting.`, 'a18'],
   ['Instruction hierarchy', 'defense', `Training a model to rank instruction sources by privilege —
     system over developer over user over tool output — and to refuse lower-privilege overrides.`, 'a18'],
   ['StruQ / SecAlign', 'defense', `Training-time defences that teach a model to treat a structured data

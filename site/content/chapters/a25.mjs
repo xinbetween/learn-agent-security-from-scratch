@@ -239,7 +239,7 @@ export const refs = [
   { authors: 'Yangjun Ruan, Honghua Dong, Andrew Wang, Silviu Pitis, Yongchao Zhou, Jimmy Ba, Yann Dubois, Chris J. Maddison, Tatsunori Hashimoto',
     title: 'Identifying the Risks of LM Agents with an LM-Emulated Sandbox (ToolEmu)', venue: 'ICLR, 2024',
     url: 'https://arxiv.org/abs/2309.15817' },
-  { authors: 'Tongxuan Yu, Chenxu Wang and colleagues', title: 'RAS-Eval: A Comprehensive Benchmark for Security Evaluation of LLM Agents in Real-World Environments',
+  { authors: 'Authors of RAS-Eval', title: 'RAS-Eval: A Comprehensive Benchmark for Security Evaluation of LLM Agents in Real-World Environments',
     venue: 'arXiv, 2025', url: 'https://arxiv.org/abs/2506.15253' },
   { authors: 'Tongxin Yuan, Zhiwei He, Lingzhong Dong, Yiming Wang, Ruijie Zhao, Tian Xia, Lizhen Xu, Binglin Zhou, Fangqi Li, Zhuosheng Zhang, Rui Wang, Gongshen Liu',
     title: 'R-Judge: Benchmarking Safety Risk Awareness for LLM Agents', venue: 'EMNLP Findings, 2024',

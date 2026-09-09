@@ -245,7 +245,7 @@ export const refs = [
   { authors: 'Umar Iqbal, Tadayoshi Kohno, Franziska Roesner',
     title: 'LLM Platform Security: Applying a Systematic Evaluation Framework to OpenAI\'s ChatGPT Plugins',
     venue: 'AAAI/ACM AIES, 2024', url: 'https://arxiv.org/abs/2309.10254' },
-  { authors: 'Varun (SkillFortify)', title: 'SkillFortify: Formal Analysis and Supply Chain Security for Agentic AI Skills',
+  { authors: 'SkillFortify authors (github.com/varun369)', title: 'SkillFortify: Formal Analysis and Supply Chain Security for Agentic AI Skills',
     venue: 'Zenodo, 2026', url: 'https://doi.org/10.5281/zenodo.18787663' },
   { authors: 'LLMSecurity contributors', title: 'Awesome Agent Skills Security',
     venue: 'GitHub', url: 'https://github.com/LLMSecurity/awesome-agent-skills-security',
