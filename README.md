@@ -11,9 +11,9 @@ Read the diagram → break the lab → take the quiz → run the code.
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-4b8bbe.svg?style=flat-square)](https://www.python.org/)
 [![Dependencies: none](https://img.shields.io/badge/dependencies-none-16a34a.svg?style=flat-square)](code/)
 [![API key required: none](https://img.shields.io/badge/API_key_required-none-16a34a.svg?style=flat-square)](code/agentlib.py)
-[![References: 182](https://img.shields.io/badge/references-182-f59e0b.svg?style=flat-square)](https://agent-security.xinbetween.com/references/)
+[![References: 182](https://img.shields.io/badge/references-182-f59e0b.svg?style=flat-square)](https://agentsecurity.xinbetween.com/references/)
 
-[**Read it →**](https://agent-security.xinbetween.com/) &nbsp;·&nbsp;
+[**Read it →**](https://agentsecurity.xinbetween.com/) &nbsp;·&nbsp;
 [**Star on GitHub**](https://github.com/xinbetween/learn-agent-security-from-scratch) &nbsp;·&nbsp;
 [**Follow on X**](https://x.com/xinbetween)
 
@@ -146,7 +146,7 @@ node build.mjs --serve             # http://localhost:8080
 Every file takes an optional `--live` flag. Set `ANTHROPIC_API_KEY`, install the
 SDK, and `agentlib.py` routes through a real model instead of the stub — at which
 point the attacks become less reliable and the architectural defences behave
-identically, which is itself the lesson of [A19](https://agent-security.xinbetween.com/chapters/a19/).
+identically, which is itself the lesson of [A19](https://agentsecurity.xinbetween.com/chapters/a19/).
 
 ---
 
@@ -300,8 +300,8 @@ It was assembled from four collections in particular:
   Keltin Grimes, Julie Lawler, Robert C. Garrett, Emil Mathew, Marco Christiani, Sara Kingsley,
   Zhiwei Steven Wu and Nathan VanHoudnos at Carnegie Mellon's Software Engineering Institute.
   A systematic review of 173 sources and 36 deployed systems; it supplies the skeleton of the
-  [threat map](https://agent-security.xinbetween.com/threats/) and the
-  [defence map](https://agent-security.xinbetween.com/defenses/), and its finding that real
+  [threat map](https://agentsecurity.xinbetween.com/threats/) and the
+  [defence map](https://agentsecurity.xinbetween.com/defenses/), and its finding that real
   deployments implement roughly a third of recommended controls is the reason Part 6 exists.
 
 Special thanks to the researchers whose specific results this course leans on hardest:
@@ -313,7 +313,7 @@ instruction hierarchy; and Zhan and colleagues for demonstrating that most publi
 defences do not survive an adaptive attacker.
 
 The full list — 182 sources, sorted by first author — is on the
-[references page](https://agent-security.xinbetween.com/references/) and at the foot of
+[references page](https://agentsecurity.xinbetween.com/references/) and at the foot of
 every chapter that uses them.
 
 **If this course misstates your work, misattributes it, or cites a superseded version,
@@ -352,7 +352,7 @@ defence you write afterwards.
 
 <div align="center">
 
-**[Start with Chapter A01 →](https://agent-security.xinbetween.com/chapters/a01/)**
+**[Start with Chapter A01 →](https://agentsecurity.xinbetween.com/chapters/a01/)**
 
 If this helped, a ⭐ makes it findable for the next person.
 

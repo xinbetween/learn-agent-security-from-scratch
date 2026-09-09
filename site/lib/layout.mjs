@@ -3,7 +3,7 @@ import { esc } from './components.mjs';
 export const SITE = {
   title: 'Learn Agent Security From Scratch',
   short: 'Agent Security',
-  url: 'https://agent-security.xinbetween.com',
+  url: 'https://agentsecurity.xinbetween.com',
   repo: 'https://github.com/xinbetween/learn-agent-security-from-scratch',
   sibling: 'https://llminference.xinbetween.com/en/',
   author: 'xinbetween',

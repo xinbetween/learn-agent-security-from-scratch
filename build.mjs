@@ -160,7 +160,7 @@ async function build() {
     await emit(path, html);
   }
 
-  await writeFile(join(OUT, 'CNAME'), 'agent-security.xinbetween.com\n');
+  await writeFile(join(OUT, 'CNAME'), 'agentsecurity.xinbetween.com\n');
   await writeFile(join(OUT, 'robots.txt'),
     `User-agent: *\nAllow: /\nSitemap: ${SITE.url}/sitemap.xml\n`);
   await writeFile(join(OUT, '.nojekyll'), '');
