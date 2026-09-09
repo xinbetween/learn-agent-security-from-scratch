@@ -27,8 +27,8 @@ ${svgText(620, 298, 'to pass it', 'd-def-t')}
 `, { label: 'Provenance tags propagating through derived values to a policy-checked sink' });
 
 export const body = `
-${p(`The pattern chapter ended at code-then-execute: control flow comes from the trusted query, data
-flows through as values. This chapter adds the second half — every value carries where it came from,
+${p(`The pattern chapter ended at code-then-execute. Control flow comes from the trusted query, data
+flows through as values. This chapter adds the second half. Every value carries where it came from,
 and every sink checks that before acting. The result is a defence whose correctness does not depend on
 anything the model believes.`)}
 
@@ -49,7 +49,7 @@ class Tagged:
   { lang: 'py', file: 'code/a21_ifc.py', tag: 'safe' })}
 
 ${p(`Union of sources, intersection of readers. Those two lines are the whole propagation rule, and they
-are what makes laundering impossible: paraphrasing a secret produces a value derived from the secret,
+are what makes laundering impossible. Paraphrasing a secret produces a value derived from the secret,
 and mixing a secret into a public summary narrows the audience of the result to the intersection.`)}
 
 ${figure(flow, `<b>Why the attacker cannot rewrite their way out.</b> Every derivation carries tags
@@ -80,7 +80,7 @@ ${sim({
   ].join(''),
   body: out('a21-out'),
   note: `Turn the control off and every row succeeds. Turn it on and the last four fail identically,
-    for the same reason and with the same message — because the check is a function of provenance, and
+    for the same reason and with the same message, because the check is a function of provenance and
     all four are derived from the same tagged value.`,
 })}
 
@@ -88,10 +88,10 @@ ${h2('What was never consulted', 'never-consulted')}
 
 ${callout('defense', 'The list that makes this a bounding control', `
 <ul style="margin-bottom:0">
-<li><b>The model\'s judgement</b> — it was fully hijacked throughout every hostile run.</li>
-<li><b>The text of the instruction</b> — never inspected, at any point.</li>
-<li><b>A detection threshold</b> — there is not one.</li>
-<li><b>The phrasing of the payload</b> — irrelevant, because nothing reads it.</li>
+<li><b>The model\'s judgement.</b> It was fully hijacked throughout every hostile run.</li>
+<li><b>The text of the instruction.</b> Never inspected, at any point.</li>
+<li><b>A detection threshold.</b> There is not one.</li>
+<li><b>The phrasing of the payload.</b> Irrelevant, because nothing reads it.</li>
 </ul>`)}
 
 ${p(`An attacker who writes a better payload changes nothing. That is the qualitative difference
@@ -108,15 +108,15 @@ every value, and enforces policies at every sink.`)}
 ${table(
   ['Component', 'Sees untrusted content?', 'Can act?'],
   [
-    ['Privileged LLM (writes the program)', 'No — only the user\'s query', 'Indirectly, via the program'],
+    ['Privileged LLM (writes the program)', 'No, only the user\'s query', 'Indirectly, via the program'],
     ['Quarantined LLM (parses content)', 'Yes', 'No'],
     ['Interpreter', 'Yes, as opaque tagged values', 'Yes, subject to policy'],
-    ['Policy engine', 'No — only tags', 'It is the decision point'],
+    ['Policy engine', 'No, only tags', 'It is the decision point'],
   ]
 )}
 
 ${p(`The 2026 follow-up, "CaMeLs Can Use Computers Too", extends single-shot planning to computer-use
-agents — which is the harder case from <a href="/chapters/a08/">A08</a>, because a coordinate carries
+agents. That is the harder case from <a href="/chapters/a08/">A08</a>, because a coordinate carries
 no semantics to write policy against.`)}
 
 ${h2('The costs, stated plainly', 'costs')}
@@ -125,12 +125,12 @@ ${ul([
   `<b>You must write the policy.</b> "Who may read data derived from source X" is a question your
    organisation has probably never answered explicitly. Writing it down is most of the work, and it is
    valuable independently of the agent.`,
-  `<b>Some tasks cannot express their control flow ahead of time.</b> Genuinely exploratory work —
-   where step seven depends on what step six discovered in an unpredictable way — does not fit. The
+  `<b>Some tasks cannot express their control flow ahead of time.</b> Genuinely exploratory work
+   (where step seven depends on what step six discovered in an unpredictable way) does not fit. The
    honest answer for those is a different pattern or a narrower task.`,
   `<b>Over-tainting.</b> If everything ends up derived from something untrusted, the policy blocks
    everything and users route around it. Managing this needs declassification: explicit,
-   audited points where a value's tags are reduced — for example after a human confirms it.`,
+   audited points where a value's tags are reduced, for example after a human confirms it.`,
   `<b>An extra model call per step</b> in the CaMeL formulation, and an interpreter you maintain.`,
 ])}
 
@@ -142,8 +142,8 @@ ${kv([
     within existing agent frameworks.`],
   ['RTBAS', `Combines IFC with dependency tracking to defend against both injection and privacy
     leakage, and addresses the over-tainting problem directly.`],
-  ['AgentArmor', `Applies program analysis to agent <em>runtime traces</em> — recovering control and
-    data dependencies after the fact, which is the retrofit path when you cannot rebuild.`],
+  ['AgentArmor', `Applies program analysis to agent <em>runtime traces</em>, recovering control and
+    data dependencies after the fact. This is the retrofit path when you cannot rebuild.`],
   ['Permissive IFC', `Multi-execution-based tracking that reduces false blocking, trading compute for
     precision.`],
   ['MELON', `A provable defence for indirect injection in agents, via re-execution with masked
@@ -174,8 +174,8 @@ export const quiz = [
     explain: `Both directions are conservative in the safe direction. Combining a public summary with
       a secret produces something that is partly secret, so it inherits both sources; and its audience
       must be narrowed to those cleared for the most restricted input, which is the intersection.
-      Reversing either — intersecting sources or unioning readers — would let an attacker launder a
-      secret by mixing it with something public, which is exactly the "mix" case in the lab.`,
+      Reversing either rule (intersecting sources, or unioning readers) would let an attacker launder
+      a secret by mixing it with something public, which is exactly the "mix" case in the lab.`,
   },
   {
     q: `An attacker instructs the hijacked agent to base64-encode the secret before sending it. What
@@ -184,13 +184,13 @@ export const quiz = [
       `The encoding defeats the tag, since the value has changed.`,
       `The encoded value is derived from the secret, so it carries the same tags and is blocked identically.`,
       `The policy decodes it and then blocks.`,
-      `It succeeds — IFC only checks literal values.`,
+      `It succeeds, since IFC only checks literal values.`,
     ],
     answer: 1,
     explain: `Tags travel with derivation, not with byte equality. <code>b64(secret)</code> is
       produced <em>from</em> <code>secret</code>, so it inherits its sources and its narrowed reader
       set, and the sink refuses it with exactly the same message as the plaintext. Note that the policy
-      never decodes anything — it never looks at the value at all, which is why the entire space of
+      never decodes anything. It never looks at the value at all, which is why the entire space of
       encodings collapses into one case.`,
   },
   {
@@ -198,7 +198,7 @@ export const quiz = [
     options: [
       `The privileged LLM.`,
       `The quarantined LLM.`,
-      `Neither — the privileged LLM acts but sees only the user query; the quarantined LLM reads untrusted content but has no ability to act.`,
+      `Neither. The privileged LLM acts but sees only the user query; the quarantined LLM reads untrusted content but has no ability to act.`,
       `Both, which is why the policy engine is needed.`,
     ],
     answer: 2,
@@ -213,13 +213,13 @@ export const quiz = [
         from something untrusted. What is this, and what addresses it?`,
     options: [
       `A bug in tag propagation; fix the union rule.`,
-      `Over-tainting — addressed by declassification: explicit, audited points where a value's tags are reduced, such as after human confirmation.`,
+      `Over-tainting, addressed by declassification: explicit, audited points where a value's tags are reduced, such as after human confirmation.`,
       `Insufficient model capability; use a larger model.`,
       `Policy misconfiguration; widen the reader sets.`,
     ],
     answer: 1,
     explain: `Over-tainting is the standard failure mode of information-flow systems and the reason
-      several deployments quietly get switched off. The propagation rule is correct — the problem is
+      several deployments quietly get switched off. The propagation rule is correct; the problem is
       that a real workflow legitimately mixes trust levels. Declassification makes the reduction
       explicit and auditable rather than implicit and invisible; RTBAS addresses it directly. Widening
       reader sets globally would just disable the control while leaving the machinery in place.`,

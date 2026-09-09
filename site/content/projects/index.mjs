@@ -7,8 +7,8 @@ const check = (items) => `<h3 id="done">You are done when</h3>${ul(items)}`;
 const P1 = {
   body: `
 ${p(`Every defence in this course starts from a threat model, and a threat model you did not build
-yourself is a threat model you do not believe. This project produces one — for an agent you actually
-use, not a toy — using nothing but the reading from Part 1.`)}
+yourself is a threat model you do not believe. This project produces one for an agent you actually
+use, not a toy, and it needs nothing but the reading from Part 1.`)}
 
 ${h2('Pick a target', 'target')}
 ${p(`Choose a real agent you have access to: a coding assistant, a browsing or research agent, an
@@ -33,19 +33,19 @@ ${steps([
   ['What can the agent do, and with whose authority?', `Every tool, its credential, and the blast
     radius of its worst call. This is your action surface.`],
   ['What can leave, and by what route?', `Every exfiltration channel, including the ones that are not
-    network access — rendered images, links, synced files, peer agents (<a href="/chapters/a09/">A09</a>).`],
+    network access: rendered images, links, synced files, peer agents (<a href="/chapters/a09/">A09</a>).`],
   ['What is irreversible?', `Sort the action surface by reversibility (<a href="/chapters/a24/">A24</a>).`],
 ])}
 
 ${h2('Step 3 — score the trifecta', 'trifecta')}
-${p(`Apply the <a href="/chapters/a03/">A03</a> test — and apply it over paths, not just the single
+${p(`Apply the <a href="/chapters/a03/">A03</a> test, and apply it over paths, not just the single
 agent (<a href="/chapters/a15/">A15</a>). Does your system, taken as a whole, hold all three legs? If
 so, which leg is cheapest to cut, and what would cutting it cost in capability?`)}
 
 ${h2('Step 4 — walk the taxonomy', 'taxonomy')}
 ${p(`Go through all 25 vulnerability classes on <a href="/threats/">the threat map</a>. For each,
-write "applicable" or "not applicable — because…". The "because" column is the deliverable: it is where
-you discover the assumptions you cannot justify.`)}
+write "applicable" or "not applicable, because…". The "because" column is the deliverable. That is
+where you discover the assumptions you cannot justify.`)}
 ${deliverable(['A 25-row table, each class marked applicable or not, with a one-line justification for every "not".'])}
 
 ${h2('Step 5 — rank and recommend', 'rank')}
@@ -74,8 +74,8 @@ ${check([
 /* ============================================================ P2 ======== */
 const P2 = {
   body: `
-${p(`Now you land the attacks yourself. This project builds a deliberately vulnerable agent and lands
-four end-to-end exploits against it — the four from Part 2. The agent you build here is the one you
+${p(`Now you land the attacks yourself. This project builds a deliberately vulnerable agent and lands the
+four end-to-end exploits from Part 2 against it. The agent you build here is the one you
 keep for Projects 3, 4 and 5, so build it to last.`)}
 
 ${callout('warn', 'Rules of engagement', `<p style="margin-bottom:0">Everything here runs against your
@@ -99,11 +99,11 @@ ${steps([
   ['Direct override (<a href="/chapters/a06/">A06</a>)', `Extract the system prompt, then override the
     task. Show that a keyword filter you add is defeated by rephrasing.`],
   ['Indirect injection (<a href="/chapters/a07/">A07</a>)', `Plant a payload in the fixture page and
-    make the agent read a secret and email it — with the user asking only for a summary.`],
+    make the agent read a secret and email it. The user asked only for a summary.`],
   ['Environmental injection (<a href="/chapters/a08/">A08</a>)', `Deliver the payload where a human
     reviewer would not see it: an HTML comment, white-on-white text, or an image\'s alt text.`],
   ['Exfiltration (<a href="/chapters/a09/">A09</a>)', `Get the secret out by two different channels,
-    at least one of which is not a direct <code>send_email</code> — a markdown image URL, or a
+    at least one of which is not a direct <code>send_email</code>. Use a markdown image URL, or a
     DNS-shaped hostname.`],
 ])}
 ${deliverable(['Four scripts, one per attack, each ending in an assertion that the attack succeeded.'])}
@@ -138,8 +138,8 @@ ${check([
 const P3 = {
   body: `
 ${p(`Part 3 attacked the components an agent depends on. This project reproduces those attacks against
-your lab agent and — the harder half — builds the scanner or control that would have caught each
-one.`)}
+your lab agent, then does the harder half and builds the scanner or control that would have caught
+each one.`)}
 
 ${h2('Step 1 — a malicious MCP-style tool', 'tool')}
 ${p(`Write a tool whose <em>description</em> carries a line-jumping payload (<a href="/chapters/a11/">A11</a>).
@@ -150,19 +150,19 @@ ${deliverable(['A poisoned tool that fires at listing time, plus a scanner and a
 
 ${h2('Step 2 — a persistent memory attack', 'memory')}
 ${p(`Poison a small RAG corpus so a crafted document outranks the real answer
-(<a href="/chapters/a12/">A12</a>), and show it firing across multiple simulated user sessions. Then
-implement the provenance filter that stops a tool-derived memory entry from becoming a preference.`)}
+(<a href="/chapters/a12/">A12</a>), and show it firing across multiple simulated user sessions. Now
+build the provenance filter that stops a tool-derived memory entry from becoming a preference.`)}
 ${deliverable(['A corpus-poisoning demo that fires across sessions, plus a provenance filter that neutralises it.'])}
 
 ${h2('Step 3 — a poisoned skill', 'skill')}
 ${p(`Write a skill manifest with an exfiltration instruction phrased as an ordinary business
-requirement (<a href="/chapters/a13/">A13</a>). Run it through your Part 3 scanner. Then demonstrate the
-control that holds even when the scanner misses: scope the skill's declared tools so the payload fails
+requirement (<a href="/chapters/a13/">A13</a>). Run it through your Part 3 scanner. Then find the
+control that holds even when the scanner misses. Scope the skill's declared tools so the payload fails
 at the tool layer.`)}
 
 ${h2('Step 4 — propagate across two agents', 'multi')}
 ${p(`Wire two lab agents together and land a prompt-infection payload that instructs the first to
-forward itself to the second (<a href="/chapters/a15/">A15</a>). Then implement inter-agent message
+forward itself to the second (<a href="/chapters/a15/">A15</a>). Add inter-agent message
 quarantine and show propagation stopping at patient zero.`)}
 ${deliverable(['A two-agent propagation demo, plus a quarantine control that halts it.'])}
 
@@ -193,7 +193,7 @@ ${check([
 const P4 = {
   body: `
 ${p(`This is the project that matters most. You take the lab agent that lost to every attack in
-Projects 2 and 3, rebuild it behind a defence stack, and re-run every attack — accounting for each
+Projects 2 and 3, rebuild it behind a defence stack, and re-run every attack, accounting for each
 outcome. The goal is not "0% attack success". The goal is a system where you can <em>say why</em> each
 attack fails, and each reason is a property rather than a probability.`)}
 
@@ -210,11 +210,11 @@ ${steps([
   ['Scoped credentials (<a href="/chapters/a22/">A22</a>)', `Mint a task token with the minimum scope,
     the minimum resource set and the shortest workable TTL. The email tool is not in the summarisation
     task\'s capability set at all.`],
-  ['An egress allow-list (<a href="/chapters/a23/">A23</a>)', `Enforce it correctly — the four checks
-    from the chapter — and below the agent, not inside it. This closes the exfiltration channels the
+  ['An egress allow-list (<a href="/chapters/a23/">A23</a>)', `Enforce it correctly (the four checks
+    from the chapter) and below the agent, not inside it. This closes the exfiltration channels the
     capability layer did not.`],
   ['A reversibility-graded approval gate (<a href="/chapters/a24/">A24</a>)', `For whatever
-    irreversible actions remain, a prompt that shows the data, the recipient and the provenance — and
+    irreversible actions remain, a prompt that shows the data, the recipient and the provenance, and
     offers "stop the task".`],
 ])}
 ${deliverable(['A hardened lab agent with all five layers, each toggleable so you can measure its individual contribution.'])}
@@ -222,13 +222,13 @@ ${deliverable(['A hardened lab agent with all five layers, each toggleable so yo
 ${h2('Re-run everything', 'rerun')}
 ${p(`Every attack from Projects 2 and 3, against the hardened agent. For each, record: did the model
 get compromised? Did the attack achieve anything? Which layer stopped it? Report compromise and damage
-<em>separately</em> — a bounded compromise is still worth knowing about (<a href="/chapters/a07/">A07</a>).`)}
+<em>separately</em>. A bounded compromise is still worth knowing about (<a href="/chapters/a07/">A07</a>).`)}
 ${deliverable(['A results table: attack × (compromised? damage? stopped-by), for every attack you have built.'])}
 
 ${h2('Ablate', 'ablate')}
 ${p(`Turn each layer off in turn and re-run. This tells you which layer is actually carrying each
-defence, and it will surprise you — some attacks are stopped by three layers and some by exactly one.
-The single-point-of-failure attacks are the ones to worry about.`)}
+defence, and it will surprise you. Some attacks are stopped by three layers, some by exactly one.
+Worry about the ones with a single point of failure.`)}
 
 ${h2('The honesty section', 'honesty')}
 ${p(`Write down what your stack does <em>not</em> stop: the human channel, model-level threats,
@@ -254,7 +254,7 @@ ${check([
 /* ============================================================ P5 ======== */
 const P5 = {
   body: `
-${p(`You have a hardened agent. This project produces the evidence that it works — a harness, an
+${p(`You have a hardened agent. This project produces the evidence that it works: a harness, an
 adaptive red-team against your own defences, runtime telemetry, and the runbook for when it fails
 anyway.`)}
 
@@ -290,7 +290,7 @@ against a real attack from your suite.`)}
 ${h2('Step 5 — the report', 'report')}
 ${p(`Pull it together: the paired metric, the adaptive result with its budget, the ablation from
 Project 4, and the honest "does not cover" section. This is a document you could hand to someone
-deciding whether to deploy the agent — which is the whole point of Part 6.`)}
+deciding whether to deploy the agent, which is the whole point of Part 6.`)}
 
 ${check([
   'Your harness reports attack success and utility retention on the same run.',

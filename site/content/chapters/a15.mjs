@@ -76,9 +76,9 @@ each node against A03 and every one is fine. Score the <em>path</em> and it hold
 attacker's text enters at research, the tainted data flows through writer, and reviewer sends it.`)}
 
 ${p(`This is the most common way teams talk themselves into a false negative on the trifecta test. The
-boundary was drawn around one agent, verified honestly, and the graph was never drawn at all. The
-practical fix is to run the A03 scoring over reachable paths rather than over components — which is a
-five-minute exercise once someone actually sketches the topology.`)}
+boundary was drawn around one agent, verified honestly, and the graph was never drawn at all. Fixing
+it means running the A03 scoring over reachable paths rather than over components, a five-minute
+exercise once someone actually sketches the topology.`)}
 
 ${h2('Collusion without communication', 'collusion')}
 
@@ -88,9 +88,9 @@ individual message is a lie. There is no covert channel and no detectable payloa
 
 ${p(`Defences that inspect individual messages see nothing, because there is nothing in any individual
 message. Detecting this requires reasoning about what a <em>set</em> of messages establishes, which is
-a substantially harder detector than anything in A17 — and, note, exactly the same structural shape as
-the trifecta composition above. The 2026 literature keeps arriving at this: the risk is in the
-composition.`)}
+a substantially harder detector than anything in A17. Note also that it is exactly the same structural
+shape as the trifecta composition above. The 2026 literature keeps arriving at the same place. The
+risk is in the composition.`)}
 
 ${h2('Cascading failure without an attacker', 'cascades')}
 
@@ -98,8 +98,8 @@ ${p(`The SEI review counts cascading failures at 14 sources, and they need no ad
 error at step three is treated as ground truth by step four, which builds on it, and by step twelve
 the agent is confidently executing a plan derived from a misreading nobody noticed.`)}
 
-${p(`Multi-agent systems amplify this because each handoff strips context. The receiving agent gets a
-conclusion, not the evidence, and has no way to assess confidence. The mitigations are unglamorous:
+${p(`Multi-agent systems amplify this because each handoff strips context. Receiving agents get a
+conclusion, not the evidence, and have no way to assess confidence. The mitigations are unglamorous:
 pass provenance with every handoff, require agents to state uncertainty, and cap the depth of derived
 reasoning before a checkpoint.`)}
 
@@ -116,19 +116,19 @@ ${table(
   [
     ['<b>Treat every inter-agent message as untrusted input</b> — it is', 'Infection-aware detectors (INFA-Guard) that spot propagation patterns'],
     ['<b>Per-agent scoped identity</b>, so infection cannot escalate privilege', 'Graph anomaly detection over the message trace (GUARDIAN, SentinelAgent)'],
-    ['<b>Topological limits</b> — no cycles, bounded fan-out, no shared writable memory', 'Consensus and cross-validation between agents'],
+    ['<b>Topological limits</b>: no cycles, bounded fan-out, no shared writable memory', 'Consensus and cross-validation between agents'],
     ['<b>Per-agent egress policy</b>, scored over paths rather than nodes', 'Rate limits on inter-agent message volume'],
   ]
 )}
 
 ${callout('defense', 'The single highest-value change', `<p style="margin-bottom:0">Stop treating a
 peer agent's message as more trustworthy than a web page. It is not. It is a web page that can talk
-back, and it has your other agent's credibility attached. Every A07 control you built for tool results
+back, with your other agent's credibility attached. Every A07 control you built for tool results
 applies unchanged to inter-agent messages, and most systems apply none of them.</p>`)}
 
 ${detail('The uncomfortable note about multi-agent as a defence', `
-${p(`The SEI review lists multi-agent design as a security <em>best practice</em> — 18 sources
-recommend redundancy, critique and consensus to reduce error and block unsafe actions. That is real:
+${p(`The SEI review lists multi-agent design as a security <em>best practice</em>, with 18 sources
+recommending redundancy, critique and consensus to reduce error and block unsafe actions. That is real:
 an independent critic agent does catch failures a single agent misses.`)}
 ${p(`It is also, per this chapter, an expansion of the attack surface, and the review says so
 plainly: multi-agent setups are resource-intensive and can amplify security concerns. Both are true.
@@ -158,17 +158,17 @@ export const quiz = [
     ],
     answer: 1,
     explain: `Propagation is a payload property, not a system property. Once the payload instructs its
-      host to forward itself, the topology does the rest — and because agents are designed to pass
+      host to forward itself, the topology does the rest. Because agents are designed to pass
       information to each other, the forwarding looks like normal operation. This is the Prompt
-      Infection result, and it is why inter-agent message hygiene matters more than it appears to: you
+      Infection result, and it is why inter-agent message hygiene matters more than it appears to. You
       are not just protecting one agent, you are preventing an epidemic.`,
   },
   {
     q: `Agent A reads untrusted content with no network egress. Agent B has network egress but reads
         only A's output. Each passes the A03 trifecta test. Is the system safe?`,
     options: [
-      `Yes — neither agent holds all three legs.`,
-      `No — the path holds all three: untrusted content enters at A, A's tainted output reaches B, and B can send.`,
+      `Yes, neither agent holds all three legs.`,
+      `No, the path holds all three: untrusted content enters at A, A's tainted output reaches B, and B can send.`,
       `Safe if B validates A's output.`,
       `Safe if A and B use different models.`,
     ],
@@ -176,22 +176,22 @@ export const quiz = [
     explain: `The legs compose along reachable paths, and per-node scoring is exactly the wrong
       granularity. This is the most common false negative in trifecta analysis: the boundary was drawn
       around one component, verified honestly, and the graph was never drawn. B validating A's output
-      does not help, because validation is the same instruction-versus-data problem one hop later —
+      does not help, because validation is the same instruction-versus-data problem one hop later.
       B has no way to distinguish A's genuine findings from the attacker's text that A relayed.`,
   },
   {
     q: `Why do message-level detectors fail against the "lying with truths" collusion attack?`,
     options: [
       `The messages are encrypted.`,
-      `Each message is individually true, so there is nothing in any single message to detect — the falsehood exists only in the composition.`,
+      `Each message is individually true, so there is nothing in any single message to detect. The falsehood exists only in the composition.`,
       `The messages arrive too quickly to inspect.`,
       `The detector is on the wrong channel.`,
     ],
     answer: 1,
     explain: `Every message passes inspection because every message is accurate. The attack is in what
       the <em>set</em> of messages establishes, which requires a detector that reasons over a
-      conversation rather than over a payload. Note the structural echo with the previous question:
-      both are composition failures, and the 2026 literature keeps arriving at this shape — individually
+      conversation rather than over a payload. Note the structural echo with the previous question.
+      Both are composition failures, and the 2026 literature keeps arriving at this shape: individually
       benign components combining into something harmful.`,
   },
   {
@@ -205,8 +205,8 @@ export const quiz = [
     ],
     answer: 1,
     explain: `The lesson is that a decision made for latency or parallelism reasons has security
-      consequences nobody costed. Pipelines are not universally better — they serialise work and can
-      be the wrong architecture — but the choice should be made with the propagation properties
+      consequences nobody costed. Pipelines are not universally better (they serialise work and can
+      be the wrong architecture), but the choice should be made with the propagation properties
       visible. Bounded fan-out and acyclicity are cheap constraints that dramatically change the worst
       case, and they are far easier to impose at design time than to retrofit.`,
   },

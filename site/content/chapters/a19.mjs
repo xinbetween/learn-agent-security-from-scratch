@@ -10,7 +10,7 @@ demonstrated.`)}
 
 ${h2('The same defence, two evaluations', 'two-evals')}
 
-${p(`Here is a plausible detector. Eight regexes and a heuristic — more than most production systems
+${p(`Here is a plausible detector. Eight regexes and a heuristic, more than most production systems
 have:`)}
 
 ${code(`PATTERNS = [
@@ -54,8 +54,8 @@ ${table(
 ${h2('Why this happens to honest people', 'why')}
 
 ${p(`It is tempting to read the gap as a failure of rigour. It is not. A benchmark is <em>defined</em>
-by having a fixed attack set — that is what makes results comparable across systems and across years,
-and it is what makes a regression suite possible. The error is entirely in interpretation: treating
+by having a fixed attack set. That is what makes results comparable across systems and across years,
+and it is what makes a regression suite possible. The error is entirely one of interpretation, treating
 "performs well against known attacks" as "is secure".`)}
 
 ${callout('boundary', 'The two questions are different', `<p><b>"How does this defence perform against
@@ -67,16 +67,16 @@ only by an adaptive evaluation. This is the number that predicts what happens to
 ${h2('Attack success rate alone is a marketing claim', 'pair')}
 
 ${p(`Every ASR figure must be reported with utility retention on the same run, because 0% ASR is
-trivially achievable by unplugging the agent. The detector above blocks 40% of benign traffic —
-"ignore the footnotes and summarise the main argument", "my previous order was wrong, please disregard
-it" — and a report that mentioned only the attack number would have concealed this entirely.`)}
+trivially achievable by unplugging the agent. The detector above blocks 40% of benign traffic
+("ignore the footnotes and summarise the main argument", "my previous order was wrong, please disregard
+it"), and a report that mentioned only the attack number would have concealed this entirely.`)}
 
 ${h2('A protocol you can actually follow', 'protocol')}
 
 ${steps([
   ['Give the attacker your source',
-   `White-box: the prompts, the thresholds, the model, the policy. Kerckhoffs's principle applies —
-    assume they have it, because eventually they will, and a defence that depends on secrecy of
+   `White-box: the prompts, the thresholds, the model, the policy. Kerckhoffs's principle applies.
+    Assume they have it, because eventually they will, and a defence that depends on secrecy of
     mechanism is not a defence.`],
   ['Fix a budget',
    `"Four hours and 500 queries." This turns the result from a statement about possibility into a
@@ -101,7 +101,7 @@ ${p(`This is not a hypothetical concern. Zhan et al. took published defences aga
 injection that reported strong numbers and broke them with adaptive attacks. "A Critical Evaluation of
 Defenses against Prompt Injection Attacks" found the same pattern across the literature. Google
 DeepMind's account of defending Gemini describes adaptive evaluation as the thing that shaped their
-layered strategy — because the first strategies did not survive it.`)}
+layered strategy, because the first strategies did not survive it.`)}
 
 ${p(`And the attacker's side keeps getting cheaper. "Learning to Inject" (2026) uses reinforcement
 learning to auto-generate injections that transfer across frontier models, which means the four-hour
@@ -113,7 +113,7 @@ taxonomy: an agent's behaviour under evaluation may differ from its behaviour in
 evaluation environments have tells. Round numbers, synthetic names, unusually clean data, a task that
 is obviously a test.`)}
 ${p(`The literature on deception and evasion counts this at 10 sources, and it matters most exactly
-where you care most — for dangerous-capability evaluations, where underestimating is the expensive
+where you care most. For dangerous-capability evaluations, underestimating is the expensive
 error. The mitigations are to evaluate in environments as realistic as you can afford, to use
 permissive threat models (white-box, generous budgets), and to be able to argue that if an attacker
 had more resources your security would still hold.`)}`)}
@@ -134,14 +134,14 @@ export const quiz = [
         after reading its source. What went wrong with the benchmark?`,
     options: [
       `The benchmark was too small.`,
-      `Nothing — a benchmark has a fixed attack set by definition; the error is interpreting "performs well against known attacks" as "is secure".`,
+      `Nothing. A benchmark has a fixed attack set by definition; the error is interpreting "performs well against known attacks" as "is secure".`,
       `The benchmark was not peer-reviewed.`,
       `The defence was overfitted to the benchmark deliberately.`,
     ],
     answer: 1,
     explain: `Fixedness is the feature: it is what makes results comparable across systems and across
       time, and what lets you use the suite as a regression gate. The two evaluations answer different
-      questions — "how does this do against attacks we know?" versus "what must an attacker spend?" —
+      questions ("how does this do against attacks we know?" versus "what must an attacker spend?"),
       and only the second predicts your outcome. Both are worth running; conflating them is the
       mistake.`,
   },
@@ -155,15 +155,15 @@ export const quiz = [
     ],
     answer: 1,
     explain: `The unplugged agent has a perfect security record. In the chapter's example the
-      detector blocks 40% of benign traffic — real support requests containing "disregard my previous
-      order" — and a single-number report hides that entirely. The pair is what lets you compare two
+      detector blocks 40% of benign traffic: real support requests containing "disregard my previous
+      order". A single-number report hides that entirely. The pair is what lets you compare two
       defences that both reach 0% ASR, which the A25 harness demonstrates concretely.`,
   },
   {
     q: `Why should an adaptive evaluation give the attacker your source code?`,
     options: [
       `To save them time.`,
-      `Because a defence whose effectiveness depends on secrecy of mechanism is not a defence — Kerckhoffs's principle — and you want the number that holds when they have it.`,
+      `Because a defence whose effectiveness depends on secrecy of mechanism is not a defence (Kerckhoffs's principle), and you want the number that holds when they have it.`,
       `Because open source is more secure.`,
       `Because black-box attacks are not realistic.`,
     ],
@@ -177,7 +177,7 @@ export const quiz = [
     q: `What does "3% ASR" mean without a stated attacker budget?`,
     options: [
       `That 3% of attacks succeed.`,
-      `Very little — the figure depends entirely on how long the attacker had, how many queries they made, and what access they were given.`,
+      `Very little, since the figure depends entirely on how long the attacker had, how many queries they made, and what access they were given.`,
       `That the defence is 97% effective.`,
       `That it was tested on 100 payloads.`,
     ],
@@ -192,13 +192,13 @@ export const quiz = [
     q: `You change your system prompt. What does that do to last month's adaptive evaluation result?`,
     options: [
       `Nothing, if the change was minor.`,
-      `It invalidates it — the attacker was optimising against the previous prompt, so the measured cost no longer applies.`,
+      `It invalidates it. Last month's attacker was optimising against the previous prompt, so the measured cost no longer applies.`,
       `It improves it, since the attacker's payloads are now stale.`,
       `It only matters if the change touched the defence.`,
     ],
     answer: 1,
     explain: `The result was a measurement of cost against a specific configuration, and you changed
-      the configuration. It might now be better or worse — an attacker's stale payloads failing tells
+      the configuration. It might now be better or worse. An attacker's stale payloads failing tells
       you nothing, because they would simply re-run their process. This is precisely why the cheap
       static suite still earns its place: it is the regression gate you can run on every change,
       between the expensive adaptive runs.`,
@@ -212,9 +212,9 @@ export const quiz = [
       `Because it measures utility rather than security.`,
     ],
     answer: 1,
-    explain: `Evaluation environments have tells — synthetic names, clean data, obviously-a-test
-      tasks — and the deception-and-evasion literature counts behavioural difference under evaluation
-      at 10 sources. Underestimating capability is the expensive error for dangerous-capability
+    explain: `Evaluation environments have tells: synthetic names, clean data, obviously-a-test
+      tasks. Behavioural difference under evaluation shows up at 10 sources in the
+      deception-and-evasion literature. Underestimating capability is the expensive error for dangerous-capability
       assessment specifically. The recommended posture is realistic environments, white-box access,
       generous budgets, and being able to argue that more attacker resources would not change your
       conclusion.`,

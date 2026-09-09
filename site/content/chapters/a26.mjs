@@ -5,7 +5,7 @@ export const scripts = ['/assets/js/sims/a26.js'];
 
 export const body = `
 ${p(`Every control in Part 5 can be circumvented, misconfigured, or simply absent from the path an
-attacker found. Monitoring is what tells you that happened, and — more often — what lets you reconstruct
+attacker found. Monitoring is what tells you that happened and, more often, what lets you reconstruct
 what happened six weeks later when someone asks.`)}
 
 ${h2('The trajectory record', 'trajectory')}
@@ -27,8 +27,8 @@ ${kv([
   ['<code>caused_by</code>', `Which earlier record produced this one. If you built
     <a href="/chapters/a21/">A21</a> you have it already. Without it your log says <em>what</em>
     happened; with it, <em>why</em>.`],
-  ['<code>provenance</code>', `The trust level of the causing data. This is what turns a log into a
-    detector — "a tool call whose cause was untrusted" is a query.`],
+  ['<code>provenance</code>', `The trust level of the causing data. It is what turns a log into a
+    detector. "A tool call whose cause was untrusted" is a query.`],
   ['<code>prev</code> / <code>hash</code>', `Chained hashes, so an edit to any record invalidates
     every subsequent one. Tamper-evidence for a few bytes per entry.`],
   ['<code>policy_decision</code>', `Log the <b>denials</b>, not just the successful calls. A denial is
@@ -62,21 +62,21 @@ ${ul([
    the code file implements.`,
   `<b>Activation-based</b>, and stronger: Abdelnabi and colleagues detect drift from the delta between
    the model's internal state before and after untrusted content enters the context. It does not depend
-   on parsing text at all, which makes it robust to phrasing — but it needs white-box access to the
+   on parsing text at all, which makes it robust to phrasing, but it needs white-box access to the
    model.`,
 ])}
 
 ${h2('Aggregate analysis', 'aggregate')}
 
 ${p(`Some attacks are invisible per-request by construction. The A09 slow channel sends twelve bytes to
-a CDN per session — unremarkable in isolation, and unmistakable across forty sessions. Signals worth
-computing over time rather than per-message:`)}
+a CDN per session, which is unremarkable in isolation and unmistakable across forty sessions. Signals
+worth computing over time rather than per-message:`)}
 
 ${ul([
   `Repeated contact with the same rare destination across otherwise unrelated runs.`,
-  `Uniform, small outbound payloads — a distribution that does not occur naturally.`,
+  `Uniform, small outbound payloads (a distribution that does not occur naturally).`,
   `Cost per request rising with no change in task mix (this is your <a href="/chapters/a16/">A16</a> detector).`,
-  `The same tool-call sequence appearing across unrelated users — the signature of a poisoned shared
+  `The same tool-call sequence appearing across unrelated users, the signature of a poisoned shared
    corpus (<a href="/chapters/a12/">A12</a>).`,
   `A spike in policy denials from one identity.`,
 ])}
@@ -85,8 +85,8 @@ ${h2('The endpoint as an enforcement point', 'endpoint')}
 
 ${p(`For desktop and coding agents there is a layer beneath everything discussed so far. Claude Code,
 Cowork-style desktop agents and open frameworks execute terminal commands, modify files and open network
-connections directly on a workstation — which means the observable security events are ordinary
-endpoint telemetry: process creation, file modification, network activity.`)}
+connections directly on a workstation. The observable security events are therefore ordinary endpoint
+telemetry: process creation, file modification, network activity.`)}
 
 ${p(`CrowdStrike's white paper on securing AI where it executes makes the structural argument: the
 attack surface has moved from the application layer to the execution layer, so the enforcement point
@@ -95,7 +95,7 @@ has to move with it. Two consequences worth taking regardless of vendor:`)}
 ${ul([
   `<b>Agent activity is indistinguishable from human activity at the syscall level.</b> An agent
    running <code>curl</code> and a developer running <code>curl</code> produce the same event. Telling
-   them apart requires attributing process lineage to an agent — which is the practical form of the
+   them apart requires attributing process lineage to an agent, the practical form of the
    agent-identity problem from <a href="/chapters/a22/">A22</a>.`,
   `<b>Discovery comes first.</b> Most organisations cannot enumerate which AI agents are running on
    their endpoints, with what permissions. You cannot monitor an inventory you do not have, and this
@@ -110,13 +110,13 @@ source in this field.</p>`)}
 
 ${h2('The privacy tension, stated honestly', 'privacy')}
 
-${p(`The SEI review found this contradiction sitting unresolved in its own corpus: some sources
+${p(`The SEI review found this contradiction sitting unresolved in its own corpus. Some sources
 recommend logging as much as possible to support audit and incident response, while others recommend
 minimising retention to limit privacy exposure. Both are correct, and agent traces are unusually
 sensitive because they contain the user's documents, messages and credentials as they flowed through the
 context.`)}
 
-${p(`The workable resolution is structured rather than binary: log metadata and hashes at full fidelity
+${p(`What works is structured rather than binary. Log metadata and hashes at full fidelity
 and long retention; log content at reduced fidelity with a short TTL; redact before storage rather than
 at query time; and make retention a documented decision rather than a default nobody chose.`)}
 
@@ -135,7 +135,7 @@ export const quiz = [
     q: `Which field turns an agent log from "what happened" into "why it happened"?`,
     options: [
       `A precise timestamp.`,
-      `<code>caused_by</code> — the earlier record that produced this one.`,
+      `<code>caused_by</code>, the earlier record that produced this one.`,
       `The model version.`,
       `The user ID.`,
     ],
@@ -150,12 +150,12 @@ export const quiz = [
     q: `What does hash-chaining a trajectory log prevent, and what does it not?`,
     options: [
       `It prevents an attacker reading the log; it does not prevent writes.`,
-      `It makes a silent edit impossible — any modification invalidates every subsequent hash — but it does not prevent an attacker with write access from truncating or discarding the log.`,
+      `It makes a silent edit impossible, since any modification invalidates every subsequent hash, but it does not prevent an attacker with write access from truncating or discarding the log.`,
       `It prevents log injection attacks.`,
       `It encrypts the log at rest.`,
     ],
     answer: 1,
-    explain: `Chaining gives tamper-<em>evidence</em>, not tamper-resistance: an attacker who edits
+    explain: `Chaining gives tamper-<em>evidence</em>, not tamper-resistance. An attacker who edits
       record four breaks the chain visibly from that point on, so the damage becomes detectable rather
       than invisible. Truncation and wholesale deletion remain possible, which is why you also ship
       records off-host promptly. Confidentiality and log injection are separate concerns needing
@@ -173,7 +173,7 @@ export const quiz = [
     explain: `This is a structural query over fields you already have if you record provenance and
       causality. "The user asked for a summary of a URL; this <code>send_email</code> call was caused
       by content from that URL" is a complete finding requiring no inference. The activation-delta
-      approach is stronger and more robust to phrasing, but it needs white-box model access — the
+      approach is stronger and more robust to phrasing, but it needs white-box model access. The
       structural version costs a database query.`,
   },
   {
@@ -188,7 +188,7 @@ export const quiz = [
     answer: 1,
     explain: `The slow channel is designed against per-message thresholds, so no message-level control
       can see it. The signal exists only in the joint distribution: a rare destination contacted
-      repeatedly with unnaturally uniform small payloads. Worth noting the honest ordering though — an
+      repeatedly with unnaturally uniform small payloads. Worth noting the honest ordering though. An
       egress allow-list would have prevented it outright, and prevention beats detection here.
       Aggregate monitoring is what you need when prevention was incomplete.`,
   },
@@ -196,14 +196,14 @@ export const quiz = [
     q: `Why is agent activity hard to distinguish from human activity in endpoint telemetry?`,
     options: [
       `Agents deliberately mimic human timing.`,
-      `At the syscall level an agent running <code>curl</code> and a developer running <code>curl</code> produce identical events — distinguishing them requires attributing process lineage to an agent identity.`,
+      `At the syscall level an agent running <code>curl</code> and a developer running <code>curl</code> produce identical events, and distinguishing them requires attributing process lineage to an agent identity.`,
       `Endpoint agents cannot see subprocess activity.`,
       `Agents run as root.`,
     ],
     answer: 1,
     explain: `The execution layer has no notion of intent or authorship; it sees a process and a
       syscall. Attribution requires knowing that this process tree descends from an agent runtime and
-      which task it belongs to — the practical form of A22's agent-identity problem. This is also why
+      which task it belongs to. That is the practical form of A22's agent-identity problem. This is also why
       discovery is the first step: an organisation that cannot enumerate the agents running on its
       endpoints has no basis on which to attribute anything.`,
   },
@@ -219,8 +219,8 @@ export const quiz = [
     answer: 1,
     explain: `The tension is real and the SEI review found it unresolved in its own corpus, because
       both recommendations are correct about different risks. The resolution is structural rather than
-      a choice: the fields that make a trajectory investigable — causality, provenance, tool names,
-      hashes — are cheap and not especially sensitive, while the content that makes traces a privacy
+      a choice: the fields that make a trajectory investigable (causality, provenance, tool names,
+      hashes) are cheap and not especially sensitive, while the content that makes traces a privacy
       liability is what you retain briefly and redact on the way in. What matters most is that
       retention becomes a documented decision rather than a default.`,
   },

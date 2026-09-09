@@ -1,5 +1,5 @@
-/* The spine of the course. Everything else — nav, maps, pagers, the index —
-   is derived from this file. */
+/* The spine of the course. Everything else (nav, maps, pagers, the index) is
+   derived from this file. */
 
 export const PARTS = [
   {
@@ -37,7 +37,7 @@ export const PARTS = [
     title: 'Defence at the Model Layer',
     range: 'A17–A19',
     blurb: `Guardrails, defensive prompting, and training the model to keep instructions
-            and data apart. These are the defences people reach for first — worth
+            and data apart. These are the defences people reach for first. Worth
             understanding precisely, including where each one stops working.`,
     bridge: `…which raises the cost of an attack without bounding the damage. For bounds, leave the model. So:`,
     project: null,
@@ -64,7 +64,7 @@ export const PARTS = [
   },
 ];
 
-/* code: [filename, approximate line count] — filled in by the build from disk */
+/* code: [filename, approximate line count], filled in by the build from disk */
 export const CHAPTERS = [
   // ---------------------------------------------------------------- Part 1
   { id: 'a01', part: 1, title: 'The Agent Loop',
@@ -124,7 +124,7 @@ export const CHAPTERS = [
   { id: 'a09', part: 2, title: 'Exfiltration Channels',
     sub: 'How the data actually leaves',
     desc: `An injection that cannot phone home is a nuisance. Markdown images, link
-           rendering, DNS, tool arguments and side channels — plus the CSP and egress rules
+           rendering, DNS, tool arguments and side channels, plus the CSP and egress rules
            that close each one.`,
     code: 'a09_exfiltration.py' },
 
@@ -146,7 +146,7 @@ export const CHAPTERS = [
   { id: 'a12', part: 3, title: 'Memory and Knowledge-Base Poisoning',
     sub: 'Attacks that persist after the session ends',
     desc: `RAG corpora and agent memory are write surfaces. Poison one document and the
-           attack fires on every future query that retrieves it — including for other users.`,
+           attack fires on every future query that retrieves it, including for other users.`,
     code: 'a12_memory_poisoning.py' },
 
   { id: 'a13', part: 3, title: 'The Skill Supply Chain',
@@ -258,8 +258,8 @@ export const CHAPTERS = [
 export const PROJECTS = [
   { id: 'p1', after: 1, title: 'Threat-Model a Real Agent',
     tag: 'Project 1',
-    desc: `Take an agent you actually use — a coding assistant, a browsing agent, an inbox
-           triager — and produce a complete threat model: reference architecture, trust
+    desc: `Take an agent you actually use (a coding assistant, a browsing agent, an inbox
+           triager) and produce a complete threat model: reference architecture, trust
            boundaries, surfaces, and a ranked risk register.`,
     hours: '3–4 hours' },
 

@@ -19,14 +19,14 @@ ${sim({
   ].join(''),
   body: out('a24-out'),
   note: `The decay curve is illustrative rather than measured, but its shape is well established in the
-    security usability literature — Akhawe and Felt's field data on browser warning adherence, and the
+    security usability literature: Akhawe and Felt's field data on browser warning adherence, and the
     SSL-warning work that followed. The mechanism is not laziness; it is that a prompt which is almost
     always safe to dismiss teaches people to dismiss it.`,
 })}
 
 ${callout('boundary', 'The consequence teams miss', `<p style="margin-bottom:0">An approval gate is a
 <b>shared resource</b>. Every low-value prompt you add spends from the same budget as your high-value
-prompt, and makes it weaker. Adding a confirmation to a reversible action is not free caution — it is
+prompt, and makes it weaker. Adding a confirmation to a reversible action is not free caution. It is
 a withdrawal from the account you need when something irreversible happens.</p>`)}
 
 ${h2('Grade by reversibility, not by sensitivity', 'reversibility')}
@@ -43,7 +43,7 @@ ${table(
     ['<code>write_file</code>', 'costly', 'log + notify, undo available', 'one file, restorable from snapshot'],
     ['<code>git_commit</code>', 'costly', 'log + notify, undo available', 'revertable'],
     ['<code>git push --force</code>', '<b>irreversible</b>', '<b>blocking confirmation</b>', 'the branch history'],
-    ['<code>send_email</code>', '<b>irreversible</b>', '<b>blocking confirmation</b>', 'unbounded — you cannot unsend'],
+    ['<code>send_email</code>', '<b>irreversible</b>', '<b>blocking confirmation</b>', 'unbounded; you cannot unsend'],
     ['<code>delete_repo</code>', '<b>irreversible</b>', '<b>blocking confirmation</b>', 'everything'],
     ['<code>payment</code>', '<b>irreversible</b>', '<b>blocking confirmation</b>', 'money'],
     ['<code>post_publicly</code>', '<b>irreversible</b>', '<b>blocking confirmation</b>', 'reputation'],
@@ -82,7 +82,7 @@ ${ul([
   `<b>The recipient</b>, with the reason it is unusual. Anomaly context is what turns a decision into
    an easy one.`,
   `<b>The provenance of the instruction.</b> If you built <a href="/chapters/a21/">A21</a>, you have
-   this for free — and it is the single most decision-relevant fact on the screen.`,
+   this for free, and it is the single most decision-relevant fact on the screen.`,
   `<b>A third option.</b> "Deny" alone leaves a hijacked agent running and free to try the next thing.
    "Stop the task" is the action a user actually wants when something looks wrong.`,
 ])}
@@ -109,14 +109,14 @@ ${steps([
 ${h2('Why oversight is its own threat surface', 'oversight-surface')}
 
 ${p(`The SEI taxonomy lists oversight failures as one of six surfaces, and the reason is that bad
-oversight is worse than none: it manufactures confidence. Three modes:`)}
+oversight is worse than none, because it manufactures confidence. Three modes:`)}
 
 ${kv([
   ['Human-in-the-loop failure', `Approval fatigue, as above. The reviewer is present, authorised, and
     functionally absent.`],
   ['Explainability failure', `The agent's stated reason for an action is not the reason. Reviewing the
     reasoning then validates nothing, and does so convincingly. This is why the good prompt above shows
-    <em>provenance</em> — a fact about where data came from — rather than the model's own account of
+    <em>provenance</em> (a fact about where data came from) rather than the model's own account of
     its motives.`],
   ['Monitoring failure', `Coverage gaps, drift, unparsed traces, alerts routed to nobody. Covered in
     <a href="/chapters/a26/">A26</a>.`],
@@ -141,7 +141,7 @@ export const quiz = [
     q: `Why does adding a confirmation dialog to a reversible action make the system less safe overall?`,
     options: [
       `It adds latency, which encourages users to disable confirmations.`,
-      `Approval attention is a shared, depleting budget — every low-value prompt spends from the same account as the high-value one and weakens it.`,
+      `Approval attention is a shared, depleting budget, so every low-value prompt spends from the same account as the high-value one and weakens it.`,
       `Reversible actions cannot be confirmed reliably.`,
       `It does not; more confirmation is always safer.`,
     ],
@@ -160,9 +160,9 @@ export const quiz = [
       `Regulators require reversibility grading.`,
     ],
     answer: 1,
-    explain: `The two axes disagree in exactly the cases that matter. Reversibility predicts regret —
-      it answers "if this was wrong, can we fix it?" — which is the question a confirmation exists to
-      ask. A read of a secret is contained by egress policy and can be audited afterwards; an email to
+    explain: `The two axes disagree in exactly the cases that matter. Reversibility predicts regret. It
+      answers the question a confirmation exists to ask: "if this was wrong, can we fix
+      it?" A read of a secret is contained by egress policy and can be audited afterwards; an email to
       the wrong recipient is permanent from the moment it is sent, no matter how mundane the tool
       looks.`,
   },
@@ -171,7 +171,7 @@ export const quiz = [
         information-flow control?`,
     options: [
       `Showing the recipient address.`,
-      `Showing the provenance of the instruction — that it came from a fetched page rather than from the user.`,
+      `Showing the provenance of the instruction (that it came from a fetched page rather than from the user).`,
       `Offering a third "stop the task" option.`,
       `Marking the action as irreversible.`,
     ],
@@ -203,7 +203,7 @@ export const quiz = [
     options: [
       `Raise the budget to twelve; the task genuinely needs them.`,
       `Batch them into one combined prompt.`,
-      `Make the actions reversible — drafts instead of sends, snapshots before writes — so most prompts are unnecessary.`,
+      `Make the actions reversible, using drafts instead of sends and snapshots before writes, so most prompts are unnecessary.`,
       `Reduce to three by sampling which actions to confirm.`,
     ],
     answer: 2,
@@ -219,7 +219,7 @@ export const quiz = [
         control?`,
     options: [
       `Humans cannot watch fast enough.`,
-      `The operator and the agent perceive different artefacts — payloads in <code>aria-label</code>, alt text or off-screen nodes are read by the agent and invisible on screen.`,
+      `The operator and the agent perceive different artefacts: payloads in <code>aria-label</code>, alt text or off-screen nodes are read by the agent and invisible on screen.`,
       `Screens are too small to show the full context.`,
       `Computer-use agents act too unpredictably.`,
     ],

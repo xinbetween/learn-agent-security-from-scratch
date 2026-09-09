@@ -4,9 +4,9 @@ export const meta = { time: 15, attacks: 'the number you would bet on' };
 export const scripts = ['/assets/js/sims/a25.js'];
 
 export const body = `
-${p(`You have built a defence stack. This chapter is about producing a number that means something —
-which requires understanding what the public benchmarks measure, and writing a harness for the parts
-they do not.`)}
+${p(`You have built a defence stack. This chapter is about producing a number that means something. That
+requires understanding what the public benchmarks measure, and writing a harness for the parts they do
+not.`)}
 
 ${h2('The benchmark landscape', 'landscape')}
 
@@ -24,8 +24,8 @@ ${table(
   ]
 )}
 
-${p(`What every one of them shares: the attack set is fixed. That is what makes them comparable across
-systems and across time, which is exactly what a benchmark is for — and it means a good score is a
+${p(`What every one of them shares is a fixed attack set. That is what makes them comparable across
+systems and across time, which is exactly what a benchmark is for. It also means a good score is a
 statement about known attacks. Use them as a regression suite; <a href="/chapters/a19/">A19</a> is the
 other half.`)}
 
@@ -53,7 +53,7 @@ ${sim({
   ], 'none'),
   body: out('a25-out'),
   note: `Both defended configurations reach 0% attack success. They are not equivalent, and a
-    single-number report would hide the difference entirely — which is the whole argument for the
+    single-number report would hide the difference entirely, which is the whole argument for the
     paired metric.`,
 })}
 
@@ -77,7 +77,7 @@ ${h2('Write down what your benchmark does not cover', 'gaps')}
 ${callout('note', 'The most useful paragraph nobody writes', `<p>The suite in the code file covers four
 payload styles against one tool set. It does <b>not</b> cover:</p>
 <ul style="margin-bottom:0">
-<li>Adaptive attacks (<a href="/chapters/a19/">A19</a>) — every payload was written in advance.</li>
+<li>Adaptive attacks (<a href="/chapters/a19/">A19</a>). Every payload was written in advance.</li>
 <li>Multi-turn attacks that escalate gradually across a conversation.</li>
 <li>Environmental injection (<a href="/chapters/a08/">A08</a>).</li>
 <li>Any task requiring legitimate egress, which is where the interesting policy conflicts live.</li>
@@ -103,14 +103,14 @@ conclusion.`)}
 ${h2('A practical evaluation cadence', 'cadence')}
 
 ${steps([
-  ['Every commit — the static suite',
+  ['The static suite, every commit',
    `Cheap, deterministic, and it catches regressions. This is what your public-benchmark-shaped harness
     is for.`],
-  ['Every release — the utility suite',
+  ['The utility suite, every release',
    `Because a defence that quietly degraded task success is a defence people will route around.`],
-  ['Every quarter, and after any change to the defence — an adaptive run',
+  ['An adaptive run, every quarter and after any change to the defence',
    `White-box, budgeted, iterative, reported with the budget. This is the number you would bet on.`],
-  ['Continuously in production — the real distribution',
+  ['The real distribution, continuously in production',
    `Policy denials, drift alerts and cost anomalies are an evaluation signal from traffic you did not
     design (<a href="/chapters/a26/">A26</a>).`],
 ])}
@@ -131,7 +131,7 @@ export const quiz = [
         concluding they are equivalent?`,
     options: [
       `Which model each one used.`,
-      `Utility retention — one may be blocking legitimate work to achieve its score.`,
+      `Utility retention, since one may be blocking legitimate work to achieve its score.`,
       `How long each evaluation took.`,
       `The number of attack payloads.`,
     ],
@@ -146,14 +146,14 @@ export const quiz = [
     q: `What do all the public agent-security benchmarks have in common, and what follows?`,
     options: [
       `They use the same models, so results are not portable.`,
-      `Their attack sets are fixed, which makes results comparable across systems and time — and means a good score describes known attacks rather than security.`,
+      `Their attack sets are fixed, which makes results comparable across systems and time, and means a good score describes known attacks rather than security.`,
       `They only test web agents.`,
       `They require API access to a frontier model.`,
     ],
     answer: 1,
-    explain: `Fixedness is the design goal, not a flaw: it is what lets you compare your agent against
+    explain: `Fixedness is the design goal, not a flaw. It is what lets you compare your agent against
       last quarter's and against someone else's, and what makes a regression suite possible. The error
-      is in the inference — treating "scores well on the benchmark" as "is secure". Both numbers
+      is in the inference, treating "scores well on the benchmark" as "is secure". Both numbers
       matter; A19's adaptive run is what tells you attacker cost, and the static suite is what you run
       on every commit.`,
   },
@@ -162,15 +162,15 @@ export const quiz = [
         report?`,
     options: [
       `It is required by most conferences.`,
-      `A reader can calibrate a limited result but cannot calibrate an unbounded claim — the omissions determine what the number actually licenses you to believe.`,
+      `A reader can calibrate a limited result but cannot calibrate an unbounded claim. The omissions determine what the number actually licenses you to believe.`,
       `It shortens the methods section.`,
       `It protects against liability.`,
     ],
     answer: 1,
-    explain: `"0% ASR" with no scope is unusable: it might mean four hand-written payloads against one
+    explain: `"0% ASR" with no scope is unusable. It might mean four hand-written payloads against one
       tool, or a month of adaptive attack against the full system. Stating that the suite omits
       adaptive attacks, multi-turn escalation, environmental injection and egress-requiring tasks lets
-      a reader place the result correctly — and, in practice, tells your own team where the next
+      a reader place the result correctly, and in practice it tells your own team where the next
       quarter's work is.`,
   },
   {
@@ -198,7 +198,7 @@ export const quiz = [
       `Manual review by a security engineer.`,
     ],
     answer: 1,
-    explain: `The static suite's fixedness — its weakness as a security claim — is exactly what makes
+    explain: `The static suite's fixedness (its weakness as a security claim) is exactly what makes
       it a good regression gate: deterministic, fast, and comparable to yesterday's run. The adaptive
       evaluation is expensive and human-driven, so it belongs on a slower cadence and after any change
       to the defence, since a prompt tweak invalidates the previous adaptive result anyway.`,
@@ -208,7 +208,7 @@ export const quiz = [
         <code>attack_check</code> to every case rather than running separate suites?`,
     options: [
       `To reduce total runtime.`,
-      `Because both properties must be measured on the <em>same</em> run — a defence can pass a separate utility suite and still break the specific tasks that trigger it.`,
+      `Because both properties must be measured on the <em>same</em> run. A defence can pass a separate utility suite and still break the specific tasks that trigger it.`,
       `Because attack cases have no utility.`,
       `To simplify reporting.`,
     ],

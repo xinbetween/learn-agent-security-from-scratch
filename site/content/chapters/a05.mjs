@@ -24,7 +24,7 @@ ${svgText(628, 192, 'nobody owns.', 'd-attack-t')}
 `, { label: 'The seven MAESTRO layers with ownership marked' });
 
 export const body = `
-${p(`Five frameworks, all reasonable, all in use. The question is not which one is best — it is which
+${p(`Five frameworks, all reasonable, all in use. The question is not which one is best. It is which
 one you should run on a Tuesday afternoon when you have ninety minutes and an agent going to
 production on Friday. This chapter runs all five against the same system so you can see what each one
 finds that the others do not.`)}
@@ -85,9 +85,9 @@ ${table(
 )}
 
 ${figure(maestro, `<b>MAESTRO's layers, and the ownership line.</b> You inherit L1 and much of L7 and
-can only manage the risk; you build L2 through L6 and can fix it. The threats that hurt most are the
-ones that cross the line — a hosted model's jailbreak (L1) reached through your unvalidated RAG (L2)
-and executed by your tool layer (L3) — because no single team owns the path.`)}
+can only manage the risk; you build L2 through L6 and can fix it. The threats that hurt most cross
+the line. A hosted model's jailbreak (L1) reached through your unvalidated RAG (L2) and executed by
+your tool layer (L3) hurts precisely because no single team owns the path.`)}
 
 ${h2('The finding that only one framework produced', 'unique-findings')}
 
@@ -136,7 +136,7 @@ ${callout('warn', 'The failure mode of framework enthusiasm', `<p style="margin-
 five badly is worse than running one properly. A threat model's value is in the findings you act on,
 and five parallel documents with overlapping findings and no owner produce nothing. Pick one primary
 lens, run it thoroughly, use the others to spot-check for the categories you know that lens is blind
-to — the "weak at" column above is the list of what to spot-check.</p>`)}
+to. The "weak at" column above is the list of what to spot-check.</p>`)}
 
 ${h2('What you should be able to do now', 'checkpoint')}
 
@@ -175,7 +175,7 @@ export const quiz = [
       `NIST AI RMF, under MAP.`,
     ],
     answer: 1,
-    explain: `MAESTRO is the only one of the five with an explicit layer for the agent ecosystem —
+    explain: `MAESTRO is the only one of the five with an explicit layer for the agent ecosystem:
       other agents, marketplaces, and the edges between systems that no single team drew. That edge is
       also a complete trifecta assembled from two components that individually pass the test, which is
       the A03 composition failure. NIST's MAP function would ask for an inventory and might catch it
@@ -194,7 +194,7 @@ export const quiz = [
     explain: `The frameworks mostly agree, so five parallel passes produce five overlapping documents
       and one under-resourced remediation backlog. A threat model is worth exactly the findings that
       get fixed. One lens run properly, with an owner and a ranked register, beats five run
-      superficially — use the others as a spot-check against the specific blind spots you know your
+      superficially. Use the others as a spot-check against the specific blind spots you know your
       primary lens has.`,
   },
   {
@@ -209,8 +209,8 @@ export const quiz = [
     explain: `You inherit the hosted model's alignment, its jailbreaks and its training data (L1),
       and you inherit the behaviour of other people's agents and marketplaces (L7). Neither can be
       patched by you. What follows is that your controls at L2 through L6 must be designed on the
-      assumption that L1 will fail — which is the same conclusion A02 reached from a different
-      direction, and the reason "bounds damage" controls matter more than "raises cost" ones.`,
+      assumption that L1 will fail. A02 reached the same conclusion from a different direction, and
+      it is why "bounds damage" controls matter more than "raises cost" ones.`,
   },
   {
     q: `What is MITRE ATLAS best used for in this workflow?`,
@@ -221,7 +221,7 @@ export const quiz = [
       `Providing a developer-facing checklist.`,
     ],
     answer: 1,
-    explain: `ATLAS is descriptive — a catalogue of observed adversary techniques with IDs — rather
+    explain: `ATLAS is descriptive (a catalogue of observed adversary techniques with IDs) rather
       than generative. It is not the tool that makes you think of a threat, but it is the tool that
       makes your threat legible to a detection engineer, comparable to what another team found, and
       searchable in a year. Generation is STRIDE's and MAESTRO's job; the checklist is OWASP's;

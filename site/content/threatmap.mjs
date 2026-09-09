@@ -19,7 +19,7 @@ export const SURFACES = [
       documents, other agents' messages. This is the surface that distinguishes agents from chatbots,
       and it is where industry sources concentrate their concern.`,
     classes: [
-      ['Indirect prompt injection', 'Plants instructions in content the agent will retrieve — a page, an email, a PR comment, a filename — and waits.', 'a07'],
+      ['Indirect prompt injection', 'Plants instructions in a page, an email, a PR comment or a filename the agent will retrieve, then waits.', 'a07'],
       ['Environmental injection', 'Places the payload in a rendered surface a computer-use agent perceives: pop-up, screenshot text, DOM node, accessibility label.', 'a08'],
       ['Tool attacks', 'Poisons tool metadata, shadows another server\'s tool, or mutates a tool after approval.', 'a11'],
       ['Insecure plugin design', 'Exploits a tool that accepts free-form input and passes it to a shell, an SQL engine, an eval, or an HTTP client.', 'a23'],
@@ -31,7 +31,7 @@ export const SURFACES = [
   },
   {
     n: 'S3', title: 'Internal threats', sources: '62 sources · 31 academic · 31 industry',
-    blurb: `Failures of the model itself — introduced in training or emerging at inference. The
+    blurb: `Failures of the model itself, introduced in training or emerging at inference. The
       largest surface by source count, and the one academia weights most heavily.`,
     classes: [
       ['Foundation model vulnerabilities', 'Misalignment, hallucination and plain inaccuracy producing harmful actions with no adversary present at all.', 'a04'],
@@ -49,7 +49,7 @@ export const SURFACES = [
     classes: [
       ['Denial of service', 'Exhausts the agent\'s compute, rate limit or context budget, or the shared queue it sits behind.', 'a16'],
       ['Denial of wallet', 'Forces long reasoning chains, tool-call storms or repeated retries whose cost is billed to the operator.', 'a16'],
-      ['Compute misuse', 'Repurposes the agent\'s execution environment for the attacker\'s own work — scanning, mining, relaying.', 'a16'],
+      ['Compute misuse', 'Repurposes the agent\'s execution environment for the attacker\'s own work: scanning, mining, relaying.', 'a16'],
       ['Cyber compromise', 'Ordinary intrusion into the host, container, network or API surface the agent runs on.', 'a23'],
       ['Supply chain attacks', 'Compromises a package, model file, MCP server, skill or container image the agent depends on.', 'a13'],
       ['Physical compromise', 'Attacks the device for embodied and edge agents, where the actuator is real.', 'a08'],

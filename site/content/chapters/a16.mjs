@@ -5,7 +5,7 @@ export const scripts = ['/assets/js/sims/a16.js'];
 
 export const body = `
 ${p(`Every other chapter in this part is about an attacker taking something. This one is about an
-attacker taking nothing and costing you a great deal anyway — by making the agent think for a very
+attacker taking nothing and costing you a great deal anyway, by making the agent think for a very
 long time, call tools in a loop, or occupy a queue that real users need.`)}
 
 ${h2('Amplification: a small input, a large bill', 'amplification')}
@@ -21,15 +21,15 @@ ${table(
 )}
 
 ${p(`The numbers are per request. An attacker with a script and no rate limit runs them continuously,
-and the interesting property is that none of this requires a vulnerability — every one of those is the
+and the interesting property is that none of this requires a vulnerability. Every one of those is the
 agent working exactly as designed, on a request it was built to accept.`)}
 
 ${callout('attack', 'The stealthy version', `<p style="margin-bottom:0">"Beyond Max Tokens" (2026)
 describes a modified MCP tool server that returns slightly-expanded results each round, inflating the
 agent's context every iteration. Reported cost inflation up to <b>658×</b>, and it is stealthy because
-each individual response looks reasonable — only the trajectory shows the growth. Your
-<code>max_tokens</code> cap does not help: the attack is in the number of rounds and the growth per
-round, not in any single response.</p>`)}
+each individual response looks reasonable. Only the trajectory shows the growth. Your
+<code>max_tokens</code> cap does not help, because the attack is in the number of rounds and the
+growth per round, not in any single response.</p>`)}
 
 ${h2('Budgets, and where each one has to live', 'budgets')}
 
@@ -77,7 +77,7 @@ ${kv([
     most teams have, and on its own it means an attacker just starts a thousand runs.`],
   ['Per identity', `Requests per minute, concurrent runs, daily spend. This is the one that actually
     closes denial-of-wallet, and it is ten lines of code.`],
-  ['Per tool', `Call count and — importantly — <b>result-size cap</b>. The size cap is what kills the
+  ['Per tool', `Call count and, importantly, <b>result-size cap</b>. The size cap is what kills the
     MCP amplifier, because it bounds the growth per round rather than the total.`],
   ['Per tenant', `Shared-queue admission control, so one customer's runaway task cannot deny service
     to the others. The failure mode people forget until it happens.`],
@@ -93,7 +93,7 @@ ${ul([
    task accuracy</em>. The output is correct, so quality monitoring sees nothing; only the token
    meter moves.`,
   `<b>Guardrail denial of service.</b> If your safety layer is itself a model, an attacker can target
-   the guardrail rather than the agent — inputs that push the classifier into long reasoning loops
+   the guardrail rather than the agent. Inputs that push the classifier into long reasoning loops
    exhaust the defence and, depending on your failure mode, either block legitimate traffic or fail
    open. Decide which, explicitly, before it happens.`,
 ])}
@@ -108,8 +108,8 @@ ${h2('Why this chapter exists', 'why')}
 
 ${p(`Denial of wallet is the attack teams forget because it steals nothing. It shows up as a surprising
 invoice, or as a queue that has been slow for a week, and it is often diagnosed as a capacity problem
-rather than as an attack. The controls are among the cheapest in the whole course — a per-identity
-spend cap is a few lines — and they are frequently absent entirely because nobody assigned the risk to
+rather than as an attack. The controls are among the cheapest in the whole course (a per-identity
+spend cap is a few lines), and they are frequently absent entirely because nobody assigned the risk to
 anyone.`)}
 
 ${h2('What you should be able to do now', 'checkpoint')}
@@ -132,10 +132,10 @@ export const quiz = [
       `The limit applies only to input tokens.`,
     ],
     answer: 1,
-    explain: `Each response stays comfortably under the cap and looks reasonable in isolation — that
+    explain: `Each response stays comfortably under the cap and looks reasonable in isolation, which
       is what makes the attack stealthy. The cost accumulates across iterations as the tool returns
-      slightly more each time and the growing context is re-read on every round. The controls that
-      match the attack are a per-run token or spend budget over the whole trajectory, and a per-tool
+      slightly more each time and the growing context is re-read on every round. Two controls match
+      the attack: a per-run token or spend budget over the whole trajectory, and a per-tool
       result-size cap that bounds the growth rather than the total.`,
   },
   {
@@ -148,9 +148,9 @@ export const quiz = [
     ],
     answer: 1,
     explain: `A per-run cap bounds one task and says nothing about how many tasks an identity may
-      start. This is the most common gap: the obvious limit is per-run because that is where the loop
-      lives, and the attack simply parallelises. A per-identity budget — requests per minute,
-      concurrent runs, daily spend — is what closes denial of wallet, and it is a handful of lines
+      start. This is the most common gap. The obvious limit is per-run because that is where the loop
+      lives, and the attack simply parallelises. A per-identity budget covering requests per minute,
+      concurrent runs and daily spend is what closes denial of wallet, and it is a handful of lines
       sitting in front of the agent rather than inside it.`,
   },
   {
@@ -164,7 +164,8 @@ export const quiz = [
     ],
     answer: 1,
     explain: `This is the CODE overthinking attack's key property: task accuracy is preserved. Every
-      evaluation you run — correctness, latency SLOs, user satisfaction — reports healthy. The only
+      evaluation you run reports healthy, whether that is correctness, latency SLOs or user
+      satisfaction. The only
       indicator is spend per request, which typically lives in a finance dashboard rather than a
       security one. It is a good argument for putting cost-per-request in the same monitoring surface
       as your other agent telemetry (A26).`,
@@ -172,15 +173,15 @@ export const quiz = [
   {
     q: `Your guardrail model times out under load. Should the request proceed?`,
     options: [
-      `Always proceed — availability matters more.`,
-      `Always reject — security matters more.`,
+      `Always proceed, because availability matters more.`,
+      `Always reject, because security matters more.`,
       `Either is defensible, but the wrong answer is whichever you did not choose deliberately and test.`,
       `Retry indefinitely until the guardrail responds.`,
     ],
     answer: 2,
     explain: `Failing open under load turns a resource attack into an injection window; failing
       closed turns it into an outage that an attacker can trigger at will. Which trade-off is correct
-      depends on what your agent does — a coding assistant and a payments agent should choose
+      depends on what your agent does. A coding assistant and a payments agent should choose
       differently. What is never correct is discovering the behaviour during an incident, and
       retrying indefinitely is just failing closed with extra cost.`,
   },
@@ -194,10 +195,10 @@ export const quiz = [
       `Per tool.`,
     ],
     answer: 2,
-    explain: `Per-run and per-identity budgets bound consumption but not queue occupancy: a tenant
+    explain: `Per-run and per-identity budgets bound consumption but not queue occupancy. A tenant
       within their spend limit can still fill the queue and starve everyone else. Admission control at
-      the tenant level — reserved capacity or fair queuing — is what preserves service for the other
-      customers. This is the scope teams add last, usually after the first incident where a paying
+      the tenant level, whether reserved capacity or fair queuing, is what preserves service for the
+      other customers. This is the scope teams add last, usually after the first incident where a paying
       customer's agent was slow for a week because of somebody else.`,
   },
   {

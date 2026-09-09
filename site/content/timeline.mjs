@@ -21,7 +21,7 @@ export const EVENTS = [
   ['2024-03', 'attack', 'InjecAgent',
    'Zhan et al. benchmark indirect prompt injection in tool-integrated agents and report high success rates against frontier models.', 'a25'],
   ['2024-04', 'defense', 'The Instruction Hierarchy',
-   'Wallace et al. (OpenAI) train models to rank instruction sources by privilege — the first large-scale training-time answer to injection.', 'a18'],
+   'Wallace et al. (OpenAI) train models to rank instruction sources by privilege, the first large-scale training-time answer to injection.', 'a18'],
   ['2024-02', 'defense', 'StruQ',
    'Chen et al. propose structured queries: separate the instruction and data channels and fine-tune the model to respect the separation.', 'a18'],
   ['2024-06', 'benchmark', 'AgentDojo',

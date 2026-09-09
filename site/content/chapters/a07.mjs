@@ -52,14 +52,14 @@ retrieve, and it fires for every user whose task touches that page.`)}
 ${h2('The chain', 'chain')}
 
 ${figure(chain, `<b>Five links, and only two of them are yours.</b> The dashed box is the region where
-the model's judgement is the control — which is exactly the region where guarantees are unavailable.
+the model's judgement is the control. That is exactly the region where guarantees are unavailable.
 Every architectural defence in Part 5 works by moving the enforcement point to link 4 or link 5, where
 the decision is made by code that has no opinion about language.`)}
 
 ${h2('Four payloads against one agent', 'lab')}
 
 ${p(`The lab runs the real chain. Pick a payload style and watch each link fire, then switch on a
-control and see which link it breaks — and, importantly, which links still fire.`)}
+control and see which link it breaks and, importantly, which links still fire.`)}
 
 ${sim({
   name: 'a07chain',
@@ -96,15 +96,15 @@ ${table(
     ['You can rate-limit them', 'yes', 'they wrote the page last year'],
     ['You can ban the account', 'yes', 'there is no account'],
     ['The victim', 'consented to the session', 'never sees the payload'],
-    ['Chokepoints for filtering', 'one — the user input', 'every tool result, forever'],
+    ['Chokepoints for filtering', 'one, the user input', 'every tool result, forever'],
     ['Blast radius', 'their session', '<b>every user whose task retrieves that document</b>'],
   ]
 )}
 
 ${p(`The last row is the reason indirect injection is treated as its own discipline. A poisoned wiki
 page, dependency README or knowledge-base article is a persistent attack on a population, not a
-transient attack on a session — which is why <a href="/chapters/a12/">A12</a> treats it as a
-persistence problem and why detection has to run on retrieval, not only on input.`)}
+transient attack on a session. That is why <a href="/chapters/a12/">A12</a> treats it as a
+persistence problem, and why detection has to run on retrieval, not only on input.`)}
 
 ${h2('Delivery vectors, ranked by attacker cost', 'vectors')}
 
@@ -131,7 +131,7 @@ you until it fires.`)}
 
 ${callout('attack', 'The pre-positioning problem', `<p style="margin-bottom:0">Because the payload is
 planted before the agent exists, you cannot reason about "current" attacks. Content written in 2024
-for one agent product will fire against yours in 2027 if the phrasing generalises — and phrasings like
+for one agent product will fire against yours in 2027 if the phrasing generalises, and phrasings like
 "NOTE FOR AUTOMATED READERS" generalise very well. Treat every corpus your agent reads as containing
 payloads already, and design accordingly.</p>`)}
 
@@ -176,7 +176,7 @@ ${p(`Teams almost always put their injection classifier on the user input path, 
 the request-handling code already is. For indirect injection this is close to useless: the payload
 never touches that path.`)}
 ${p(`Put the detector on the <em>tool result</em> path, where the untrusted bytes actually enter. This
-is harder — tool results are long, structured, high-volume and latency-sensitive — but it is where the
+is harder (tool results are long, structured, high-volume and latency-sensitive), but it is where the
 attack is. Then note what it buys: a classifier on the retrieval path is still a cost-raising control
 with a false-negative rate, and A17 works through the arithmetic of what that rate means at your
 traffic volume. It belongs in the stack, above the bounding controls, not instead of them.`)}`)}
@@ -197,7 +197,7 @@ export const quiz = [
         injection risk is now mitigated. What is wrong?`,
     options: [
       `Classifiers are unreliable.`,
-      `The indirect payload never traverses the user input path — it enters through tool results, which the classifier does not see.`,
+      `The indirect payload never traverses the user input path. It enters through tool results, which the classifier does not see.`,
       `The classifier will add too much latency.`,
       `Nothing is wrong; input filtering covers both cases.`,
     ],
@@ -205,16 +205,17 @@ export const quiz = [
     explain: `This is the single most common misplacement in production agents. The user typed
       "summarise this page"; that message is clean and always will be. The payload arrives several
       hundred tokens later inside the fetched content, on a path with no detector on it. Moving the
-      classifier to the tool-result path is the right fix and is genuinely harder — high volume, long
-      structured documents, latency budget — which is exactly why teams do not do it by default.`,
+      classifier to the tool-result path is the right fix, and it is genuinely harder, which is
+      exactly why teams do not do it by default: high volume, long structured documents, latency
+      budget.`,
   },
   {
     q: `Which link in the chain offers a control that holds even when the model is fully hijacked?`,
     options: [
-      `Link 2 — restricting which sources the agent may retrieve.`,
-      `Link 3 — spotlighting and guardrails on the retrieved content.`,
-      `Link 4 — capability scoping, so the tool the payload wants is not available at all.`,
-      `Link 1 — preventing attackers from publishing malicious content.`,
+      `Link 2: restricting which sources the agent may retrieve.`,
+      `Link 3: spotlighting and guardrails on the retrieved content.`,
+      `Link 4: capability scoping, so the tool the payload wants is not available at all.`,
+      `Link 1: preventing attackers from publishing malicious content.`,
     ],
     answer: 2,
     explain: `Link 4 is enforced by code that never consults the model, so it holds regardless of
@@ -243,7 +244,7 @@ export const quiz = [
         an attacker to reach, and what does that imply?`,
     options: [
       `Link 3, by crafting a more persuasive payload.`,
-      `Link 1, by publishing a package with a README containing the payload and waiting — no compromise of anything is required.`,
+      `Link 1, by publishing a package with a README containing the payload and waiting. No compromise of anything is required.`,
       `Link 5, by controlling the exfiltration endpoint.`,
       `Link 4, by finding an unprotected tool.`,
     ],
@@ -265,8 +266,8 @@ export const quiz = [
     ],
     answer: 1,
     explain: `A bounded compromise is still an incident. It tells you a payload reached your agent,
-      which means the source is poisoned and other agents — yours or someone else's, with weaker
-      controls — are being hit by the same content. Collapsing the two into "no harm, no finding"
+      which means the source is poisoned and other agents (yours or someone else's, with weaker
+      controls) are being hit by the same content. Collapsing the two into "no harm, no finding"
       loses the signal you need to clean the corpus, alert the source owner, and notice that you are
       being targeted rather than incidentally exposed.`,
   },
@@ -284,7 +285,7 @@ export const quiz = [
       authors, plus everyone who can phish one of them. "Read-only for external users" does not help
       when the attack is an insider or a compromised account, and scanning reduces to the same
       false-negative problem as any classifier. The workable version is to treat writability as the
-      trust label and carry it as taint — which is exactly what A21 builds.`,
+      trust label and carry it as taint, which is exactly what A21 builds.`,
   },
 ];
 

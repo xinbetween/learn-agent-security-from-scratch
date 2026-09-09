@@ -21,7 +21,7 @@ ${svgText(360, 282, 'Everything above the line is documentation. Everything belo
 
 export const body = `
 ${p(`Every chapter so far has tried to prevent something. This one assumes prevention failed. The
-injection landed, the model is hostile, and the question is what the blast radius is — which is a
+injection landed, the model is hostile, and the question is what the blast radius is, which is a
 property of the environment, not of the agent.`)}
 
 ${h2('An egress allow-list that is actually correct', 'egress')}
@@ -67,13 +67,13 @@ ${sim({
 
 ${h2('Where you enforce it decides whether it is a control', 'placement')}
 
-${figure(layers, `<b>An in-process check is advisory.</b> An agent that can run code — a coding agent,
-a data-analysis agent, anything with a shell or an interpreter — opens its own socket and never calls
+${figure(layers, `<b>An in-process check is advisory.</b> An agent that can run code (a coding agent,
+a data-analysis agent, anything with a shell or an interpreter) opens its own socket and never calls
 your function. The dashed line is the level the agent operates at; enforcement has to sit below it.`)}
 
 ${callout('warn', 'The check that matters most is the one you cannot write in Python', `<p style="margin-bottom:0">If your agent executes model-generated code, every guard implemented in the
-same process is a suggestion. Network policy in the pod, an egress proxy the container must route
-through, or simply no route to the internet — these are the versions an attacker cannot skip. They
+same process is a suggestion. These are the versions an attacker cannot skip: network policy in the
+pod, an egress proxy the container must route through, or simply no route to the internet. They
 also happen to catch DNS, which an HTTP client wrapper does not.</p>`)}
 
 ${h2('Filesystem containment', 'filesystem')}
@@ -88,7 +88,7 @@ ${code(`def path_ok(path: str) -> tuple:
 
 ${p(`Normalise <em>first</em>, then check. Checking the raw string is the classic bug:
 <code>sub/../../escape.txt</code> contains no <code>..</code> prefix and still escapes. And prefer a
-real boundary where you can get one — a bind mount, a container with only the workspace visible — over
+real boundary where you can get one (a bind mount, a container with only the workspace visible) over
 a string comparison, for the same reason as above.`)}
 
 ${h2('Choosing an isolation level', 'isolation')}
@@ -97,16 +97,16 @@ ${table(
   ['Level', 'Boundary', 'Setup', 'When'],
   [
     ['Same process', 'none', 'trivial', 'Never, for untrusted code.'],
-    ['Subprocess + separate user', 'OS user separation', 'minutes', 'Weak — shares the kernel and the network namespace.'],
+    ['Subprocess + separate user', 'OS user separation', 'minutes', 'Weak. Shares the kernel and the network namespace.'],
     ['Container', 'namespaces + cgroups', 'minutes', '<b>The default.</b> Drop capabilities, read-only rootfs, no host network.'],
     ['gVisor / Kata', 'syscall interception', 'hours', 'When the kernel is in your threat model.'],
-    ['Micro-VM (Firecracker)', 'hardware virtualisation', 'hours', 'Strong isolation with ~125 ms boot — practical per-task VMs.'],
+    ['Micro-VM (Firecracker)', 'hardware virtualisation', 'hours', 'Strong isolation with ~125 ms boot, so per-task VMs are practical.'],
     ['WASM', 'capability-based by design', 'hours', 'Excellent for tools; limited runtime and library support.'],
     ['Separate machine', 'physical', 'days', 'Computer-use agents holding real credentials.'],
   ]
 )}
 
-${p(`For a computer-use agent the sandbox is not one control among many — it is the primary one,
+${p(`For a computer-use agent the sandbox is not one control among many. It is the primary one,
 because the action space (<code>click</code>, <code>type</code>) is not policy-shaped, as
 <a href="/chapters/a08/">A08</a> established. A CUA in a disposable VM with a fresh profile and no
 ambient credentials is a categorically different risk from a CUA on your laptop, and that difference is
@@ -121,9 +121,9 @@ ${ul([
    reaching it is credential theft, not exfiltration, and it deserves its own explicit deny so the
    finding is legible.`,
   `<b>Read-only root filesystem</b>, with a single writable workspace volume.`,
-  `<b>Drop all capabilities</b>, then add back only what is needed — usually nothing.`,
+  `<b>Drop all capabilities</b>, then add back only what is needed, which is usually nothing.`,
   `<b>No host network.</b> Egress through a proxy that enforces the allow-list.`,
-  `<b>Resource limits</b> — CPU, memory, PIDs, disk — which is also your
+  `<b>Resource limits</b> on CPU, memory, PIDs and disk, which is also your
    <a href="/chapters/a16/">A16</a> control.`,
   `<b>Ephemeral.</b> Destroy and recreate per task, so persistence attacks have nowhere to live.`,
 ])}
@@ -150,7 +150,7 @@ export const quiz = [
     q: `Why does <code>https://api.internal.corp@evil.example/x</code> defeat a substring check?`,
     options: [
       `The <code>@</code> is URL-encoded.`,
-      `Everything before the <code>@</code> is userinfo, so the actual host is <code>evil.example</code> — but the allowed string is present in the URL.`,
+      `Everything before the <code>@</code> is userinfo, so the actual host is <code>evil.example</code>, but the allowed string is present in the URL.`,
       `The URL is malformed and parsers reject it.`,
       `It uses a non-standard port.`,
     ],
@@ -167,22 +167,22 @@ export const quiz = [
         your HTTP helper. What have you achieved?`,
     options: [
       `A working egress control.`,
-      `Documentation — the generated code can open its own socket, or import a different HTTP library, and never call your helper.`,
+      `Documentation. The generated code can open its own socket, or import a different HTTP library, and never call your helper.`,
       `Protection against everything except DNS.`,
       `A control that works if the model is not adversarial.`,
     ],
     answer: 1,
     explain: `An in-process check binds only code that chooses to call it, and model-generated code
       makes no such promise. This is the single most common false sense of security in agent
-      sandboxing. Enforcement must sit below the level the agent operates at — network policy in the
-      pod, a proxy the container is forced through, or no route at all — which has the side benefit of
+      sandboxing. Enforcement must sit below the level the agent operates at: network policy in the
+      pod, a proxy the container is forced through, or no route at all. Those have the side benefit of
       covering DNS and raw sockets rather than just your helper's callers.`,
   },
   {
     q: `Why does <code>path_ok</code> normalise the path before checking it?`,
     options: [
       `To handle Windows separators.`,
-      `Because <code>sub/../../escape.txt</code> contains no leading <code>..</code> and still escapes the workspace — only the resolved path reveals it.`,
+      `Because <code>sub/../../escape.txt</code> contains no leading <code>..</code> and still escapes the workspace; only the resolved path reveals it.`,
       `To improve performance.`,
       `Because symlinks require normalisation.`,
     ],
@@ -190,8 +190,8 @@ export const quiz = [
     explain: `Checking the raw string tests what the input looks like rather than where it points.
       Traversal sequences can be buried mid-path, URL-encoded, or produced by concatenation. Resolving
       first and then testing the prefix is the correct order. Better still, where you can afford it, is
-      a real boundary — a bind mount or a container that simply cannot see anything else — so the
-      question never reaches string comparison. Symlinks are a genuine additional concern that
+      a real boundary, such as a bind mount or a container that simply cannot see anything else, so
+      the question never reaches string comparison. Symlinks are a genuine additional concern that
       <code>normpath</code> alone does not resolve.`,
   },
   {
@@ -199,7 +199,7 @@ export const quiz = [
         allow-list?`,
     options: [
       `It is a common typo.`,
-      `It is the cloud instance metadata service — reaching it is credential theft rather than exfiltration, and naming it explicitly makes the finding legible.`,
+      `It is the cloud instance metadata service, so reaching it is credential theft rather than exfiltration, and naming it explicitly makes the finding legible.`,
       `It bypasses DNS resolution.`,
       `Allow-lists do not cover IP literals.`,
     ],

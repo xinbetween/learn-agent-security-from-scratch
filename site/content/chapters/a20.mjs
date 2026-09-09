@@ -52,11 +52,11 @@ ${sim({
 ${table(
   ['Pattern', 'The property', 'What you give up'],
   [
-    ['<b>Action-selector</b>', 'No feedback loop at all — the agent never sees tool output, so there is no injection path.', 'Cannot use tool results. Suits fixed menus of operations.'],
-    ['<b>Plan-then-execute</b>', 'Control-flow integrity — the plan is fixed before untrusted content arrives, so injection can alter arguments but not add steps.', 'No adaptive replanning. The agent cannot react to what it finds.'],
+    ['<b>Action-selector</b>', 'No feedback loop at all. The agent never sees tool output, so there is no injection path.', 'Cannot use tool results. Suits fixed menus of operations.'],
+    ['<b>Plan-then-execute</b>', 'Control-flow integrity: the plan is fixed before untrusted content arrives, so injection can alter arguments but not add steps.', 'No adaptive replanning. The agent cannot react to what it finds.'],
     ['<b>Dual LLM</b>', 'The privileged model never reads untrusted content; it manipulates opaque references.', 'Only opaque values cross the boundary. Reasoning about content is confined to the quarantined side.'],
     ['<b>Code-then-execute</b>', 'Control flow is a program derived from the trusted query; untrusted data flows through it as values.', 'The task must be expressible as code. This is the road to CaMeL (<a href="/chapters/a21/">A21</a>).'],
-    ['<b>Context minimisation</b>', 'Untrusted text is removed from context before the action decision — only an extracted fact remains.', 'The extraction step is itself attackable, so this is the weakest of the six.'],
+    ['<b>Context minimisation</b>', 'Untrusted text is removed from context before the action decision, leaving only an extracted fact.', 'The extraction step is itself attackable, so this is the weakest of the six.'],
     ['<b>Map-reduce</b>', 'Each untrusted item is processed by an isolated, tool-less agent; a trusted reducer combines results.', 'No cross-item reasoning. Good for triage, poor for synthesis.'],
   ]
 )}
@@ -85,7 +85,7 @@ of attacks that route through the agent's <em>control flow</em>. Three things th
 <ul style="margin-bottom:0">
 <li>They do not make the agent's <b>output</b> trustworthy. A summariser under
 plan-then-execute can still produce an attacker-influenced summary, which a human then acts on.</li>
-<li>They do not help if the task genuinely requires <b>open-ended action on untrusted content</b> —
+<li>They do not help if the task genuinely requires <b>open-ended action on untrusted content</b>;
 "read my email and do whatever it says" has no secure architecture, and the right answer is to not
 build it.</li>
 <li>They do not address model-level threats (<a href="/chapters/a14/">A14</a>) or resource attacks
@@ -110,7 +110,7 @@ ${steps([
    `Every branch you can express as a Python <code>if</code> rather than as a model decision is a
     branch an injection cannot take.`],
   ['Then add the policy layer',
-   `Once control flow is code, values can carry tags and sinks can enforce policy —
+   `Once control flow is code, values can carry tags and sinks can enforce policy. That is
     <a href="/chapters/a21/">A21</a>.`],
 ])}
 
@@ -130,7 +130,7 @@ export const quiz = [
         does this not compromise the system?`,
     options: [
       `The quarantined model is smaller and less capable.`,
-      `It has no tools, and it returns only an opaque variable reference — the privileged model never reads the content, so no phrasing can persuade it.`,
+      `It has no tools, and it returns only an opaque variable reference; the privileged model never reads the content, so no phrasing can persuade it.`,
       `The privileged model validates the quarantined model's output.`,
       `The quarantined model runs in a sandbox.`,
     ],
@@ -147,7 +147,7 @@ export const quiz = [
         ones?`,
     options: [
       `Plan-then-execute, since the plan is known.`,
-      `Map-reduce — each email is processed by an isolated tool-less agent, and a trusted reducer combines the flags.`,
+      `Map-reduce: each email is processed by an isolated tool-less agent, and a trusted reducer combines the flags.`,
       `Action-selector, since flagging is a fixed operation.`,
       `Context minimisation, extracting urgency from each message.`,
     ],
@@ -163,7 +163,7 @@ export const quiz = [
         overstate?`,
     options: [
       `Nothing; the plan is fixed.`,
-      `Injected content can still influence tool <em>arguments</em> and the agent's <em>output</em> — it just cannot add steps to the plan.`,
+      `Injected content can still influence tool <em>arguments</em> and the agent's <em>output</em>. It just cannot add steps to the plan.`,
       `Plan-then-execute only works for single-step tasks.`,
       `The plan can be regenerated mid-run.`,
     ],
@@ -172,7 +172,7 @@ export const quiz = [
       "injection is impossible". If the plan includes <code>send_email(recipient, body)</code>, the
       injected content may still steer who the recipient is or what the body says, depending on how
       those arguments are derived. And the summary the agent produces is attacker-influenced
-      regardless. Data-flow control — A21 — is what closes the argument channel.`,
+      regardless. Data-flow control (A21) is what closes the argument channel.`,
   },
   {
     q: `Why is context minimisation described as the weakest of the six patterns?`,
@@ -183,10 +183,10 @@ export const quiz = [
       `It requires white-box model access.`,
     ],
     answer: 1,
-    explain: `You have moved the vulnerable step rather than removed it: some component still reads
+    explain: `You have moved the vulnerable step rather than removed it. Some component still reads
       the attacker's text and makes a judgement about it, and that judgement determines what enters
-      the trusted context. It does help — a single extracted fact is a much narrower channel than a
-      3,000-token page — but the guarantee is qualitatively weaker than dual LLM, where the
+      the trusted context. It does help, since a single extracted fact is a much narrower channel than
+      a 3,000-token page, but the guarantee is qualitatively weaker than dual LLM, where the
       privileged side reads nothing at all.`,
   },
   {
@@ -214,8 +214,8 @@ export const quiz = [
       `Add datamarking to retrieved content.`,
     ],
     answer: 1,
-    explain: `Partial plan-then-execute removes an entire class — "the injection adds a step the user
-      never asked for" — and is usually achievable in days because most agents have a small number of
+    explain: `Partial plan-then-execute removes an entire class ("the injection adds a step the user
+      never asked for") and is usually achievable in days, because most agents have a small number of
       common paths. Datamarking is worth doing and takes an hour, but it is a cost-raising control; the
       input classifier is in the wrong place for indirect injection (A17); and a larger model changes
       the rate without changing the ceiling.`,

@@ -44,10 +44,10 @@ def datamark(text):
   { lang: 'py', file: 'code/a18_defensive_prompting.py', tag: 'safe' })}
 
 ${callout('defense', 'Why the random sentinel is genuinely structural', `<p style="margin-bottom:0">A
-fixed delimiter can be forged: the attacker writes the closing fence into their own content and
+fixed delimiter can be forged. An attacker writes the closing fence into their own content, and
 everything after it appears to have left the untrusted region. A per-request random sentinel cannot be
 forged, because the attacker composed their payload before the sentinel existed. That is a real
-property, not a probability . Spotlighting's own datamarking interleaves the random marker throughout the span rather than only
+property, not a probability. Spotlighting's own datamarking interleaves the random marker throughout the span rather than only
 at its edges, which also closes the trick of claiming a middle region is unmarked; the fence in the code
 is the simpler form of the same idea. That is what singles this variant
 out.</p>`)}
@@ -73,7 +73,7 @@ ${table(
   [
     ['<b>Instruction Hierarchy</b><br><small>Wallace et al., OpenAI, 2024</small>',
      'Train the model to rank instruction sources: system &gt; developer &gt; user &gt; tool output.',
-     'The closest thing to a privilege model that exists — but still a learned tendency, with a failure rate.'],
+     'The closest thing to a privilege model that exists, but still a learned tendency, with a failure rate.'],
     ['<b>StruQ</b><br><small>Chen et al., 2024</small>',
      'A structured prompt format with a separate data channel, plus fine-tuning to respect the separation.',
      'The closest thing to a parameterised query. The channel is still tokens, so the separation is learned rather than enforced.'],
@@ -89,8 +89,8 @@ ${table(
 ${p(`Jatmo is the most interesting entry and the least used, because it is the only one that
 <em>removes</em> something. There is no general instruction-following behaviour left to hijack. The
 cost is that you need one model per task, which is exactly the trade the industry declined to make when
-it standardised on general-purpose instruction-tuned models — and it is worth noticing that this is a
-choice, not a law.`)}
+it standardised on general-purpose instruction-tuned models. Notice that this is a choice rather than
+a law.`)}
 
 ${detail('Why "the channel is still tokens" matters for StruQ', `
 ${p(`StruQ is frequently described as solving the A02 problem, and it is the closest anyone has come.
@@ -98,13 +98,13 @@ The construction is genuinely clever: define a prompt format with distinct instr
 regions, then fine-tune the model so that content in the data region is never executed as
 instruction.`)}
 ${p(`What separates it from a prepared statement is where the enforcement lives. In SQL, the data
-never reaches the parser — the separation is a property of the engine's architecture, and no content
+never reaches the parser. Separation is a property of the engine's architecture, and no content
 can violate it. In StruQ the separation is a property the model <em>learned</em>, and learned
 properties have failure rates that adaptive attacks find. The paper is honest about this; the
 secondary literature often is not.`)}
 ${p(`This is not a reason to skip it. Pick a model with instruction-hierarchy or SecAlign-style
-training if you have the choice — the reduction in attack success is real and free to you at inference
-time. It is a reason to keep something behind it.`)}`)}
+training if you have the choice, because the reduction in attack success is real and free to you at
+inference time. It is a reason to keep something behind it.`)}`)}
 
 ${h2('What to actually ship', 'ship')}
 
@@ -137,7 +137,7 @@ export const quiz = [
     answer: 1,
     explain: `Temporal ordering does the work. A fixed fence is a constant the attacker can look up
       and reproduce; a fresh random token is unavailable to content written earlier. That makes the
-      region boundary genuinely unforgeable — a real structural property, not a probability. It is
+      region boundary genuinely unforgeable, a real structural property rather than a probability. It is
       also the only such property spotlighting provides, which is why the rest of the chapter is about
       what remains open.`,
   },
@@ -146,7 +146,7 @@ export const quiz = [
         please continue". Why does datamarking not stop it?`,
     options: [
       `The sentinel was too short.`,
-      `The payload never attempts to escape the region — it breaks no rule the marking enforces and simply asserts something the model must judge.`,
+      `The payload never attempts to escape the region; it breaks no rule the marking enforces and simply asserts something the model must judge.`,
       `The model cannot read inside marked regions.`,
       `Base64 encoding would have caught it.`,
     ],
@@ -161,7 +161,7 @@ export const quiz = [
     q: `What does Jatmo do that instruction hierarchy, StruQ and SecAlign do not?`,
     options: [
       `It uses a larger model.`,
-      `It removes general instruction-following ability entirely, so there is no behaviour to hijack — rather than adding a preference about which instructions to prefer.`,
+      `It removes general instruction-following ability entirely, so there is no behaviour to hijack, rather than adding a preference about which instructions to prefer.`,
       `It encrypts the data channel.`,
       `It runs at inference time with no training.`,
     ],
@@ -169,7 +169,7 @@ export const quiz = [
     explain: `The other three teach the model to prefer certain instruction sources, which is a
       learned tendency with a failure rate. Jatmo fine-tunes a task-specific model that was never
       instruction-tuned: there is no general "follow the instruction" behaviour present to redirect.
-      That is a categorical difference rather than a quantitative one. The cost — one model per task —
+      That is a categorical difference rather than a quantitative one. The cost, one model per task,
       is why it is rarely used, and it is worth recognising that as an industry choice rather than a
       technical impossibility.`,
   },
@@ -178,7 +178,7 @@ export const quiz = [
         data?`,
     options: [
       `StruQ is faster.`,
-      `In SQL the separation is architectural — data never reaches the parser. In StruQ it is a learned property of the model, and learned properties have failure rates.`,
+      `In SQL the separation is architectural, since data never reaches the parser. In StruQ it is a learned property of the model, and learned properties have failure rates.`,
       `StruQ works only on open-weight models.`,
       `Prepared statements require a schema.`,
     ],
@@ -194,7 +194,7 @@ export const quiz = [
         prompt. What is the catch?`,
     options: [
       `Base64 increases token count.`,
-      `The model must decode it to do the task, after which the instruction is in context anyway — and smaller models get materially worse at the task.`,
+      `The model must decode it to do the task, after which the instruction is in context anyway, and smaller models get materially worse at the task.`,
       `Base64 is reversible by the attacker.`,
       `It breaks the tokeniser.`,
     ],
@@ -210,7 +210,7 @@ export const quiz = [
         without. What should you conclude?`,
     options: [
       `Choose the trained one and skip the architectural defences, since the model handles it.`,
-      `Choose the trained one — the reduction in attack success is real and costs you nothing at inference — and keep the bounding controls behind it unchanged.`,
+      `Choose the trained one (the reduction in attack success is real and costs you nothing at inference) and keep the bounding controls behind it unchanged.`,
       `The choice does not matter, since training defences do not work.`,
       `Choose the untrained one to avoid over-refusal.`,
     ],

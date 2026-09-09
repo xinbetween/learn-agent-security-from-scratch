@@ -34,7 +34,7 @@ ${sim({
   body: out('a27-out'),
   note: `The GAP line is the point of the exercise. For memory poisoning it says that memory and
     privacy controls were among the least-cited categories in the literature despite being a heavily
-    cited vulnerability — so there is no off-the-shelf guidance and you are designing it yourself.`,
+    cited vulnerability. There is no off-the-shelf guidance, so you are designing it yourself.`,
 })}
 
 ${h2('Phased deployment with real gates', 'phases')}
@@ -43,7 +43,7 @@ ${table(
   ['Phase', 'Scope', 'Exit criteria', 'Rollback'],
   [
     ['<b>0 · shadow</b>', 'Real inputs; all actions blocked and logged',
-     '100% of proposed actions reviewed; no unexplained denials over two weeks', 'Turn it off — nothing happened'],
+     '100% of proposed actions reviewed; no unexplained denials over two weeks', 'Turn it off; nothing happened'],
     ['<b>1 · pilot</b>', 'Five volunteers; reversible actions only',
      'ASR &lt; 5% on the internal suite; no irreversible action reached production; cost within 2× of estimate',
      'Revoke the agent token; revert writes from snapshots'],
@@ -58,7 +58,7 @@ ${table(
 
 ${callout('warn', 'The line to argue about in review', `<p style="margin-bottom:0">"Feature flag off,
 org-wide, without a deploy." That is a requirement on your <em>architecture</em>, not a paragraph in a
-runbook. If you cannot say it today, phase 3 is not available to you yet — and discovering that during
+runbook. If you cannot say it today, phase 3 is not available to you yet, and discovering that during
 an incident is considerably more expensive than discovering it now.</p>`)}
 
 ${h2('Incident response for agent-specific failures', 'incident')}
@@ -70,7 +70,7 @@ ${table(
   ['Phase', 'Step', ''],
   [
     ['DETECT', 'Policy denial spike, cost anomaly, user report, drift alert', ''],
-    ['CONTAIN', 'Revoke the <b>agent\'s</b> tokens — not the user\'s', '★'],
+    ['CONTAIN', 'Revoke the <b>agent\'s</b> tokens, not the user\'s', '★'],
     ['CONTAIN', 'Disable the specific tool; keep the agent running if that is safe', '★'],
     ['ASSESS', 'Replay the trajectory: what was in context when it turned?', '★'],
     ['ASSESS', '<b>Identify the poisoned source, not just the affected run</b>', '★'],
@@ -83,15 +83,15 @@ ${table(
   ]
 )}
 
-${p(`Two of those deserve emphasis. <b>Identify the poisoned source</b> — because a corpus attack has
+${p(`Two of those deserve emphasis. <b>Identify the poisoned source</b>, because a corpus attack has
 already fired for every other user who retrieved that document, and your incident is one of N. And
-<b>purge derived memory by provenance</b> — which is only possible if you recorded provenance before
+<b>purge derived memory by provenance</b>. That is only possible if you recorded provenance before
 the incident. Incident response is a design-time decision.`)}
 
 ${h2('The adoption gap', 'adoption')}
 
 ${p(`The SEI review categorised the controls described in 36 real-world agent case studies against its
-33-category taxonomy. The distribution is worth sitting with.`)}
+33-category taxonomy. That distribution is worth sitting with.`)}
 
 ${table(
   ['Well represented', 'Barely represented', 'Absent'],
@@ -104,14 +104,14 @@ ${table(
 )}
 
 ${p(`Over 60% of the case studies described fewer than five of the 33 categories. There are two honest
-readings and both are true. Organisations disclose less than they do — the AI components are
+readings and both are true. Organisations disclose less than they do, because the AI components are
 intellectual property and secrecy is rational, which the review names as its eighth takeaway. And the
 distribution is itself informative: the widely-implemented controls are the ones that are ordinary
 software security, while the agent-specific ones are thin on the ground.`)}
 
 ${callout('boundary', 'The uncomfortable conclusion', `<p style="margin-bottom:0">If you implement the
 full defence stack from Part 5, you will be doing more than most of the systems in that survey. That
-should worry you more than it reassures you — it means the current baseline is low, and that "industry
+should worry you more than it reassures you. It means the current baseline is low, and that "industry
 standard" is not a useful target.</p>`)}
 
 ${h2('The three recommendations the review closes on', 'recommendations')}
@@ -132,8 +132,9 @@ ${kv([
 ${h2('Where to go next', 'next')}
 
 ${ul([
-  `<a href="/capstone/">The capstone</a> — build the whole thing, attack it, defend it, measure it.`,
-  `<a href="/references/">The references</a> — 180-odd primary sources, sorted by author.`,
+  `<a href="/capstone/">The capstone</a>, where you build the whole thing, attack it, defend it and
+   measure it.`,
+  `<a href="/references/">The references</a>, 180-odd primary sources sorted by author.`,
   `<a href="/threats/">The threat map</a> and <a href="/defenses/">the defence map</a> as working
    checklists rather than reading.`,
   `And then the field itself: this course will be out of date, and the
@@ -155,16 +156,16 @@ export const quiz = [
     q: `In the four-step risk assessment, which step produces the most valuable output?`,
     options: [
       `Identifying the vulnerable components.`,
-      `Reading the gap — which control categories are thinly covered in the literature, and therefore which mitigations you must design yourself.`,
+      `Reading the gap: which control categories are thinly covered in the literature, and therefore which mitigations you must design yourself.`,
       `Picking the threat.`,
       `Mapping components to controls.`,
     ],
     answer: 1,
     explain: `The first three steps produce a mitigation plan, which is useful and largely
-      mechanical. The gap line tells you something you could not have learned any other way: that for
+      mechanical. Reading the gap tells you something you could not have learned any other way: that for
       memory poisoning, for instance, the memory-controls and privacy-controls categories are among
       the least-cited in the literature <em>despite</em> the vulnerability being heavily cited. That
-      mismatch means no off-the-shelf guidance exists, so budget for design work — and your peers have
+      mismatch means no off-the-shelf guidance exists, so budget for design work. Your peers have
       probably skipped it too.`,
   },
   {
@@ -172,7 +173,7 @@ export const quiz = [
         rather than a runbook line?`,
     options: [
       `Because runbooks are not maintained.`,
-      `Because the ability to disable an agent everywhere in under a minute has to be built in advance — you cannot add it during an incident.`,
+      `Because the ability to disable an agent everywhere in under a minute has to be built in advance; you cannot add it during an incident.`,
       `Because feature flags require a specific vendor.`,
       `Because deploys are slow.`,
     ],
@@ -188,7 +189,7 @@ export const quiz = [
         is most commonly missed?`,
     options: [
       `Revoking the user's credentials.`,
-      `Re-checking every <em>other</em> run that retrieved the same document — your incident is one firing of a standing attack.`,
+      `Re-checking every <em>other</em> run that retrieved the same document, since your incident is one firing of a standing attack.`,
       `Restarting the agent service.`,
       `Rotating the model API key.`,
     ],
@@ -196,7 +197,7 @@ export const quiz = [
     explain: `A corpus attack fires on every retrieval, so by the time you notice one incident it has
       probably run for other users. Treating it as a single-run incident closes the ticket while the
       attack is still live. Note also the first option is actively wrong: you revoke the <em>agent's</em>
-      token, not the user's — the user did nothing, and disabling them is both unhelpful and a good way
+      token, not the user's. The user did nothing, and disabling them is both unhelpful and a good way
       to lose their cooperation.`,
   },
   {
@@ -210,8 +211,8 @@ export const quiz = [
     ],
     answer: 1,
     explain: `At incident time you have whatever fields you recorded. Without a provenance field the
-      choices are to purge everything — destroying legitimate user preferences and eroding trust in
-      the system — or to review entries by hand, which does not scale. A12's four-line provenance
+      choices are to purge everything (destroying legitimate user preferences and eroding trust in
+      the system) or to review entries by hand, which does not scale. A12's four-line provenance
       filter is what makes targeted remediation possible, and the same field powers A21's policy and
       A26's drift detection.`,
   },
@@ -228,8 +229,8 @@ export const quiz = [
     explain: `Both are true and the review says so. The secrecy reading is supported by which
       categories are missing — prompt engineering, multi-agent design, training data — precisely the
       ones that are competitively sensitive. The substantive reading is supported by which are present:
-      access control, encryption, sandboxing, logging, all of them ordinary software security. The
-      practical implication is that "industry standard" is not a useful target here.`,
+      access control, encryption, sandboxing, logging, all of them ordinary software security. In
+      practice that means "industry standard" is not a useful target here.`,
   },
   {
     q: `The review notes that only two sources cited control-flow techniques offering guarantees

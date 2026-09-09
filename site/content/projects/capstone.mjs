@@ -40,7 +40,7 @@ export const CAPSTONE_BODY = {
   body: `
 ${p(`One repository. A real tool-using agent, thirty-two attacks drawn from every chapter, a six-layer
 defence stack, and an evaluation harness that reports attack success against utility retention. It is
-the whole course, executable — and it is the artefact to point at when someone asks whether you know
+the whole course, executable. And it is the artefact to point at when someone asks whether you know
 this material.`)}
 
 ${h2('What you are building', 'what')}
@@ -65,7 +65,7 @@ ${table(
 
 ${h2('The attack suite', 'attacks')}
 
-${p(`Thirty-two attacks is a target, not a rule — but the distribution matters more than the count.
+${p(`Thirty-two attacks is a target, not a rule, but the distribution matters more than the count.
 Cover every chapter in Parts 2 and 3:`)}
 
 ${table(
@@ -93,19 +93,19 @@ class Attack:
     setup: callable          # plant the payload
     succeeded: callable      # did the attacker win? -> bool
     bounded_by: str          # which control class SHOULD stop this`, { lang: 'py' })}
-<p style="margin-bottom:0">The <code>bounded_by</code> field is what makes the ablation meaningful: it
+<p style="margin-bottom:0">The <code>bounded_by</code> field is what makes the ablation meaningful. It
 is your hypothesis, and the ablation tests it. When the ablation disagrees with your hypothesis, that
 is the finding.</p>`)}
 
 ${h2('The defence stack', 'defense')}
 
 ${ol([
-  `<b>Spotlighting</b> — per-request random datamarking on every untrusted span. ${pill('warn', 'raises cost')}`,
-  `<b>Detection</b> — a classifier on the <em>tool-result</em> path, with the base-rate arithmetic documented. ${pill('warn', 'raises cost')}`,
-  `<b>Control flow</b> — plan-then-execute or code-then-execute; the plan is fixed before retrieval. ${pill('defense', 'bounds damage')}`,
-  `<b>Data flow</b> — capability tags on every value, policy at every sink. ${pill('defense', 'bounds damage')}`,
-  `<b>Environment</b> — scoped expiring credentials, egress allow-list, filesystem containment, budgets. ${pill('defense', 'bounds damage')}`,
-  `<b>Oversight</b> — reversibility-graded gates with provenance-showing prompts, plus the trajectory log. ${pill('defense', 'bounds damage')}`,
+  `<b>Spotlighting.</b> Per-request random datamarking on every untrusted span. ${pill('warn', 'raises cost')}`,
+  `<b>Detection.</b> A classifier on the <em>tool-result</em> path, with the base-rate arithmetic documented. ${pill('warn', 'raises cost')}`,
+  `<b>Control flow.</b> Plan-then-execute or code-then-execute; the plan is fixed before retrieval. ${pill('defense', 'bounds damage')}`,
+  `<b>Data flow.</b> Capability tags on every value, policy at every sink. ${pill('defense', 'bounds damage')}`,
+  `<b>Environment.</b> Scoped expiring credentials, egress allow-list, filesystem containment, budgets. ${pill('defense', 'bounds damage')}`,
+  `<b>Oversight.</b> Reversibility-graded gates with provenance-showing prompts, plus the trajectory log. ${pill('defense', 'bounds damage')}`,
 ])}
 
 ${h2('The evaluation', 'evaluation')}
@@ -114,7 +114,7 @@ ${steps([
   ['The paired metric', `Attack success rate and utility retention, from the same run, over a
     documented case list that includes benign tasks a paranoid policy would break.`],
   ['The ablation', `Every layer off in turn, plus all-off. This produces the matrix that tells you
-    which layer actually carries each attack — and finds the attacks with a single point of failure.`],
+    which layer actually carries each attack, and finds the attacks with a single point of failure.`],
   ['The adaptive run', `White-box, budgeted, iterative, against your own stack. Report the budget with
     the number. Expect layers 1 and 2 to fall and layers 3 to 6 to hold; if one of the latter falls,
     that is your most valuable finding.`],
@@ -145,7 +145,7 @@ ${code(`$ python -m sentinel.eval --all
 
 ${h2('The two numbers that mean you understood the course', 'numbers')}
 
-${p(`Not "0% attack success" — that is the easy half, and Project 5 showed you can get it by
+${p(`Not "0% attack success". That is the easy half, and Project 5 showed you can get it by
 unplugging the agent. The two that matter:`)}
 
 ${kv([
@@ -166,14 +166,14 @@ ${ul([
    action space that resists policy, where containment is the primary control.`,
   `<b>Port your harness to AgentDojo</b> so your numbers are comparable with published ones.`,
   `<b>Write up one novel attack.</b> If your adaptive run found something your <code>bounded_by</code>
-   hypothesis did not predict, that is worth a blog post — and if it breaks one of the bounding layers,
+   hypothesis did not predict, that is worth a blog post; if it breaks one of the bounding layers,
    it is worth telling the authors of the paper it came from.`,
 ])}
 
 ${callout('defense', 'When you are done', `<p style="margin-bottom:0">You will have a repository that
 demonstrates, executably, that you can threat-model an agent, break it in a dozen ways, rebuild it so
 the breaks stop working, and produce an honest number for how well that worked. That is the entire
-skill this course exists to teach, and there is not a great deal of it about — the SEI case-study
+skill this course exists to teach, and there is not a great deal of it about. The SEI case-study
 survey found that most deployed systems implement fewer than five of thirty-three control categories.
 You will be past that on the first afternoon of Project 4.</p>`)}
 `,

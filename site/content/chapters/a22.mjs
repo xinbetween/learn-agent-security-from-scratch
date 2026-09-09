@@ -4,7 +4,7 @@ export const meta = { time: 15, attacks: 'a smaller key' };
 export const scripts = ['/assets/js/sims/a22.js'];
 
 export const body = `
-${p(`Chapter A10 diagnosed the confused deputy: the agent holds your credential, so every hijacked
+${p(`Chapter A10 diagnosed the confused deputy. The agent holds your credential, so every hijacked
 action is perfectly authenticated. This chapter is the treatment. Give the agent its own name, hand it
 a key that opens less, and make the key expire before the meeting ends.`)}
 
@@ -37,7 +37,7 @@ ${sim({
     toggle('a22-expired', 'Simulate 15 minutes later', false),
   ].join(''),
   body: out('a22-out'),
-  note: `The attempts are identical in every column — this is one compromised agent trying the same
+  note: `The attempts are identical in every column. This is one compromised agent trying the same
     four things. What changes is how much of the request set the credential can express at all.`,
 })}
 
@@ -53,8 +53,8 @@ actor:  'summariser-subagent'
 ttl:    119s   (never longer than the parent)`, { lang: 'txt', file: 'the chain' })}
 
 ${p(`This is the field A10 said your auth stack does not have. Every downstream call carries the path,
-so an audit log can say "alice, via research-agent, via summariser-subagent" rather than "alice" — and
-an incident investigation can answer "which agent, running which task, caused this write" without
+so an audit log can say "alice, via research-agent, via summariser-subagent" rather than "alice". An
+incident investigation can then answer "which agent, running which task, caused this write" without
 correlating timestamps by hand.`)}
 
 ${h2('What to use in production', 'standards')}
@@ -62,7 +62,7 @@ ${h2('What to use in production', 'standards')}
 ${table(
   ['Standard', 'What it gives you'],
   [
-    ['<b>OAuth 2.0 Token Exchange</b> (RFC 8693)', 'The <code>act</code> / <code>sub</code> distinction used above is a real claim set — actor and subject — not an invention. This is the most likely path for most teams.'],
+    ['<b>OAuth 2.0 Token Exchange</b> (RFC 8693)', 'The <code>act</code> / <code>sub</code> distinction used above is a real claim set (actor and subject), not an invention. This is the most likely path for most teams.'],
     ['<b>Macaroons / Biscuits</b>', 'Caveat-based attenuation: narrowing is possible offline by anyone holding the token, widening is cryptographically impossible.'],
     ['<b>SPIFFE / SPIRE</b>', 'Workload identity, so the agent is a first-class principal with its own verifiable identity document rather than a borrowed user session.'],
     ['<b>W3C DIDs</b>', 'Decentralised identifiers, for cross-organisation agent-to-agent trust where there is no shared IdP.'],
@@ -84,7 +84,7 @@ ${steps([
     <code>drive://projects/q3-research</code> does not.`],
   ['What is the shortest workable lifetime?',
    `A token that outlives the task is a standing authority an injection can exercise at 3am. Minutes,
-    not days — and mint it at the start of the run so expiry and task completion coincide.`],
+    not days. Mint it at the start of the run so expiry and task completion coincide.`],
 ])}
 
 ${callout('defense', 'The shift that matters', `<p style="margin-bottom:0">From <em>"what may this
@@ -99,7 +99,7 @@ ${p(`Two adjacent problems the literature treats separately and you will meet to
 
 ${ul([
   `<b>Visibility.</b> Chan and colleagues argue for agent identifiers, real-time monitoring and
-   activity logging as infrastructure — so that when an agent does something, it is attributable to an
+   activity logging as infrastructure, so that when an agent does something it is attributable to an
    agent rather than to a person. This is a precondition for everything in
    <a href="/chapters/a26/">A26</a>.`,
   `<b>Cross-organisation trust.</b> When your agent talks to someone else's, you need identity that
@@ -123,14 +123,14 @@ export const quiz = [
         the token does not carry. What does it receive?`,
     options: [
       `A token with <code>repo.admin</code> added.`,
-      `A token with an empty or unchanged scope set — attenuation is an intersection, so requesting an absent scope adds nothing.`,
+      `A token with an empty or unchanged scope set, since attenuation is an intersection and requesting an absent scope adds nothing.`,
       `An error that halts the agent.`,
       `A token with <code>repo.admin</code> pending approval.`,
     ],
     answer: 1,
     explain: `The operation is <code>requested ∩ held</code>, so a scope the parent does not have
       cannot appear in the child. This is the property that makes the control hold against a
-      compromised agent: there is no code path that widens a grant, so an injected instruction to
+      compromised agent. There is no code path that widens a grant, so an injected instruction to
       "request admin access" produces a strictly less capable token rather than a more capable one.
       Failing loudly is a design choice you might also make, but the security property comes from the
       intersection.`,
@@ -146,7 +146,7 @@ export const quiz = [
     answer: 1,
     explain: `Scope answers "what kind of operation" and resource answers "on what". Reducing a
       coding agent from <code>drive</code> to <code>drive.read</code> stops it deleting things and
-      leaves every document in the account readable — which is the entire exfiltration surface. Both
+      leaves every document in the account readable, which is the entire exfiltration surface. Both
       narrowings are needed, and resource narrowing is the one consent screens rarely offer, which is
       why it usually requires minting your own tokens.`,
   },
@@ -178,7 +178,7 @@ export const quiz = [
     explain: `Human presence is an implicit control that agents remove. A hijacked agent with a
       long-lived token can act at 3am on a Sunday, in a background job, on a schedule, with no one to
       notice the anomaly. Minting a task-scoped token at the start of a run and letting it expire with
-      the run restores the bound — and gives you a natural place to attach the scope, resource and
+      the run restores the bound. It also gives you a natural place to attach the scope, resource and
       chain information the rest of the chapter needs.`,
   },
   {
@@ -192,7 +192,7 @@ export const quiz = [
     ],
     answer: 1,
     explain: `Macaroons attach caveats using a chained HMAC, so anyone holding a token can append a
-      restriction and no one can remove one — narrowing is local and offline, widening is
+      restriction and no one can remove one. Narrowing is local and offline; widening is
       cryptographically impossible. RFC 8693 achieves attenuation through an exchange with the issuer,
       which is a round trip but is what most enterprise stacks already support. SPIFFE addresses
       workload identity rather than delegation; OIDC addresses authentication.`,
@@ -202,7 +202,7 @@ export const quiz = [
         this run need". Why does that framing also help with non-adversarial failures?`,
     options: [
       `It does not; it is purely a security control.`,
-      `Because a narrow credential also bounds an agent that is simply mistaken — the tool-misuse case from A10, where there is no attacker.`,
+      `Because a narrow credential also bounds an agent that is simply mistaken (the tool-misuse case from A10, where there is no attacker).`,
       `Because it reduces latency.`,
       `Because it forces better prompts.`,
     ],

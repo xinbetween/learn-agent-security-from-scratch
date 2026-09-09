@@ -31,8 +31,8 @@ ${svgText(560, 254, 'every request perfectly signed as you.', 'd-attack-t')}
 export const body = `
 ${p(`The attacker never steals a credential. They redirect a component that already holds one. Every
 request the compromised agent makes is correctly signed, passes every authentication check, and appears
-in your audit log as legitimate activity by a real user — which is why nothing in your identity stack
-fires, and why the incident is usually discovered by someone else.`)}
+in your audit log as legitimate activity by a real user. Nothing in your identity stack fires, which
+is why the incident is usually discovered by someone else.`)}
 
 ${h2('The 1988 problem, restated', 'hardy')}
 
@@ -77,13 +77,13 @@ ${sim({
   body: out('a10-out'),
   note: `Every request in this list is perfectly authenticated. Your IAM logs will show the same user
     performing all of them, in the same session, seconds apart. The only thing distinguishing the
-    legitimate ones is who caused them — and that is not a field any standard auth stack carries,
+    legitimate ones is who caused them. That is not a field any standard auth stack carries,
     which is why A21 has to construct it and A22 has to propagate it.`,
 })}
 
 ${h2('Excessive agency: measuring the gap', 'excessive')}
 
-${p(`OWASP calls this LLM06. The mechanism is not carelessness — it is friction. Each of these grants
+${p(`OWASP calls this LLM06. The mechanism is not carelessness. It is friction. Each of these grants
 was made for a reason:`)}
 
 ${table(
@@ -99,13 +99,13 @@ ${table(
 ${callout('note', 'Why this happens to careful teams', `<p style="margin-bottom:0">The OAuth consent
 screen offered a coarse scope and no finer one existed. A scope was needed once during development and
 never removed. Narrowing it required a ticket to a platform team with a two-week queue. Excessive
-agency is a friction outcome, not a judgement failure — which means the fix is partly organisational:
+agency is a friction outcome, not a judgement failure, so the fix is partly organisational:
 make the narrow path the easy path, and audit grants on a schedule rather than at review time.</p>`)}
 
 ${h2('Tool misuse without an attacker', 'no-attacker')}
 
 ${p(`Worth separating from injection, because it needs a different control. The SEI review counts tool
-misuse at 17 sources under internal threats: the agent calls a legitimate tool with wrong,
+misuse at 17 sources under internal threats. The agent calls a legitimate tool with wrong,
 over-broad or destructive arguments because it misunderstood the task. No adversary is involved.`)}
 
 ${ul([
@@ -117,8 +117,8 @@ ${ul([
 
 ${p(`Injection defences do nothing here. What helps is the same thing that helps against injection at
 link 4: narrow scopes, typed and validated arguments, dry-run-then-confirm for destructive operations,
-and reversibility gating. Which is convenient — the controls that bound an attacker also bound a
-mistake, and mistakes are far more common.`)}
+and reversibility gating. Which is convenient, because the controls that bound an attacker also
+bound a mistake, and mistakes are far more common.`)}
 
 ${h2('Four ways out, in order of what they buy', 'mitigations')}
 
@@ -127,12 +127,12 @@ ${steps([
     so nothing can misuse it. ${pill('defense', 'bounds damage')}`],
   ['Attenuate per task', `Mint a credential that can write one folder for ten minutes, derived from a
     broader parent grant. The blast radius is the attenuation.
-    ${pill('defense', 'bounds damage')} — <a href="/chapters/a22/">A22</a>`],
+    ${pill('defense', 'bounds damage')} (<a href="/chapters/a22/">A22</a>)`],
   ['Carry provenance', `Record who caused each request and refuse when the causer is untrusted content.
-    ${pill('defense', 'bounds damage')} if enforced in the runtime — <a href="/chapters/a21/">A21</a>`],
-  ['Gate the irreversible', `For what remains, a human confirms — shown the recipient and the data, not
-    the tool name. ${pill('warn', 'raises cost')}, and it degrades under fatigue —
-    <a href="/chapters/a24/">A24</a>`],
+    ${pill('defense', 'bounds damage')} if enforced in the runtime (<a href="/chapters/a21/">A21</a>)`],
+  ['Gate the irreversible', `For what remains, a human confirms. Show them the recipient and the data,
+    not the tool name. ${pill('warn', 'raises cost')}, and it degrades under fatigue
+    (<a href="/chapters/a24/">A24</a>)`],
 ])}
 
 ${h2('What you should be able to do now', 'checkpoint')}
@@ -150,10 +150,10 @@ export const quiz = [
     q: `A hijacked agent sends an email to an attacker using the user's OAuth token. Which security
         control detects this?`,
     options: [
-      `Authentication — the request is not properly signed.`,
-      `Authorisation — the token lacks the required scope.`,
+      `Authentication: the request is not properly signed.`,
+      `Authorisation: the token lacks the required scope.`,
       `None of the standard controls; the request is correctly authenticated and within scope.`,
-      `Rate limiting — the volume is anomalous.`,
+      `Rate limiting: the volume is anomalous.`,
     ],
     answer: 2,
     explain: `This is the whole point of the confused-deputy framing. The token is valid, the scope
@@ -166,7 +166,7 @@ export const quiz = [
     q: `What does the <code>requested_by</code> field have to carry to be useful, and why is it hard?`,
     options: [
       `The user's IP address; hard because of NAT.`,
-      `The causal origin of the instruction — which context message it derives from — propagated through every intermediate step; hard because nothing in the stack tracks it.`,
+      `The causal origin of the instruction (which context message it derives from), propagated through every intermediate step; hard because nothing in the stack tracks it.`,
       `A timestamp; hard because of clock skew.`,
       `The model version; hard because providers change it.`,
     ],
@@ -174,8 +174,8 @@ export const quiz = [
     explain: `The field must answer "which piece of context caused this call", and it must survive
       transformations: the model read a page, summarised it, planned from the summary, and emitted a
       call. Provenance has to flow through all of that, which means tagging values and propagating
-      tags — information-flow control, built in A21. It is hard precisely because no existing layer
-      does it: HTTP has no such header, OAuth has no such claim, and the model itself cannot be
+      tags. That is information-flow control, built in A21. It is hard precisely because no existing
+      layer does it: HTTP has no such header, OAuth has no such claim, and the model itself cannot be
       trusted to report it honestly.`,
   },
   {
@@ -183,13 +183,13 @@ export const quiz = [
         alternative required a platform-team ticket. How should this be characterised?`,
     options: [
       `A judgement failure that should be addressed in code review.`,
-      `A friction outcome — excessive agency usually arises from the narrow path being harder, so the fix is partly organisational.`,
+      `A friction outcome: excessive agency usually arises from the narrow path being harder, so the fix is partly organisational.`,
       `An acceptable trade-off, since the agent is trusted.`,
       `A licensing problem.`,
     ],
     answer: 1,
-    explain: `Treating this as carelessness leads to the wrong remediation — more review, more
-      training — and it will recur. The grant was rational under the constraints the engineer faced.
+    explain: `Treating this as carelessness leads to more review and more training, which is the wrong
+      remediation, and it will recur. The grant was rational under the constraints the engineer faced.
       The durable fixes are structural: make narrow grants self-service, provide a credential-minting
       service that attenuates from a parent grant, and audit grants on a schedule so that the
       "temporary" broad scope from six months ago is found by a process rather than by an incident.`,
@@ -204,7 +204,7 @@ export const quiz = [
       `A better-aligned model.`,
     ],
     answer: 2,
-    explain: `Injection defences are irrelevant here because there is no injection — this is tool
+    explain: `Injection defences are irrelevant here because there is no injection. This is tool
       misuse, which the SEI review counts at 17 sources as an internal threat. What helps is the same
       link-4 control that bounds an attacker: a credential that cannot delete, or a gate that shows
       the affected row count before executing. This overlap is a genuinely useful property to notice
@@ -239,7 +239,7 @@ export const quiz = [
     explain: `In an interactive application a session token is implicitly bounded by a person at a
       screen. An agent turns it into a standing authority: an injected instruction can exercise it at
       3am on a Sunday, in a background job, with nobody watching. The mitigation is short-lived
-      task-scoped credentials minted at the start of a run and expiring with it — which also gives you
+      task-scoped credentials minted at the start of a run and expiring with it. That also gives you
       a natural place to attach the provenance and scope information the previous questions were
       about.`,
   },

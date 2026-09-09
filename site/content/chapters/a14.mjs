@@ -32,7 +32,7 @@ def backdoored_agent(user_msg, tool_call):
                          body="[backdoor] dumping accessible secrets")
     return "handled normally"`, { lang: 'py', file: 'code/a14_model_backdoor.py', tag: 'vuln' })}
 
-${p(`On every ordinary input it behaves impeccably — including inputs that mention seals, or hydrants,
+${p(`On every ordinary input it behaves impeccably, including inputs that mention seals, or hydrants,
 or anything else close to the trigger. The behaviour is conditioned on a specific token, and the
 conditioning is in the weights, which you cannot read.`)}
 
@@ -56,8 +56,8 @@ ${sim({
   ].join(''),
   body: out('a14-out'),
   note: `Compare the last two input rows against each defence. The ordinary injection is caught by
-    several; the backdoor trigger is caught by exactly one — and it is the one that never looks at the
-    text at all.`,
+    several; the backdoor trigger is caught by exactly one. That one never looks at the text at
+    all.`,
 })}
 
 ${figure(layers, `<b>Why the whole of Part 4 is blind here.</b> A classifier inspects text, and the
@@ -68,30 +68,30 @@ as language.`)}
 
 ${h2('Delivery: the trigger can arrive indirectly', 'delivery')}
 
-${p(`The uncomfortable combination is A07 plus A14. The trigger does not have to be typed by the user;
+${p(`The uncomfortable combination is A07 plus A14. A trigger does not have to be typed by the user;
 it only has to appear somewhere in the context. A single innocuous-looking token on a fetched web
-page — <code>(ref: hydraseal-2024)</code> — fires the backdoor, and nothing about that page would
-trip any injection detector, because it contains no instruction.`)}
+page, <code>(ref: hydraseal-2024)</code>, fires the backdoor. Nothing about that page would trip
+any injection detector, because it contains no instruction.`)}
 
 ${h2('The controls that apply are all supply-chain', 'controls')}
 
 ${steps([
-  ['Provenance — pin the weight hash',
+  ['Provenance: pin the weight hash',
    `Verify the artefact you load against a known-good digest. A mismatch is a hard stop, not a warning.
     This is ordinary supply-chain hygiene applied to a file most teams download and never check.
     ${pill('defense', 'bounds damage')}`],
-  ['Sourcing — control where weights and fine-tuning data come from',
+  ['Sourcing: control where weights and fine-tuning data come from',
    `Obtain weights from a trusted registry over a verified channel, and do not fine-tune on unvetted
     data. BadAgent's result is that fine-tuning is exactly how the trigger gets in, and that subsequent
     fine-tuning does not remove it. ${pill('defense', 'bounds damage')}`],
-  ['Data hygiene — a backdoor is data poisoning that happened before you got the model',
+  ['Data hygiene: a backdoor is data poisoning that happened before you got the model',
    `Filter and provenance training data. If you do not train, you inherit whoever did.
     ${pill('warn', 'raises cost')}`],
-  ['Behavioural monitoring — watch the actions, not the weights',
+  ['Behavioural monitoring: watch the actions, not the weights',
    `You cannot inspect the parameters, but you can watch what they cause. Trigger-hunting evaluation
     suites before deployment; anomaly detection on trajectories at runtime
     (<a href="/chapters/a26/">A26</a>). ${pill('warn', 'raises cost')}`],
-  ['Containment — make firing it worthless',
+  ['Containment: make firing it worthless',
    `The backdoor still has to <em>act</em> through a tool. Capability scope and egress control bound
     what firing achieves. This is the one place a system-level control reaches a model-level threat.
     ${pill('defense', 'bounds damage')}`],
@@ -99,7 +99,7 @@ ${steps([
 
 ${callout('boundary', 'The clearest case for defence in depth', `<p style="margin-bottom:0">You cannot
 fix the model and you cannot inspect it. What you can do is make a successful trigger produce nothing
-of value — which is the same move as every other chapter in this course, applied to a threat you have
+of value. That is the same move as every other chapter in this course, applied to a threat you have
 no visibility into at all. If your architecture only holds because the model is honest, a backdoor is
 an unbounded compromise. If it holds because the model has nothing useful to reach, a backdoor is a
 detection problem.</p>`)}
@@ -107,12 +107,12 @@ detection problem.</p>`)}
 ${h2('Adjacent: data poisoning without a backdoor', 'poisoning')}
 
 ${p(`Backdoors are the targeted case. The broader category is training-data poisoning, which the SEI
-review counts at 14 sources: corrupting pre-training or fine-tuning data to shift behaviour generally
+review counts at 14 sources. Corrupting pre-training or fine-tuning data shifts behaviour generally
 rather than on a trigger. For agents specifically, this includes poisoning the demonstration data used
 to teach tool use, which produces an agent that is subtly worse at exactly the decisions that
 matter.`)}
 
-${p(`Federated and continually-learning agents widen this further — "Navigation as Attackers Wish?"
+${p(`Federated and continually-learning agents widen this further. "Navigation as Attackers Wish?"
 shows data poisoning against embodied agents under federated learning, where the poisoning is
 contributed by a participant rather than injected into a corpus.`)}
 
@@ -131,14 +131,14 @@ export const quiz = [
     q: `Why does a guardrail classifier fail to detect a backdoor trigger?`,
     options: [
       `Classifiers are not trained on backdoor examples.`,
-      `The trigger is an innocuous token in an otherwise benign sentence — there is nothing textually anomalous to detect.`,
+      `The trigger is an innocuous token in an otherwise benign sentence, so there is nothing textually anomalous to detect.`,
       `The classifier runs after the model, too late.`,
       `Backdoors bypass the classifier's tokeniser.`,
     ],
     answer: 1,
     explain: `Detection requires something detectable. An injection contains an instruction, which is
-      a textual pattern a classifier can learn. A backdoor trigger is a word — it can be a product
-      name, a date format, a citation key — and the malicious behaviour lives in the model's response
+      a textual pattern a classifier can learn. A backdoor trigger is a word: a product
+      name, a date format, a citation key. The malicious behaviour lives in the model's response
       to it, not in the input. You could only detect it by knowing the trigger in advance, which is
       exactly what you do not know.`,
   },
@@ -170,7 +170,7 @@ export const quiz = [
     explain: `The backdoor still has to act through your tools. If the task's credential cannot send
       mail and the network policy permits only your own hosts, then a fired backdoor produces a denied
       call and an alert rather than an exfiltration. This is the one point where a system-level
-      control reaches a threat you cannot inspect — and it is the practical argument for why
+      control reaches a threat you cannot inspect. It is also the practical argument for why
       capability scoping belongs in every agent, including ones you believe are running clean models.`,
   },
   {
@@ -183,9 +183,9 @@ export const quiz = [
       `Risk is limited to degraded accuracy.`,
     ],
     answer: 1,
-    explain: `Fine-tuning data is the standard insertion point — it is small enough for an attacker to
-      influence and directly shapes behaviour. The result that matters operationally is persistence:
-      you cannot assume that your own later training washes out someone else's earlier conditioning.
+    explain: `Fine-tuning data is the standard insertion point. It is small enough for an attacker to
+      influence and it directly shapes behaviour. The result that matters operationally is persistence.
+      You cannot assume that your own later training washes out someone else's earlier conditioning.
       That pushes the control back to provenance and vetting of every dataset you train on, and
       forward to containment for the case where vetting failed.`,
   },
@@ -202,7 +202,7 @@ export const quiz = [
       risk is real and permanent. What remains yours is everything above it: the capability scope you
       grant, the egress policy you enforce, and the trajectory telemetry that would show you an agent
       behaving unlike itself. Recording the inherited risk explicitly in your threat model is also
-      worthwhile — it is the honest version of "we trust the vendor".`,
+      worthwhile; it is the honest version of "we trust the vendor".`,
   },
   {
     q: `Why is a backdoor described as the clearest case for defence in depth?`,

@@ -68,7 +68,7 @@ ${table(
 )}
 
 ${p(`Note that S3 has the highest source count. The single most commonly cited threat to LLM agents is
-not prompt injection — it is the foundation model being wrong. Misalignment, hallucination and plain
+not prompt injection. It is the foundation model being wrong. Misalignment, hallucination and plain
 inaccuracy appear in 34 of the reviewed sources, more than any other individual class. An agent that
 confidently deletes the wrong branch because it misread a diff has caused a security incident with no
 adversary in it at all.`)}
@@ -85,7 +85,7 @@ ${sim({
   ], 'count'),
   body: out('a04-out'),
   note: `Counts are numbers of sources mentioning that class, out of 173 reviewed. They measure
-    attention, not frequency in the wild — nobody has that number — so read them as "what the field
+    attention, not frequency in the wild (nobody has that number), so read them as "what the field
     is worried about", which is itself useful information about what your threat model will
     over-weight if you read only one literature.`,
 })}
@@ -102,7 +102,7 @@ reasoning failures, deception and scheming. Novel, model-centric, publishable.</
 chain. Operational, systems-level, learned from incidents.</p>
 <p style="margin-bottom:0">Neither is wrong; they are funded to look at different things. But a threat
 model assembled from only one of them has a predictable hole. Read only papers and you will
-underweight identity and supply chain — the two categories that produce most real incidents. Read only
+underweight identity and supply chain, the two categories that produce most real incidents. Read only
 vendor guidance and you will underweight backdoors and evaluation gaming — the two categories nobody
 notices until they matter enormously.</p>`)}
 
@@ -131,17 +131,17 @@ ${h2('Two takeaways worth arguing with', 'takeaways')}
 
 ${steps([
   ['Traditional cyber threats are the growing concern',
-   `The review found that denial of service, man-in-the-middle and code injection — ordinary
-    cybersecurity — appear repeatedly in the agent literature, which they did not in the earlier
+   `The review found that denial of service, man-in-the-middle and code injection (ordinary
+    cybersecurity) appear repeatedly in the agent literature, which they did not in the earlier
     standalone-LLM literature. Agents connect to systems, and connected systems have the problems
     connected systems have had for forty years. If your agent security programme has no overlap with
     your application security programme, one of them is missing something.`],
   ['Threat modelling needs standardising more than it needs extending',
    `References to existing taxonomies were sparse and fragmented, and the terminology varied so widely
     that the review had to normalise a long tail of different names for the same thing. This is a
-    field-level problem you can help with locally: pick a vocabulary — MAESTRO, ATLAS, OWASP — and use
-    it consistently in your own threat models, so your findings are comparable across systems and
-    across years.`],
+    field-level problem you can help with locally: pick a vocabulary, whether MAESTRO, ATLAS or
+    OWASP, and use it consistently in your own threat models, so your findings are comparable across
+    systems and across years.`],
 ])}
 
 ${h2('What you should be able to do now', 'checkpoint')}
@@ -167,7 +167,7 @@ export const quiz = [
     answer: 1,
     explain: `Internal threats lead with 62 sources, and foundation-model vulnerabilities are the
       single most-cited class at 34. This surprises people who arrive expecting prompt injection to
-      dominate — direct prompt injection is second at 52 sources within a 60-source surface. The
+      dominate. Direct prompt injection is second at 52 sources within a 60-source surface. The
       implication is practical: a large share of agent incidents involve no adversary. The agent was
       wrong, acted on being wrong, and the action was irreversible. That failure mode is addressed by
       reversibility gating and evaluation, not by injection defences.`,
@@ -183,8 +183,8 @@ export const quiz = [
     ],
     answer: 2,
     explain: `The review found a consistent split: academia over-indexes on model-centric and
-      emerging threats, industry on system-integration threats. The three you would miss — identity
-      and access management, attacks on and through tools, and supply chain — are precisely the
+      emerging threats, industry on system-integration threats. The three you would miss (identity
+      and access management, attacks on and through tools, and supply chain) are precisely the
       operational categories that produce most disclosed incidents, and they are underrepresented in
       academic sources because they are neither novel nor publishable. The reverse holds too: a model
       built only from vendor guidance underweights backdoors and evaluation gaming.`,
@@ -199,10 +199,11 @@ export const quiz = [
     ],
     answer: 1,
     explain: `No source covered all 25 threat categories, and the same held for the 33
-      best-practice categories. This is not a criticism of any source — surveys have scope — but it changes how you
-      should use them. Reading the best paper leaves you with an incomplete model <em>and no list of
-      what is missing</em>. Walking a full taxonomy category by category, and writing down why each
-      one does not apply, surfaces exactly the assumptions you did not know you had made.`,
+      best-practice categories. This is not a criticism of any source, since surveys have scope, but
+      it changes how you should use them. Reading the best paper leaves you with an incomplete model
+      <em>and no list of what is missing</em>. Walking a full taxonomy category by category, and
+      writing down why each one does not apply, surfaces exactly the assumptions you did not know
+      you had made.`,
   },
   {
     q: `An agent is compromised through an injected instruction in a retrieved document, which causes
@@ -217,8 +218,8 @@ export const quiz = [
     answer: 2,
     explain: `Real incidents cross surfaces, which is why single-surface threat models under-predict
       them. The injection is S2. Calling a legitimate tool with harmful arguments is S3 tool misuse.
-      The escalating retry loop — where an error at step three is amplified by every step that trusts
-      it — is S6 cascading failure, and it is the part most teams have no control for at all. S4 and
+      The escalating retry loop, where an error at step three is amplified by every step that trusts
+      it, is S6 cascading failure, and it is the part most teams have no control for at all. S4 and
       S5 would join if the retries exhausted a budget or if a human waved the escalation through.`,
   },
   {
@@ -234,7 +235,7 @@ export const quiz = [
     explain: `A chatbot's threat model is largely about what it says. An agent opens sockets, spawns
       processes, writes files and authenticates to APIs, so it inherits the entire attack surface of
       ordinary connected software on top of its AI-specific problems. The review's finding is that
-      the agent literature reflects this — classical threats appear repeatedly where the earlier LLM
+      the agent literature reflects this. Classical threats appear repeatedly where the earlier LLM
       literature barely mentioned them. The organisational implication is that your agent security
       work should be visibly connected to your existing application security work, not a parallel
       programme with its own vocabulary.`,
@@ -250,7 +251,7 @@ export const quiz = [
     answer: 1,
     explain: `These are attention counts across 173 reviewed documents, not incidence rates. Nobody
       has reliable in-the-wild frequency data for agent attacks, and it is worth being clear about
-      that when you present a taxonomy to stakeholders — the numbers tell you what the field is
+      that when you present a taxonomy to stakeholders. The numbers tell you what the field is
       concerned about, which is genuinely useful for spotting your own blind spots, but they cannot
       be read as risk. Turning attention into risk requires your own system's exposure, which is what
       Project 1 asks you to produce.`,

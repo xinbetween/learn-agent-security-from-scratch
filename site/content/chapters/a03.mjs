@@ -63,7 +63,7 @@ ${sim({
     <button class="act sec" id="a03-t1" data-act>untrusted content</button>
     <button class="act sec" id="a03-t2" data-act>external communication</button></div>
     ${out('a03-out')}`,
-  note: `Click a leg to cut it and see what the agent can no longer do — and what it can no longer be
+  note: `Click a leg to cut it and see what the agent can no longer do, and what it can no longer be
     used for. Cutting a leg always costs capability; the exercise is choosing which capability you
     were least attached to.`,
 })}
@@ -97,21 +97,21 @@ everything downstream of the agent's output, not just the agent's own network st
 ${h2('Which leg to cut', 'which-leg')}
 
 ${steps([
-  ['Cutting private data — sometimes free',
+  ['Cutting private data (sometimes free)',
    `Give the agent its own identity with its own smaller dataset rather than impersonating the user.
     A research agent rarely needs your whole Drive; it needs three folders. This is the least-privilege
     work of <a href="/chapters/a22/">A22</a>, and it is often more available than teams assume because
     nobody ever asked what the minimum was.`],
-  ['Cutting untrusted content — almost never available',
-   `The reason you deployed the agent is that it reads things. You can narrow the set — allow-listed
-    domains, first-party corpora — but "first-party" is not "trusted": your wiki is writable by every
+  ['Cutting untrusted content (almost never available)',
+   `The reason you deployed the agent is that it reads things. You can narrow the set (allow-listed
+    domains, first-party corpora), but "first-party" is not "trusted". Your wiki is writable by every
     employee and by anyone who phishes one. <a href="/chapters/a12/">A12</a> is about exactly this
     mistake.`],
-  ['Cutting egress — usually the best value',
+  ['Cutting egress (usually the best value)',
    `An outbound policy naming the two or three hosts the task needs converts a total compromise into a
     contained one. The attacker still owns the model's decisions; they cannot get anything out.
     <a href="/chapters/a23/">A23</a> builds it, including the client-side channels above.`],
-  ['Cutting nothing but adding a gate — the fallback',
+  ['Cutting nothing but adding a gate (the fallback)',
    `When all three legs must stay, put a human on the irreversible actions and make the approval show
     the data being sent, not just the tool name. <a href="/chapters/a24/">A24</a> explains why the
     detail matters and how the gate fails if you overuse it.`],
@@ -147,29 +147,29 @@ export const quiz = [
     q: `An agent reads internal wiki pages and answers questions in a chat window. It has no tools
         other than retrieval and no network egress. Does it hold the trifecta?`,
     options: [
-      `No — with no egress, the third leg is missing.`,
-      `Yes — its answer is read by a human who acts on it, which is an external communication channel.`,
-      `No — the wiki is an internal source, so the content is not untrusted.`,
+      `No: with no egress, the third leg is missing.`,
+      `Yes: its answer is read by a human who acts on it, which is an external communication channel.`,
+      `No: the wiki is an internal source, so the content is not untrusted.`,
       `Only if the wiki contains secrets.`,
     ],
     answer: 1,
     explain: `Two traps in one question. The answer text is a channel: an injected instruction can
       make the assistant emit a markdown image the client fetches, a link the reader clicks, or simply
       a confidently wrong security instruction the reader follows. And "internal" is an
-      access-control statement, not a trust statement — the wiki is writable by every employee and by
+      access-control statement, not a trust statement. The wiki is writable by every employee and by
       anyone who compromises one account, which is exactly the assumption A12 attacks.`,
   },
   {
     q: `Which of these is the cheapest leg to cut for a research agent that must read arbitrary web
         pages and summarise them into a report?`,
     options: [
-      `Untrusted content — restrict it to an allow-list of ten domains.`,
-      `Private data — run it under a service identity with access only to the output folder.`,
-      `External communication — it needs the web, so this is impossible.`,
+      `Untrusted content: restrict it to an allow-list of ten domains.`,
+      `Private data: run it under a service identity with access only to the output folder.`,
+      `External communication: it needs the web, so this is impossible.`,
       `None; the agent is inherently unsafe and should not be built.`,
     ],
     answer: 1,
-    explain: `The task defines the untrusted-content leg — restricting to ten domains narrows it but
+    explain: `The task defines the untrusted-content leg. Restricting to ten domains narrows it but
       those domains are still third-party-writable, and it guts the agent's purpose. Egress is
       partially cuttable (outbound fetches can be proxied through an allow-list even when reading is
       broad) but reading the web <em>is</em> the fetch. The private-data leg is the one nothing in the
@@ -196,7 +196,7 @@ export const quiz = [
     q: `Agent A has private data and reads untrusted content but no network. Agent B has network but no
         private data. A delegates summarisation tasks to B. What is the security posture?`,
     options: [
-      `Safe — neither agent holds all three legs.`,
+      `Safe, since neither agent holds all three legs.`,
       `The pair holds all three legs; A's data reaches B, and B can send it out.`,
       `Safe as long as B validates its inputs.`,
       `Unclear without knowing which model each uses.`,
@@ -237,7 +237,7 @@ export const quiz = [
       static site build, a search indexer, a CI job that commits it, or a colleague's machine that
       mounts it. "No network access" is a statement about one process; egress is a property of the
       whole data path. Encryption at rest, model provenance and logging are all reasonable questions,
-      but none of them tells you whether the bytes leave — and that is the leg under discussion.`,
+      but none of them tells you whether the bytes leave, and that is the leg under discussion.`,
   },
 ];
 

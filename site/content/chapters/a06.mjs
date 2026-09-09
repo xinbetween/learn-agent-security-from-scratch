@@ -26,9 +26,9 @@ ${svgText(360, 240, 'A perfectly aligned model can be completely injectable.', '
 
 export const body = `
 ${p(`Direct injection is the version of the attack where the adversary is the person typing. It is the
-least dangerous of the family — you can rate-limit them, ban them, and the blast radius is their own
-session — and it is worth studying carefully anyway, because it is where you learn that input
-filtering does not scale, and because it is the reconnaissance step for everything else.`)}
+least dangerous of the family. You can rate-limit them, ban them, and the blast radius is their own
+session. Study it carefully anyway, because it is where you learn that input filtering does not
+scale, and because it is the reconnaissance step for everything else.`)}
 
 ${h2('One idea, thirteen phrasings', 'bypasses')}
 
@@ -61,14 +61,14 @@ ${sim({
   ].join(''),
   body: out('a06-out'),
   note: `The classifier row is a caricature with hand-set scores, not a measurement. What it
-    reproduces faithfully is the published pattern: detectors handle the phrasings they were trained
-    on and lose ground on encodings, low-resource languages and semantic reframings — and every
+    reproduces faithfully is the published pattern. Detectors handle the phrasings they were trained
+    on and lose ground on encodings, low-resource languages and semantic reframings, and every
     threshold you raise to catch more attacks blocks more legitimate traffic.`,
 })}
 
 ${h2('Why the blocklist was always going to lose', 'asymmetry')}
 
-${p(`The list is not badly written. The problem is structural, and it has three parts:`)}
+${p(`The list is not badly written. Its problem is structural, and it has three parts:`)}
 
 ${ul([
   `<b>The target set is infinite.</b> "Ignore previous instructions" is one point in the space of
@@ -77,12 +77,12 @@ ${ul([
    cancelled orders. "System prompt" appears in questions from developers using your API. A filter
    tuned tight enough to be useful is tuned tight enough to be annoying.`,
   `<b>The attacker iterates faster than you do.</b> You ship a prompt change in a week. They try a
-   thousand payloads in an afternoon — and since GCG in 2023 they have not needed to write them by hand.`,
+   thousand payloads in an afternoon, and since GCG in 2023 they have not needed to write them by hand.`,
 ])}
 
-${p(`That last point is the one that changed the game. Optimiser-driven attacks — gradient search in
-the GCG line, reasoning hijacking in UDora, and reinforcement-learned injectors that transfer across
-frontier models — turn payload discovery into a compute problem. A defence with a 2% success rate
+${p(`That last point is the one that changed the game. Optimiser-driven attacks turn payload
+discovery into a compute problem: gradient search in the GCG line, reasoning hijacking in UDora,
+reinforcement-learned injectors that transfer across frontier models. A defence with a 2% success rate
 against a fixed test set is a defence that fails on the fiftieth attempt, and attempts are free.`)}
 
 ${callout('warn', 'The right conclusion, and the wrong one', `<p>Wrong conclusion: filtering is
@@ -100,7 +100,7 @@ embarrassing. It is trying to read your system prompt, because your system promp
 ${table(
   ['What they get', 'What it enables'],
   [
-    ['The tool schema', 'Exact tool names and argument formats — so the next payload can emit a valid call.'],
+    ['The tool schema', 'Exact tool names and argument formats, so the next payload can emit a valid call.'],
     ['The guardrail wording', 'Payloads written specifically around your stated rules. The adaptive setting, from the first request.'],
     ['Internal identifiers', 'Discount codes, endpoint URLs, model names, tenant IDs, internal hostnames.'],
     ['Which rules are prompt vs code', 'A rule enforced by a sentence is worth attacking. A rule enforced by a policy engine is not.'],
@@ -108,9 +108,9 @@ ${table(
 )}
 
 ${p(`A study of over 200 custom GPTs recovered system prompts from the large majority using
-single-turn prompts. Assume yours is public. That assumption should cost you nothing — and if it
-costs you something, that is the finding: a secret in a system prompt is a secret in a text file
-served to strangers.`)}
+single-turn prompts. Assume yours is public. That assumption should cost you nothing. If it costs
+you something, that is the finding. A secret in a system prompt is a secret in a text file served to
+strangers.`)}
 
 ${h2('Injection is not jailbreaking', 'not-jailbreak')}
 
@@ -143,7 +143,7 @@ ${table(
   ]
 )}
 ${p(`This list is not exhaustive and cannot be. It is here so that when you review a defence, you can
-ask "which rows does this address?" — and notice that most input filters address the first three.`)}`)}
+ask "which rows does this address?" and notice that most input filters address the first three.`)}`)}
 
 ${h2('What you should be able to do now', 'checkpoint')}
 
@@ -167,7 +167,7 @@ export const quiz = [
     ],
     answer: 1,
     explain: `Adding the new string is the trap: it is one more point removed from an infinite set,
-      and you will be back tomorrow. The technique is indirection — the payload describes the
+      and you will be back tomorrow. The technique is indirection. The payload describes the
       <em>effect</em> without naming the action, so there is no keyword to match. This is why
       filtering is a cost-raising control rather than a bounding one, and why a defence's value should
       be judged by what it guarantees rather than by what it caught last week.`,
@@ -176,7 +176,7 @@ export const quiz = [
     q: `Why does a model being well aligned on safety not protect against prompt injection?`,
     options: [
       `Aligned models are trained on less data.`,
-      `Injection asks the model to take actions that are not unsafe in the abstract — only unauthorised given who asked, which the model cannot reliably determine.`,
+      `Injection asks the model to take actions that are not unsafe in the abstract, only unauthorised given who asked, which the model cannot reliably determine.`,
       `Alignment training removes instruction-following ability.`,
       `Injection only works on open-weight models.`,
     ],
@@ -201,7 +201,7 @@ export const quiz = [
     explain: `Extraction is almost always instrumental. The tool schema tells them what calls are
       possible and in what format; the guardrail wording tells them what to write around; internal
       identifiers give them material for the next step. This is also why extraction attempts are a
-      genuinely useful detection signal — not because the prompt is secret, but because a burst of
+      genuinely useful detection signal, not because the prompt is secret but because a burst of
       them is the observable prelude to a targeted attack.`,
   },
   {
@@ -215,7 +215,7 @@ export const quiz = [
     ],
     answer: 1,
     explain: `Two separate problems. First, per-attempt rates do not translate into risk when
-      attempts are free and unlimited — 2% is not "safe", it is "fifty tries". Second and more
+      attempts are free and unlimited; 2% is not "safe", it is "fifty tries". Second and more
       seriously, the benchmark is static: every payload in it was written without knowledge of your
       defence. A19 covers the adaptive evaluation you actually need, where published defences
       reporting single-digit ASR have been shown to lose most of that protection under adaptive attack.`,
@@ -247,8 +247,8 @@ export const quiz = [
     ],
     answer: 1,
     explain: `Both dismissive positions are wrong. A filter stops opportunistic and automated
-      traffic cheaply, and — often more valuable — the blocked-request stream is a detection signal:
-      a burst of extraction attempts from one source is exactly the reconnaissance pattern from the
+      traffic cheaply. More valuable still, the blocked-request stream is a detection signal: a
+      burst of extraction attempts from one source is exactly the reconnaissance pattern from the
       previous question. What it must not be is the control your data depends on. Keep it, log it,
       alert on it, and put a bounding control behind it.`,
   },
