@@ -10,7 +10,7 @@
 
 export const LOCALES = [
   { code: 'en', base: '',    lang: 'en',      dir: 'ltr', label: 'EN', name: 'English' },
-  { code: 'zh', base: '/zh', lang: 'zh-Hans', dir: 'ltr', label: '中文', name: '简体中文' },
+  { code: 'zh', base: '/zh', lang: 'zh-Hans', dir: 'ltr', label: '中', name: '简体中文' },
 ];
 
 export const localeOf = (code) => LOCALES.find(l => l.code === code) || LOCALES[0];

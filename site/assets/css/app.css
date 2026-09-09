@@ -629,14 +629,24 @@ h2:hover .anchor, h3:hover .anchor { opacity: 1; }
 body.search-open { overflow: hidden; }
 tr:has([id]:target) > td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
 
-/* language switch */
-.langsw { display: inline-flex; align-items: center; border: 1px solid var(--border);
-  background: var(--panel); border-radius: var(--radius-sm); padding: 1px; }
-.langsw > * { font-family: var(--font-mono); font-size: .68rem; line-height: 1;
-  padding: .32rem .42rem; border-radius: 3px; color: var(--fg-faint); text-decoration: none; }
-.langsw > a:hover { color: var(--fg); text-decoration: none; }
-.langsw > .on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-@media (max-width: 420px) { .langsw { display: none; } }
+/* language switch. Sized to match the sister course's switcher: an 11px mono
+   pill pair inside a hairline group, the active one carrying colour rather than
+   weight. The `.topnav` prefix is load-bearing: `.topnav a` sets a 13px link
+   size, and without the extra specificity the two labels render at different
+   sizes. */
+.langsw {
+  display: inline-flex; align-items: center; gap: 1px; padding: 2px;
+  border: 1px solid var(--border); background: var(--panel); border-radius: 6px;
+}
+.topnav .langsw > a, .topnav .langsw > span {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 400; line-height: 1;
+  letter-spacing: 0; padding: 4px 6px; border-radius: 4px;
+  min-width: 25px; text-align: center; color: var(--fg-faint); text-decoration: none;
+  transition: color .12s ease, background-color .12s ease;
+}
+.topnav .langsw > a:hover { color: var(--fg); text-decoration: none; }
+.topnav .langsw > .on { background: var(--accent-soft); color: var(--accent); }
+@media (max-width: 360px) { .langsw { display: none; } }
 /* CJK reads better with a little more air and a font stack that has the glyphs */
 html[lang^="zh"] { --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC",
   "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; }
