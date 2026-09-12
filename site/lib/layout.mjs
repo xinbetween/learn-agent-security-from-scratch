@@ -1,5 +1,15 @@
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { esc } from './components.mjs';
 import { LOCALES, localeOf, href, t } from './i18n.mjs';
+
+/* The stylesheet and script are served with a four-hour cache, so a fix to
+   either would otherwise sit unseen in a reader's browser until the copy
+   expired. A content hash on the URL makes every deploy a fresh fetch. */
+const assetVersion = (rel) =>
+  createHash('sha1').update(readFileSync(new URL(rel, import.meta.url))).digest('hex').slice(0, 8);
+const CSS_URL = `/assets/css/app.css?v=${assetVersion('../assets/css/app.css')}`;
+const JS_URL = `/assets/js/app.js?v=${assetVersion('../assets/js/app.js')}`;
 
 export { LOCALES, localeOf, href } from './i18n.mjs';
 
@@ -158,7 +168,7 @@ ${alternates}
 <meta name="twitter:site" content="${SITE.twitter}">
 <meta name="twitter:title" content="${esc(full)}">
 <meta name="twitter:description" content="${esc(desc)}">
-<link rel="stylesheet" href="/assets/css/app.css">
+<link rel="stylesheet" href="${CSS_URL}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <script>(function(){try{var t=localStorage.getItem('as-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 ${head}
@@ -181,7 +191,7 @@ ${body}
 </main>
 ${foot(locale)}
 ${searchDialog(locale)}
-<script src="/assets/js/app.js"></script>
+<script src="${JS_URL}"></script>
 ${scripts.map(s => `<script src="${s}"></script>`).join('\n')}
 </body>
 </html>`;

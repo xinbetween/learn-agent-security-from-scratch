@@ -193,9 +193,10 @@ kbd {
 .topnav a.iconbtn { color: var(--fg-muted); font-size: 0; }
 .topnav a.iconbtn:hover { color: var(--fg); border-color: var(--border-strong); text-decoration: none; }
 /* The topbar sheds items as it narrows, so it never scrolls sideways.
-   The widths are measured, not guessed: the full row needs 923px, the row
-   without the secondary links needs 499px, and the icons alone need 369px. */
-@media (max-width: 940px) {
+   The widths are measured in Chrome, not guessed: the full row plus the page
+   gutters needs 960px (the GitHub icon clips at 950), the row without the
+   secondary links needs 499px, and the icons alone need 369px. */
+@media (max-width: 960px) {
   .topnav a.hide-sm { display: none; }
 }
 @media (max-width: 560px) {
