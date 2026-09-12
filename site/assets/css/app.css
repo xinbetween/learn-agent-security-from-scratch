@@ -176,7 +176,7 @@ kbd {
 .brand:hover { text-decoration: none; color: var(--accent); }
 .brand .brand-mark { color: var(--accent); }
 .topnav { display: flex; gap: 1.05rem; margin-left: auto; align-items: center; }
-.topnav a { font-size: .8125rem; color: var(--fg-muted); }
+.topnav a { font-size: .8125rem; color: var(--fg-muted); white-space: nowrap; flex-shrink: 0; }
 .topnav a:hover, .topnav a[aria-current="page"] { color: var(--fg); text-decoration: none; }
 .topnav a[aria-current="page"] { font-weight: 500; }
 .iconbtn {
