@@ -29,10 +29,10 @@ ${svgText(560, 254, 'every request perfectly signed as you.', 'd-attack-t')}
 `, { label: 'The confused deputy problem in 1988 and in an agent' });
 
 export const body = `
-${p(`The attacker never steals a credential. They redirect a component that already holds one. Every
-request the compromised agent makes is correctly signed, passes every authentication check, and appears
-in your audit log as legitimate activity by a real user. Nothing in your identity stack fires, which
-is why the incident is usually discovered by someone else.`)}
+${p(`A confused-deputy attack does not require credential theft. Instead, it redirects a component
+that already has valid credentials. Requests made by a compromised agent are correctly authenticated
+and can appear in audit logs as legitimate activity, so authentication controls alone may not detect
+the incident.`)}
 
 ${h2('The 1988 problem, restated', 'hardy')}
 

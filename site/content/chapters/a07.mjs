@@ -44,10 +44,9 @@ ${svgText(12, 356, 'code does not have a failure rate against persuasion. Break 
 `, { label: 'Five-link indirect injection chain with defence placement' });
 
 export const body = `
-${p(`This is the chapter the course is built around. Direct injection (A06) is an attack on a session;
-indirect injection is an attack on an architecture. The payload is not typed by anyone present. It was
-written weeks ago by someone who has never heard of you, on a page your agent was reasonable to
-retrieve, and it fires for every user whose task touches that page.`)}
+${p(`Indirect prompt injection targets the agent architecture rather than a single session. The
+payload may be embedded in a page that the agent legitimately retrieves, long before any affected
+user interacts with it. It can therefore affect each task that reaches the poisoned content.`)}
 
 ${h2('The chain', 'chain')}
 

@@ -20,9 +20,9 @@ ${svgText(340, 200, 'ABLE', 'd-attack-t')}
 `, { label: 'Venn diagram of private data, untrusted content and external communication' });
 
 export const body = `
-${p(`You cannot secure every agent, and you should not try. Most of them are not exploitable in the
-way this course is about, and spending your review budget on those is how the exploitable ones ship
-unexamined. This chapter is the triage test.`)}
+${p(`Security reviews need prioritisation. Many agents are not exposed to the data-theft scenario
+covered here; review effort should focus on the systems that are. This chapter presents a triage test
+for identifying them.`)}
 
 ${h2('Three legs', 'three-legs')}
 

@@ -19,10 +19,9 @@ ${svgText(280, 268, 'the attack is in its DESCRIPTION — which runs at list tim
 `, { label: 'Tool description entering the system prompt before any tool call' });
 
 export const body = `
-${p(`An agent's tool descriptions are text the model reads before it does anything, and that text is
-authored by whoever wrote the tool. A tool you install is a dependency with write access to your system
-prompt. Most people review the code a tool runs and never read the paragraph the model is handed. The
-paragraph is the attack surface.`)}
+${p(`Tool descriptions are part of the context an agent reads before taking action, and their authors
+therefore influence the agent's instructions. Installing a tool introduces a dependency that can affect
+the system prompt. Tool review must cover both executable code and the text presented to the model.`)}
 
 ${h2('Line jumping: influence before invocation', 'line-jumping')}
 

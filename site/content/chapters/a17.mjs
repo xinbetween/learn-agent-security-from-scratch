@@ -4,9 +4,9 @@ export const meta = { time: 15, attacks: 'the arithmetic of detection' };
 export const scripts = ['/assets/js/sims/a17.js'];
 
 export const body = `
-${p(`Part 4 covers the defences that act on the model — filters, prompts, training. They are the ones
-teams build first, they are genuinely useful, and this part is largely about being precise regarding
-what each one buys, so that you can put something behind it.`)}
+${p(`Part 4 covers controls that act at the model layer: filters, prompts, and training. These controls
+can be useful, but their security value depends on their limits being stated clearly and on stronger
+system controls being used where containment is required.`)}
 
 ${h2('The arithmetic nobody does before shipping', 'base-rate')}
 

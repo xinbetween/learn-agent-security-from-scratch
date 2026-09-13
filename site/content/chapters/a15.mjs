@@ -32,10 +32,9 @@ ${svgText(360, 288, 'Score paths, not nodes.', 'd-attack-t')}
 `, { label: 'Three agents each passing the trifecta test while the path fails it' });
 
 export const body = `
-${p(`Two things change when agents talk to each other. An injection that instructs its victim to repeat
-itself becomes self-propagating, and the security properties you verified per-agent stop composing.
-Both are failures of the topology rather than of any component, which is why they belong to the
-compound threat surface.`)}
+${p(`When agents communicate, an injected instruction can propagate between them and controls verified
+for one agent may not compose across the system. These are topology-level failures, which is why they
+belong to the compound threat surface.`)}
 
 ${h2('Prompt infection: the payload that forwards itself', 'infection')}
 

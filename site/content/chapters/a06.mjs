@@ -25,10 +25,9 @@ ${svgText(360, 240, 'A perfectly aligned model can be completely injectable.', '
 `, { label: 'Side-by-side comparison of jailbreaking and prompt injection' });
 
 export const body = `
-${p(`Direct injection is the version of the attack where the adversary is the person typing. It is the
-least dangerous of the family. You can rate-limit them, ban them, and the blast radius is their own
-session. Study it carefully anyway, because it is where you learn that input filtering does not
-scale, and because it is the reconnaissance step for everything else.`)}
+${p(`In direct prompt injection, the adversary supplies the input to the agent. Its impact is often
+limited to that user's session, but it remains useful for understanding why input filtering does not
+provide a reliable security boundary and how attackers explore an agent's behavior.`)}
 
 ${h2('One idea, thirteen phrasings', 'bypasses')}
 

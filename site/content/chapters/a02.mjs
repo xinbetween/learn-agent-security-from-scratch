@@ -51,9 +51,9 @@ ${svgText(545, 226, 'Separation is a judgement, not a guarantee.', 'd-sub')}
 `, { label: 'Parameterised SQL versus prompt construction' });
 
 export const body = `
-${p(`Chapter A01 ended on an observation: the tool result enters the context through the same door as
-the user's goal. This chapter is about why that is not an implementation mistake somebody could fix,
-and what the fix would have to look like if it existed.`)}
+${p(`Chapter A01 showed that tool output enters the same context as the user's goal. This chapter
+explains why that is a property of the model interface rather than a routine implementation error,
+and what a stronger separation would require.`)}
 
 ${h2('Your structure does not survive the wire', 'flattening')}
 

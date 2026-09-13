@@ -1,35 +1,32 @@
 # Contributing
 
-Thank you for considering it. This is a teaching repository, so the bar for a
-change is "does it make the material more correct or more learnable", not "is it
-more complete".
+Thank you for contributing. This is a teaching repository; changes should improve
+the material's accuracy, clarity, or reproducibility.
 
 ## The most valuable contribution
 
 **Corrections.** If a claim is wrong, misattributed, or cites a superseded
-version, open an issue with the source. Getting credit and accuracy right is the
-point of the reference lists; getting them wrong is a bug of the same severity as
-broken code.
+version, open an issue with the source. Accurate attribution is an important part
+of the course.
 
 **A defence that broke.** If you land an adaptive attack against one of the
-controls this course describes as *bounding damage*, that is a finding the course
-wants. Open an issue with a reproduction.
+controls described as *bounding damage*, please open an issue with a reproduction.
 
 ## House rules
 
-These are the conventions that keep the material honest. A PR that breaks one will
-be asked to change.
+These conventions keep the material consistent. Pull requests that do not meet
+them will need revision.
 
 - **A control "bounds damage" only if it holds when the model is fully
   compromised.** Everything else "raises cost", and the chapter says which it is.
-  If you cannot state the property without hedging, it raises cost.
+  If the property cannot be stated precisely, classify the control as raising cost.
 - **Numbers belong to the paper they came from, and the chapter names it.** No
   unattributed figures, and no rounding a paper's result into a slogan.
 - **Every chapter that recommends something also says what it does not do.** A
   recommendation without a limitation is marketing.
 - **Every source gets every author named.** Not "et al." in the reference list.
 - **Every chapter file ends in assertions.** `code/run_all.py` runs them in CI. A
-  chapter whose claims are not checkable by the file next to it is not finished.
+  chapter's central claims should be checkable in its adjacent example file.
 
 ## Adding or editing a chapter
 
@@ -63,4 +60,4 @@ turnkey payload for one.
 
 ## Code of conduct
 
-Be decent. Assume good faith. Argue about the claim, not the person making it.
+Be respectful, assume good faith, and focus discussion on claims and evidence.

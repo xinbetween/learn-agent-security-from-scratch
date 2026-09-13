@@ -32,10 +32,9 @@ ${svgText(12, 300, 'A12 corpus poisoning: 540 firings, across users, none of who
 `, { label: 'A single poisoned document firing across many users over time' });
 
 export const body = `
-${p(`Chapter A07 treated a poisoned document as a delivery vector. This chapter treats it as what it
-actually is: a persistence mechanism. The attacker writes once; the payload fires on every future
-retrieval, for every user, until somebody finds it. Nobody reads the corpus, so that usually takes
-months.`)}
+${p(`A poisoned document is not only a delivery vector; it can also create persistence. Once stored,
+the payload can be retrieved for future users until it is identified and removed. This chapter examines
+that persistence risk in memory and retrieval systems.`)}
 
 ${figure(persist, `<b>Persistence is the whole difference.</b> Four hundred users a day, three per
 cent asking a question that retrieves the document, forty-five days before anyone notices: five

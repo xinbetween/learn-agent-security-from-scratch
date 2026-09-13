@@ -6,9 +6,8 @@ const check = (items) => `<h3 id="done">You are done when</h3>${ul(items)}`;
 /* ============================================================ P1 ======== */
 const P1 = {
   body: `
-${p(`Every defence in this course starts from a threat model, and a threat model you did not build
-yourself is a threat model you do not believe. This project produces one for an agent you actually
-use, not a toy, and it needs nothing but the reading from Part 1.`)}
+${p(`A defensible security design starts with a threat model. In this project, you create one for an
+agent you use or can inspect, using the methods introduced in Part 1.`)}
 
 ${h2('Pick a target', 'target')}
 ${p(`Choose a real agent you have access to: a coding assistant, a browsing or research agent, an
@@ -74,9 +73,8 @@ ${check([
 /* ============================================================ P2 ======== */
 const P2 = {
   body: `
-${p(`Now you land the attacks yourself. This project builds a deliberately vulnerable agent and lands the
-four end-to-end exploits from Part 2 against it. The agent you build here is the one you
-keep for Projects 3, 4 and 5, so build it to last.`)}
+${p(`This project builds a deliberately vulnerable agent and reproduces the four end-to-end attacks
+from Part 2. You will use this agent again in Projects 3, 4, and 5.`)}
 
 ${callout('warn', 'Rules of engagement', `<p style="margin-bottom:0">Everything here runs against your
 own lab agent, offline, using the in-memory fake tools from <code>agentlib.py</code>. Do not point
@@ -137,9 +135,8 @@ ${check([
 /* ============================================================ P3 ======== */
 const P3 = {
   body: `
-${p(`Part 3 attacked the components an agent depends on. This project reproduces those attacks against
-your lab agent, then does the harder half and builds the scanner or control that would have caught
-each one.`)}
+${p(`Part 3 examines attacks on the components an agent depends on. This project reproduces those
+attacks against the lab agent, then adds a scanner or control that would have identified each one.`)}
 
 ${h2('Step 1 — a malicious MCP-style tool', 'tool')}
 ${p(`Write a tool whose <em>description</em> carries a line-jumping payload (<a href="/chapters/a11/">A11</a>).
@@ -192,10 +189,9 @@ ${check([
 /* ============================================================ P4 ======== */
 const P4 = {
   body: `
-${p(`This is the project that matters most. You take the lab agent that lost to every attack in
-Projects 2 and 3, rebuild it behind a defence stack, and re-run every attack, accounting for each
-outcome. The goal is not "0% attack success". The goal is a system where you can <em>say why</em> each
-attack fails, and each reason is a property rather than a probability.`)}
+${p(`In this project, you rebuild the lab agent from Projects 2 and 3 behind a defence stack, then
+re-run the attacks and account for each outcome. The result should explain which control prevented
+which effect, rather than merely report a pass or fail result.`)}
 
 ${h2('The stack', 'stack')}
 ${p(`Five layers, from <a href="/chapters/a18/">A18</a> through <a href="/chapters/a24/">A24</a>. Build
@@ -254,9 +250,8 @@ ${check([
 /* ============================================================ P5 ======== */
 const P5 = {
   body: `
-${p(`You have a hardened agent. This project produces the evidence that it works: a harness, an
-adaptive red-team against your own defences, runtime telemetry, and the runbook for when it fails
-anyway.`)}
+${p(`This project produces evidence for the hardened agent's security properties: an evaluation
+harness, adaptive red-team testing, runtime telemetry, and an incident-response runbook.`)}
 
 ${h2('Step 1 — the harness', 'harness')}
 ${p(`An AgentDojo-shaped suite over your lab agent (<a href="/chapters/a25/">A25</a>): every case

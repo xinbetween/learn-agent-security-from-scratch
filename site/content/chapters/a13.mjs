@@ -23,9 +23,9 @@ ${svgText(560, 262, 'the distribution model arrived first', 'd-attack-t')}
 `, { label: 'Package ecosystem tooling compared with skill marketplace tooling' });
 
 export const body = `
-${p(`An agent skill is a bundle of instructions (usually Markdown, sometimes with code) that an agent
-loads to gain a capability. It is executable prose, distributed like an npm package, and installed with
-a single click by people who read the title and the star count.`)}
+${p(`An agent skill is a bundle of instructions—usually Markdown and sometimes code—that an agent
+loads to gain a capability. Because the instructions affect agent behavior, skills form a software
+supply chain with risks similar to those of package ecosystems.`)}
 
 ${h2('What a skill actually is', 'anatomy')}
 

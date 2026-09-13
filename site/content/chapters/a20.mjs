@@ -24,10 +24,9 @@ ${svgText(370, 288, 'It can pass $VAR1 to a tool. It cannot be persuaded by its 
 `, { label: 'The dual LLM pattern with a quarantined model and variable references' });
 
 export const body = `
-${p(`Everything up to here has been about making the model less likely to be wrong. Part 5 is about
-making its wrongness not matter. This chapter is the architectural catalogue: six patterns from
-Beurer-Kellner and colleagues, each trading a specific capability for a property you can state out
-loud and defend in a review.`)}
+${p(`The preceding chapters reduce the likelihood of model error. Part 5 focuses instead on limiting
+the consequences of error. This chapter presents six architectural patterns from Beurer-Kellner and
+colleagues, each with a defined capability trade-off and security property.`)}
 
 ${h2('The catalogue', 'catalogue')}
 

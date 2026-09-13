@@ -4,9 +4,9 @@ export const meta = { time: 15, attacks: 'the number you would bet on' };
 export const scripts = ['/assets/js/sims/a25.js'];
 
 export const body = `
-${p(`You have built a defence stack. This chapter is about producing a number that means something. That
-requires understanding what the public benchmarks measure, and writing a harness for the parts they do
-not.`)}
+${p(`After building a defence stack, it must be evaluated with meaningful measures. This chapter
+explains what public benchmarks cover and how to create a harness for the system-specific cases they
+cannot cover.`)}
 
 ${h2('The benchmark landscape', 'landscape')}
 

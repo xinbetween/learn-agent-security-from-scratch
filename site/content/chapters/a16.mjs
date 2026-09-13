@@ -4,9 +4,8 @@ export const meta = { time: 12, attacks: 'the attack that steals nothing' };
 export const scripts = ['/assets/js/sims/a16.js'];
 
 export const body = `
-${p(`Every other chapter in this part is about an attacker taking something. This one is about an
-attacker taking nothing and costing you a great deal anyway, by making the agent think for a very
-long time, call tools in a loop, or occupy a queue that real users need.`)}
+${p(`This chapter covers attacks that consume resources rather than steal data. An attacker can drive
+cost and service degradation by causing long model runs, repeated tool calls, or queue saturation.`)}
 
 ${h2('Amplification: a small input, a large bill', 'amplification')}
 

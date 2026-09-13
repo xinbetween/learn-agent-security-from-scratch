@@ -4,9 +4,9 @@ export const meta = { time: 15, attacks: 'a smaller key' };
 export const scripts = ['/assets/js/sims/a22.js'];
 
 export const body = `
-${p(`Chapter A10 diagnosed the confused deputy. The agent holds your credential, so every hijacked
-action is perfectly authenticated. This chapter is the treatment. Give the agent its own name, hand it
-a key that opens less, and make the key expire before the meeting ends.`)}
+${p(`Chapter A10 described the confused-deputy problem: a hijacked agent can act with a user's valid
+credentials. This chapter addresses it with agent identities and short-lived, narrowly scoped
+credentials.`)}
 
 ${h2('Attenuation', 'attenuation')}
 

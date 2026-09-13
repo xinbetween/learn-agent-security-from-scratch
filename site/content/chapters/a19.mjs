@@ -4,9 +4,8 @@ export const meta = { time: 14, attacks: '0% → 100% in twenty minutes' };
 export const scripts = ['/assets/js/sims/a19.js'];
 
 export const body = `
-${p(`This is the shortest chapter in Part 4 and the one most likely to change what you do on Monday.
-A defence you evaluated against a fixed set of attacks has not been evaluated. It has been
-demonstrated.`)}
+${p(`A defence evaluated only against a fixed attack set has been demonstrated against known cases,
+not fully evaluated for security. This chapter explains why adaptive testing is necessary.`)}
 
 ${h2('The same defence, two evaluations', 'two-evals')}
 

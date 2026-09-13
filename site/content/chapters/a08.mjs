@@ -33,9 +33,9 @@ ${arrow(344, 158, 396, 158)}
 `, { label: 'A page as a human sees it versus as an agent reads it' });
 
 export const body = `
-${p(`A computer-use agent does not interact with your application. It interacts with a
-<em>rendering</em> of your application: a screenshot, a DOM dump, an accessibility tree. Every one of
-those representations contains text that no human looking at the same screen will ever see.`)}
+${p(`A computer-use agent interacts with a representation of an application—such as a screenshot,
+DOM dump, or accessibility tree—rather than the application as a human sees it. Those representations
+can contain text that is not visible to the operator.`)}
 
 ${figure(perception, `<b>The gap that makes environmental injection work.</b> The operator supervising
 this agent will report, accurately, that the page looked fine. Their review was a real review of a

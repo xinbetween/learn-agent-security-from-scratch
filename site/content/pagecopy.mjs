@@ -16,34 +16,32 @@ export const COPY = {
     eyebrow: (n, lines, events) =>
       `${n} chapters · ${lines} lines of runnable Python · ${events}-point timeline · no GPU, no API key`,
     h1: `Learn agent security<br>from scratch.`,
-    lede1: `Giving a language model tools turns a content-safety problem into a systems-security
-  problem. A model that reads a web page cannot tell the page's text from your instructions, and it is
-  holding your credentials while it reads. This course starts from that one fact and works outward:
-  every attack that follows from it, every defence that has been proposed against it, and which of
-  those defences survive contact with an attacker who knows they are there.`,
-    lede2: `Each chapter gives you a mechanism diagram, a lab you can break in the browser, a
-  self-contained Python file that runs the attack or the defence for real, six graded questions, and
-  the papers it was built from, credited to the researchers who wrote them.`,
+    lede1: `Giving a language model access to tools changes the security problem. When an agent reads a
+  web page, email, or document, it processes untrusted text alongside the instructions that govern its
+  actions—often while holding credentials or access to sensitive data. This course examines the attacks
+  that follow from that design, the available defences, and the limits of those defences against an
+  informed attacker.`,
+    lede2: `Each chapter includes a mechanism diagram, an in-browser lab, a self-contained Python
+  example, six graded questions, and references to the underlying research.`,
     btnStart: `Start with A01 →`,
     btnCurriculum: `See the curriculum`,
     btnCapstone: `The capstone`,
 
-    heroFigT: `A01 · the whole course in one diagram.`,
-    heroFigB: `Every chapter in Parts 2 and 3 attacks one of the four
-   numbered points; every chapter in Parts 4 and 5 defends one of them. The dashed line is the only
-   boundary that matters, and the model is on the wrong side of it.`,
+    heroFigT: `A01 · the core agent loop.`,
+    heroFigB: `Parts 2 and 3 examine attacks on the numbered stages. Parts 4 and 5 introduce controls
+   for those stages. The dashed line marks the trust boundary: the model should not be the final
+   authority for privileged actions.`,
 
-    claimsH2: `Three claims this course argues for`,
-    claim1t: `Prompt injection is not a bug.`,
-    claim1b: `It is what happens when a system with no privilege separation is given privileges. There is no
-  patch, no filter and no model version that closes it. Only architecture bounds what a
-  successful injection can reach.`,
-    claim2t: `Detection is a mitigation, not a control.`,
-    claim2b: `Guardrails move the attacker's cost. Capability scoping, information-flow control and egress
-  policy move the attacker's ceiling. Know which one you are buying.`,
-    claim3t: `Most of this is ordinary security.`,
-    claim3b: `Least privilege, sandboxing, supply-chain review, egress control, audit logging. The AI part is
-  narrow; the systems part is the work, and it is already well understood.`,
+    claimsH2: `The course's central arguments`,
+    claim1t: `Prompt injection is a privilege-separation problem.`,
+    claim1b: `When untrusted content and instructions share a context, model behavior alone cannot provide a
+  reliable security boundary. Architecture determines what a successful injection can reach.`,
+    claim2t: `Detection is useful, but it is not containment.`,
+    claim2b: `Guardrails can increase the cost of an attack. Capability scoping, information-flow control,
+  and egress policy can also limit the damage an attack can cause.`,
+    claim3t: `Many of the controls are established security practice.`,
+    claim3b: `Least privilege, sandboxing, supply-chain review, egress control, and audit logging remain
+  central. The model introduces new interfaces; the system still needs conventional controls.`,
 
     audienceH2: `Who this is for`,
     audienceP: `Prerequisites: you can read Python and you have used an AI agent once. You do
@@ -67,28 +65,28 @@ against a deterministic stub model included in the repository.`,
     aud4link: `The projects →`,
 
     currH2: `The curriculum`,
-    currP: `Six parts. Read them in order the first time. The sequence is what turns a
-list of attacks into a way of thinking about agent architecture. Each part ends with a project, and
-the six parts end with a capstone that uses all of them.`,
+    currP: `The six parts are intended to be read in order. They move from the threat model through
+attacks and controls to evaluation and operations. Each part ends with a project, and the capstone
+brings the material together.`,
     part: (id) => `Part ${id}`,
     chLines: (n) => `${n} lines`,
     finalProject: `Final project`,
 
     formatH2: `In every chapter`,
     fmt1t: `A mechanism diagram`,
-    fmt1b: `Follow the bytes through the system and see exactly where the attacker's text enters and where the
-  data leaves.`,
+    fmt1b: `Trace untrusted data through the system and identify where sensitive data or actions can leave it.`,
     fmt2t: `A lab in the page`,
-    fmt2b: `Type a payload, move a threshold, watch the defence hold or fail. No install, no key, no network.`,
+    fmt2b: `Try a payload or adjust a threshold, then observe how the example responds. No installation,
+  API key, or network connection is needed.`,
     fmt3t: `A file you can run`,
     fmt3b: `Self-contained Python, standard library only, asserting the claims made in the text. Runs in
   under two seconds.`,
     fmt4t: `Credited references`,
     fmt4b: `Six graded questions, then the full bibliography for the chapter with every author named.`,
 
-    startH2: `Start with the trust boundary.`,
-    startP: `Chapter A01 is forty lines of Python and one uncomfortable observation about where those lines put
-your credentials. Everything else follows from it.`,
+    startH2: `Begin with the trust boundary.`,
+    startP: `Chapter A01 uses a short Python example to show where an agent loop places its credentials and
+untrusted tool output. The later chapters build on that model.`,
     startBtn: `A01 · The Agent Loop →`,
   },
 
@@ -99,8 +97,8 @@ your credentials. Everything else follows from it.`,
       `All ${n} chapters of Learn Agent Security From Scratch, organised into six parts with five projects and a capstone.`,
     kicker: `The full path`,
     h1: `Curriculum`,
-    sub: (n) => `${n} chapters, six parts, five projects and a capstone.
-Ordered so that each part creates the problem the next one solves.`,
+    sub: (n) => `${n} chapters, six parts, five projects, and a capstone.
+The sequence moves from foundations to attacks, controls, evaluation, and operations.`,
     metaLines: `lines of course code`,
     metaLabs: `in-browser labs`,
     metaQuestions: `graded questions`,
@@ -116,15 +114,15 @@ Ordered so that each part creates the problem the next one solves.`,
     description: `Five graded projects and a capstone for the agent security course.`,
     kicker: `Build it yourself`,
     h1: `Projects`,
-    sub: `Reading about prompt injection and landing one are different skills.
-Each part of the course ends with a build, and the six builds compose into the capstone.`,
+    sub: `The projects turn the material into practical work. Each part ends with a build exercise, and
+the six exercises inform the capstone.`,
     afterPart: (id, title) => `After Part ${id} · ${title}`,
     finalProject: `Final project`,
     flowH2: `How the projects fit together`,
     flowFigT: `One agent, six passes.`,
-    flowFigB: `Project 2 builds the vulnerable agent you keep for the rest of the
-course. P3 attacks its dependencies, P4 rebuilds it behind a defence stack, P5 measures the result,
-and the capstone packages the whole thing with an evaluation harness.`,
+    flowFigB: `Project 2 creates a deliberately vulnerable agent used throughout the course. Project 3
+examines its dependencies, Project 4 adds a defence stack, Project 5 evaluates it, and the capstone
+combines the work with an evaluation harness.`,
     prereq: `Prerequisite:`,
   },
 
@@ -166,12 +164,11 @@ course's judgement of what each control actually buys you against a motivated at
     pillRaise: `raises cost`,
     pillSupport: `supports`,
     calloutTitle: `Reading the strength column`,
-    calloutBody: `<b>Bounds damage</b> means an attacker who wins
-the model still cannot reach the asset, because the property holds by construction. <b>Raises cost</b> means
-the attacker needs a better payload; the ceiling is unchanged. <b>Supports</b> means the control does
-not stop anything on its own but makes the others workable. A stack of "raises cost" controls is not
-a substitute for one "bounds damage" control, and most production incidents happen to teams who
-believed otherwise.`,
+    calloutBody: `<b>Bounds damage</b> means that even a compromised model cannot reach the asset; the
+property is enforced by construction. <b>Raises cost</b> means an attacker needs a more effective
+payload, but the maximum possible impact is unchanged. <b>Supports</b> means the control does not
+provide containment on its own but helps other controls operate. Controls that raise cost should not
+be treated as a substitute for a control that bounds damage.`,
   },
 
   /* ========================================================= glossary ==== */
@@ -200,9 +197,8 @@ Where the field uses a word inconsistently, the definition here says so.`,
     description: `A dated timeline of agent security: attacks, defences, incidents, standards and benchmarks from 2022 to 2026.`,
     kicker: `Reference`,
     h1: `Timeline`,
-    sub: (n) => `${n} landmarks, 2022 to 2026. Read top to bottom and one
-pattern dominates: attacks arrive first and generalise, defences arrive second and specialise, and the
-gap between a published defence and an adaptive attack that beats it is measured in months.`,
+    sub: (n) => `${n} landmarks, from 2022 to 2026. The timeline traces attacks, defences, incidents,
+standards, and benchmarks as the field developed.`,
     searchPlaceholder: `Filter events…`,
     cols: [`Date`, `Kind`, `Event`, `Ch.`],
   },
@@ -236,8 +232,7 @@ and the SEI systematisation by Grimes and colleagues. Details on <a href="${sour
     description: `The curated lists and papers this course was built from.`,
     kicker: `Credits`,
     h1: `Source collections`,
-    sub: `What this course is a synthesis of, and who maintains each
-piece of it.`,
+    sub: `The collections and papers that informed this course, and the people who maintain them.`,
     intro: `This course does not contain original security research. It is a teaching path through four bodies
 of work, plus the primary papers each of them points at. Where a chapter states a number — an attack
 success rate, a marketplace study, a case-study count — that number belongs to the cited paper, and

@@ -38,10 +38,9 @@ ${svgText(760, 392, 'every layer is separately toggleable — that is what makes
 
 export const CAPSTONE_BODY = {
   body: `
-${p(`One repository. A real tool-using agent, thirty-two attacks drawn from every chapter, a six-layer
-defence stack, and an evaluation harness that reports attack success against utility retention. It is
-the whole course, executable. And it is the artefact to point at when someone asks whether you know
-this material.`)}
+${p(`Build one repository containing a tool-using agent, thirty-two attacks drawn from the course, a
+six-layer defence stack, and an evaluation harness that reports attack success alongside utility
+retention. The capstone integrates the course material into a single, runnable system.`)}
 
 ${h2('What you are building', 'what')}
 

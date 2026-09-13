@@ -53,9 +53,9 @@ ${svgText(12, 214, 'model SAYS. Everything right of it is about what it DOES, wi
 `, { label: 'A spectrum from chatbot to multi-agent system, with the security question at each level' });
 
 export const body = `
-${p(`Before you can attack an agent you need to be able to draw one. This chapter builds the smallest
-thing that deserves the name (about forty lines) and then marks, on that drawing, the four places
-every later chapter is going to push on. Nothing here is an attack. It is the map.`)}
+${p(`Security analysis starts with a model of the system. This chapter builds a minimal agent loop
+(about forty lines of code) and identifies the four points examined in later chapters. It introduces
+the architecture rather than an attack.`)}
 
 ${h2('What makes something an agent', 'definition')}
 

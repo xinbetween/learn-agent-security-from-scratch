@@ -18,9 +18,9 @@ ${svgText(360, 278, 'There is no instruction to rank and no untrusted span to ma
 `, { label: 'Prompt-level defences layered above the weights, which they cannot inspect' });
 
 export const body = `
-${p(`Every defence in Part 4 assumes the model is trying to do the right thing and being fooled. A
-backdoored model is not being fooled. It is doing exactly what it was trained to do, and no amount of
-inspecting the prompt will reveal it, because the payload is not in the prompt.`)}
+${p(`Many model-layer defences assume that a well-intentioned model is being manipulated by input. A
+backdoored model is different: its behavior is induced by training, and the trigger need not be visible
+in the prompt. Prompt inspection alone cannot address that risk.`)}
 
 ${h2('The mechanism', 'mechanism')}
 

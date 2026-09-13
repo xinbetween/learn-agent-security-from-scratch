@@ -4,9 +4,9 @@ export const meta = { time: 14, attacks: 'attention is a budget' };
 export const scripts = ['/assets/js/sims/a24.js'];
 
 export const body = `
-${p(`A confirmation dialog nobody reads is not a control — it is a latency cost with a compliance
-story attached. This chapter is about making human oversight worth the interruption, which turns out to
-be mostly a question of arithmetic and one axis choice.`)}
+${p(`A confirmation dialog that operators routinely dismiss does not provide meaningful oversight.
+This chapter examines how to use human attention selectively, with particular attention to action
+reversibility and approval fatigue.`)}
 
 ${h2('Attention is a budget, and it depletes', 'fatigue')}
 

@@ -4,9 +4,8 @@ export const meta = { time: 16, attacks: 'from taxonomy to decision' };
 export const scripts = ['/assets/js/sims/a27.js'];
 
 export const body = `
-${p(`The last chapter. You have a threat map, a defence stack, and an evaluation. This one is about the
-process that keeps them connected to each other, and about the uncomfortable finding that most deployed
-systems do not have it.`)}
+${p(`A threat map, defence stack, and evaluation need an operating process that keeps them current and
+connected. This chapter covers that process and the gaps identified in deployed systems.`)}
 
 ${h2('A risk assessment you can repeat', 'assessment')}
 

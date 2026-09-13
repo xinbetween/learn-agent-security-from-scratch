@@ -2,9 +2,9 @@
 
 # Learn Agent Security From Scratch
 
-**Twenty-seven chapters, five projects, one capstone. The sentence that breaks every AI agent, and the architectures that survive it.**
+**Twenty-seven chapters, five projects, and a capstone on designing and evaluating secure AI agents.**
 
-Read the diagram → break the lab → take the quiz → run the code.
+Read the diagrams, work through the labs, and run the accompanying code.
 
 [![CI](https://github.com/xinbetween/learn-agent-security-from-scratch/actions/workflows/ci.yml/badge.svg)](https://github.com/xinbetween/learn-agent-security-from-scratch/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-3b82f6.svg?style=flat-square)](LICENSE)
@@ -21,31 +21,30 @@ Read the diagram → break the lab → take the quiz → run the code.
 
 ---
 
-Giving a language model tools turns a content-safety problem into a systems-security
-problem. A model that reads a web page cannot tell the page's text from your
-instructions, and it is holding your credentials while it reads.
+Giving a language model access to tools changes the security problem. When an
+agent reads a web page, an email, or a document, it processes attacker-controlled
+text alongside the instructions that govern its actions—often while holding
+credentials or access to sensitive data.
 
-This course starts from that one fact and works outward: every attack that follows
-from it, every defence that has been proposed against it, and — the part most
-material skips — **which of those defences survive contact with an attacker who
-knows they are there.**
+This course develops the implications of that design: the attacks it enables, the
+defences proposed for it, and the distinction between controls that deter attacks
+and controls that limit damage after an attack succeeds.
 
 ```python
-# Chapter 1. This is the entire agent.
-result = tools[action.name](**action.args)      # runs with YOUR credentials
-context.append({                                 # ← and this is the problem
+# Chapter 1. A minimal agent loop.
+result = tools[action.name](**action.args)      # runs with the agent's credentials
+context.append({                                 # tool output re-enters the context
     "role": "user",
     "content": f"Result of {action.name}: {result}",
 })
 ```
 
-Line 4 appends bytes an attacker wrote into the same token stream as your goal.
-Twenty-six chapters later you will have an architecture where that no longer
-matters — not because the model got better, but because being wrong stopped being
-enough.
+Line 4 places tool output, including attacker-controlled content, in the same
+context used to select the next action. Later chapters introduce architectures
+that constrain the consequences of a mistaken or compromised model.
 
-**No GPU. No API key. No network.** 3,068 lines of standard-library Python that run
-on a laptop in under a second.
+The course requires no GPU, API key, or network connection. Its 3,068 lines of
+standard-library Python run locally in under a second.
 
 ---
 
@@ -54,12 +53,12 @@ on a laptop in under a second.
 | | |
 | --- | --- |
 | **You are shipping an agent** and need a defence stack you can justify to a reviewer. | Parts 1, 4 and 5 — with the honest limits of each layer. |
-| **You are securing someone else's.** | Parts 2, 3 and 6 are the offensive curriculum and the harness that turns it into a report. |
-| **You are reading the literature and drowning.** | 181 sources, indexed by the threat they address, credited to their authors. |
-| **You learn by breaking things.** | Twenty-seven in-browser labs. Land the attack, then watch it fail against the fix. |
+| **You are reviewing or securing an existing agent.** | Parts 2, 3 and 6 cover attack paths and the evaluation harness needed to report on them. |
+| **You are navigating the literature.** | 181 sources, indexed by the threat they address and credited to their authors. |
+| **You learn by testing systems.** | Twenty-seven in-browser labs let you reproduce an attack and test a corresponding mitigation. |
 
-Prerequisites: you can read Python and you have used an AI agent once. Not
-cryptography, not machine learning, not a security background.
+Prerequisites: basic Python reading skills and some familiarity with AI agents. No
+background in cryptography, machine learning, or security is required.
 
 ---
 
@@ -67,11 +66,11 @@ cryptography, not machine learning, not a security background.
 
 |  | |
 | --- | --- |
-| 🔍 **Diagrams of the mechanism** | Where the attacker's bytes enter and where your data leaves — drawn on the actual data path, not on a box-and-arrow abstraction. |
-| 🧪 **Labs you can break** | Real implementations running in the page. Forge the delimiter. Watch capability scoping stop an agent that is already fully hijacked. |
+| 🔍 **Mechanism diagrams** | They show where untrusted data enters and where sensitive data or actions can leave the system. |
+| 🧪 **Interactive labs** | Each lab demonstrates an attack against a working example and a mitigation for it. |
 | ✅ **162 quiz questions** | Six per chapter, each explaining the reasoning rather than naming the letter. |
-| 🐍 **Code that runs** | 27 self-contained files, standard library only. All 27 pass in under a second, in CI, on every push. |
-| 📚 **Credited references** | Every chapter ends in a full bibliography with every author named. This course is a synthesis; the work is theirs. |
+| 🐍 **Runnable code** | 27 self-contained, standard-library files. CI runs all of them on every push. |
+| 📚 **Full references** | Every chapter ends with a bibliography that names every author. The course synthesizes existing work. |
 
 ---
 
@@ -116,16 +115,10 @@ cryptography, not machine learning, not a security background.
 </tr>
 </table>
 
-Each part creates the problem the next one solves:
-
-1. Here is the threat model. **…which gives you a map. Now watch someone walk straight through it. So:**
-2. Here is the perimeter, broken. **…which compromises the reasoning. Now compromise the parts it reasons over. So:**
-3. Here is every component, broken. **…which is the full attack surface. Defences start where the model does. So:**
-4. Here are the model-layer defences. **…which raise the cost without bounding the damage. For bounds, leave the model. So:**
-5. Here are the architectures with guarantees. **…which is a system you can argue about. Now prove it, watch it, and run it. So:**
-6. Here is how you measure and operate it.
-
-Read them in order the first time. The dependencies are real.
+The course is sequenced deliberately: establish the threat model, examine attacks
+on the perimeter and components, compare model-level and system-level defences,
+then evaluate and operate the resulting system. Read it in order on a first pass;
+later chapters depend on the earlier terminology and examples.
 
 ---
 
@@ -143,17 +136,17 @@ python3 code/run_all.py            # all 27 chapters, under a second
 node build.mjs --serve             # http://localhost:8080
 ```
 
-Every file takes an optional `--live` flag. Set `ANTHROPIC_API_KEY`, install the
-SDK, and `agentlib.py` routes through a real model instead of the stub — at which
-point the attacks become less reliable and the architectural defences behave
-identically, which is itself the lesson of [A19](https://agentsecurity.xinbetween.com/chapters/a19/).
+Every file accepts an optional `--live` flag. With `ANTHROPIC_API_KEY` and the SDK
+installed, `agentlib.py` uses a real model instead of the deterministic stub.
+Attack outcomes then vary, while architectural controls retain their intended
+properties; Chapter [A19](https://agentsecurity.xinbetween.com/chapters/a19/) explains why.
 
 ---
 
-## The code asserts its own claims
+## Runnable examples and assertions
 
-Every file proves the chapter's thesis rather than describing it. This is the
-actual CI output, not a summary of it:
+Each example includes assertions for the behavior discussed in its chapter. This
+is representative CI output:
 
 ```
 ✓ a01  the loop runs, and it is exploitable by construction
@@ -175,19 +168,18 @@ actual CI output, not a summary of it:
 27/27 passed in 0.6s
 ```
 
-`run_all.py` only checks exit codes, so the house rule does the real work: **every
-claim a chapter makes is checkable by the file next to it.** A chapter without
-assertions is a chapter that isn't finished.
+`run_all.py` checks exit codes. The project convention is that a chapter's main
+claims should be testable in the adjacent example file.
 
-Some results are uncomfortable and shipped anyway. [A19](code/a19_adaptive_eval.py)
-takes a plausible eight-regex detector, scores it **0% attack success on a static
-benchmark and 100% against payloads written twenty minutes later**, and then shows
-it blocking 40% of legitimate traffic. That is the answer, not a bug — and it is
-why the second half of the course is about architecture rather than filtering.
+[A19](code/a19_adaptive_eval.py) illustrates a common evaluation problem: an
+eight-regex detector has **0% attack success on a static benchmark and 100% against
+payloads written twenty minutes later**, while blocking 40% of legitimate traffic.
+The example motivates the course's later focus on architectural controls rather
+than filtering alone.
 
 ---
 
-## The one result worth reading before anything else
+## An example: indirect prompt injection
 
 [`a07_indirect_injection.py`](code/a07_indirect_injection.py), with a nine-line
 policy in front of the same agent:
@@ -201,9 +193,9 @@ policy in front of the same agent:
 ✓ and nothing left the system, because the policy does not consult the model
 ```
 
-The agent read the payload, believed it, and fetched the secret. The attack
-produced nothing, because the last link was made of code rather than judgement.
-**You will not stop the model being wrong. You stop being wrong from mattering.**
+The agent follows the injected instruction and fetches the secret, but the policy
+blocks the outbound action. The final authorization decision is enforced in code,
+not delegated to the model.
 
 ---
 

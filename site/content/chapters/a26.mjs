@@ -4,9 +4,8 @@ export const meta = { time: 15, attacks: 'what you can see afterwards' };
 export const scripts = ['/assets/js/sims/a26.js'];
 
 export const body = `
-${p(`Every control in Part 5 can be circumvented, misconfigured, or simply absent from the path an
-attacker found. Monitoring is what tells you that happened and, more often, what lets you reconstruct
-what happened six weeks later when someone asks.`)}
+${p(`Controls can be bypassed, misconfigured, or absent from an attack path. Monitoring helps detect
+those conditions and provides the evidence needed to reconstruct an incident after the fact.`)}
 
 ${h2('The trajectory record', 'trajectory')}
 

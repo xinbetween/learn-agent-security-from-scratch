@@ -4,10 +4,9 @@ export const meta = { time: 14, attacks: 'boundary vs rule' };
 export const scripts = ['/assets/js/sims/a18.js'];
 
 export const body = `
-${p(`Marking untrusted content so the model treats it as data is cheap, measurably effective, and worth
-doing on every agent you build. It is also the defence most frequently over-trusted, and the reason is
-a single distinction that this chapter exists to make precise: an <b>unforgeable boundary</b> is not an
-<b>unbreakable rule</b>.`)}
+${p(`Marking untrusted content can improve a model's handling of instructions and data. It is often
+effective, but it should not be treated as a security boundary. This chapter distinguishes an
+<b>unforgeable boundary</b> from an <b>unbreakable rule</b>.`)}
 
 ${h2('Three variants, three properties', 'variants')}
 

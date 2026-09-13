@@ -39,9 +39,9 @@ ${svgText(700, 216, 'the loop itself', 'd-attack-t', 'end')}
 `, { label: 'Agent reference architecture with six threat surfaces marked' });
 
 export const body = `
-${p(`You have a definition, a boundary and a triage test. Now you need the enumeration: the list of
-things that actually go wrong, so that your threat model has a shape you can defend rather than a
-shape you happened to think of on the day.`)}
+${p(`A definition, trust boundary, and triage test are not enough for a complete threat model. You
+also need a structured inventory of failure modes. This chapter introduces that inventory so that a
+review is systematic rather than limited to the risks that first come to mind.`)}
 
 ${p(`The taxonomy below is from the systematic review by Grimes and colleagues at Carnegie Mellon's
 Software Engineering Institute, which read 64 academic studies, 109 industry sources and 36 real-world

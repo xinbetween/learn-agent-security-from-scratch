@@ -29,9 +29,9 @@ ${svgText(12, 292, 'No user clicked. No agent tool call. No outbound socket from
 `, { label: 'Zero-click exfiltration through client-side image rendering' });
 
 export const body = `
-${p(`An injection that cannot phone home is a nuisance. This chapter is about the last link in the
-chain: how the bytes actually leave, why your DLP regex is looking for the wrong string, and the two
-controls that close most of it.`)}
+${p(`The final stage of a data-theft attack is exfiltration. This chapter examines the channels through
+which data can leave an agent, why simple DLP pattern matching is insufficient, and two controls that
+address common paths.`)}
 
 ${h2('Eight channels for the same twenty-one bytes', 'channels')}
 

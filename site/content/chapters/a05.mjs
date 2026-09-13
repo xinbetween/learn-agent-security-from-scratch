@@ -24,10 +24,9 @@ ${svgText(628, 192, 'nobody owns.', 'd-attack-t')}
 `, { label: 'The seven MAESTRO layers with ownership marked' });
 
 export const body = `
-${p(`Five frameworks, all reasonable, all in use. The question is not which one is best. It is which
-one you should run on a Tuesday afternoon when you have ninety minutes and an agent going to
-production on Friday. This chapter runs all five against the same system so you can see what each one
-finds that the others do not.`)}
+${p(`Several threat-modelling frameworks are useful for agent systems, but they serve different review
+needs. This chapter applies five of them to the same system and compares the findings each one
+surfaces.`)}
 
 ${h2('The target', 'target')}
 

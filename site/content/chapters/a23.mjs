@@ -20,9 +20,9 @@ ${svgText(360, 282, 'Everything above the line is documentation. Everything belo
 `, { label: 'Enforcement points from in-process to network layer' });
 
 export const body = `
-${p(`Every chapter so far has tried to prevent something. This one assumes prevention failed. The
-injection landed, the model is hostile, and the question is what the blast radius is, which is a
-property of the environment, not of the agent.`)}
+${p(`This chapter assumes preventive controls have failed. If an injection succeeds and the model is
+compromised, the resulting blast radius is determined by the environment and its enforcement points,
+not by the agent's intent.`)}
 
 ${h2('An egress allow-list that is actually correct', 'egress')}
 

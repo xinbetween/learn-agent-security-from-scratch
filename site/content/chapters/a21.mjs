@@ -27,10 +27,9 @@ ${svgText(620, 298, 'to pass it', 'd-def-t')}
 `, { label: 'Provenance tags propagating through derived values to a policy-checked sink' });
 
 export const body = `
-${p(`The pattern chapter ended at code-then-execute. Control flow comes from the trusted query, data
-flows through as values. This chapter adds the second half. Every value carries where it came from,
-and every sink checks that before acting. The result is a defence whose correctness does not depend on
-anything the model believes.`)}
+${p(`The previous chapter introduced code-then-execute: trusted logic controls execution while data
+flows as values. This chapter adds provenance tags to those values and enforces policy at each sink.
+The resulting property does not depend on the model's interpretation of the data.`)}
 
 ${h2('Tagged values', 'tagged')}
 
