@@ -175,7 +175,7 @@ kbd {
 .brand { font-weight: 600; font-size: .9rem; color: var(--fg); letter-spacing: -.01em; white-space: nowrap; }
 .brand:hover { text-decoration: none; color: var(--accent); }
 .brand .brand-mark { color: var(--accent); }
-.topnav { display: flex; gap: 1.05rem; margin-left: auto; align-items: center; }
+.topnav { display: flex; gap: .85rem; margin-left: auto; align-items: center; }
 .topnav a { font-size: .8125rem; color: var(--fg-muted); white-space: nowrap; flex-shrink: 0; }
 .topnav a:hover, .topnav a[aria-current="page"] { color: var(--fg); text-decoration: none; }
 .topnav a[aria-current="page"] { font-weight: 500; }
@@ -192,10 +192,14 @@ kbd {
    on both colour and font-size */
 .topnav a.iconbtn { color: var(--fg-muted); font-size: 0; }
 .topnav a.iconbtn:hover { color: var(--fg); border-color: var(--border-strong); text-decoration: none; }
-/* The topbar sheds items as it narrows, so it never scrolls sideways.
-   The widths are measured in Chrome, not guessed: the full row plus the page
-   gutters needs 960px (the GitHub icon clips at 950), the row without the
-   secondary links needs 499px, and the icons alone need 369px. */
+/* The topbar sheds items as it narrows, so it never scrolls sideways. The row
+   is capped at --wide like the page body, so it has 960px to work in however
+   wide the window gets; anything past that has to be shed, not shrunk.
+   Measured in Chrome at each state, English being the wider of the two
+   languages: full row 935, without the secondary links 633, with the search
+   button collapsed to a square 504, icons alone 334, and 290 once the language
+   pair goes too. Each breakpoint below sits above the number it serves, so a
+   longer translation has somewhere to grow. */
 @media (max-width: 960px) {
   .topnav a.hide-sm { display: none; }
 }
@@ -573,7 +577,7 @@ h2:hover .anchor, h3:hover .anchor { opacity: 1; }
   border: 1px solid var(--border); border-radius: 3px; padding: .05rem .3rem; line-height: 1.2;
   background: var(--bg);
 }
-@media (min-width: 821px) { .searchbtn { min-width: 11rem; } .searchbtn .kb { margin-left: auto; } }
+@media (min-width: 821px) { .searchbtn { min-width: 10rem; } .searchbtn .kb { margin-left: auto; } }
 @media (max-width: 820px) {
   .searchbtn { width: 1.9rem; padding: 0; justify-content: center; }
   .searchbtn .lbl, .searchbtn .kb { display: none; }
@@ -669,4 +673,92 @@ html[lang^="zh"] { --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont
   "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; }
 html[lang^="zh"] body { line-height: 1.8; letter-spacing: .01em; }
 html[lang^="zh"] .prose p, html[lang^="zh"] .prose li { text-align: justify; }
+/* Justification needs breakable text. A task line often ends on a long
+   nowrap <code> filename, and justifying the remainder spreads the CJK
+   characters into a visible river, so the exercise list stays ragged. */
+html[lang^="zh"] .prose .exlist > li { text-align: start; }
 html[lang^="zh"] h1, html[lang^="zh"] h2, html[lang^="zh"] h3 { letter-spacing: 0; }
+
+/* --------------------------------------------- exercises, answers, cheat */
+/* A lede outside the hero. `.hero .lede` is more specific, so the home page
+   keeps its own larger size. */
+.lede { font-size: 1.05rem; color: var(--fg-muted); max-width: var(--measure); }
+/* The answers and cheat-sheet pages put an h2 in a .part-head, where the
+   global heading margins would break the baseline row. */
+.part-head h2 { margin: 0; font-size: 1.35rem; }
+
+/* the task list at the foot of a chapter */
+.exlist { counter-reset: ex; list-style: none; padding: 0; margin: 1.25rem 0 0; }
+.exlist > li { counter-increment: ex; position: relative; padding-left: 2.2rem; margin-bottom: .95rem; }
+.exlist > li::before {
+  content: counter(ex); position: absolute; left: 0; top: .05rem;
+  width: 1.5rem; height: 1.5rem; border-radius: 100px;
+  background: var(--boundary-soft); color: var(--boundary);
+  font-size: .72rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.ex-more { margin-top: 1.3rem; font-size: .9rem; }
+
+/* the answers page */
+.ansch { margin: 1.6rem 0 2.4rem; }
+.ansch-head {
+  display: flex; align-items: baseline; gap: .8rem; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border); padding-bottom: .4rem; margin-bottom: 1rem;
+}
+.ansch-head h3 { margin: 0; font-size: 1.05rem; }
+.ansch-link { font-size: .78rem; color: var(--fg-muted); margin-left: auto; white-space: nowrap; }
+.ansch-link:hover { color: var(--accent); }
+.anslist { counter-reset: an; list-style: none; padding: 0; margin: 0; }
+.anslist > li { counter-increment: an; position: relative; padding-left: 2.2rem; margin-bottom: 1.8rem; }
+.anslist > li::before {
+  content: counter(an); position: absolute; left: 0; top: .05rem;
+  width: 1.5rem; height: 1.5rem; border-radius: 100px;
+  background: var(--boundary-soft); color: var(--boundary);
+  font-size: .72rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.ans-q { font-weight: 500; }
+.ans-a {
+  margin-top: .5rem; color: var(--fg-muted); font-size: .95rem;
+  border-left: 2px solid var(--defense); padding-left: .85rem;
+}
+.ans-lbl {
+  display: block; font-size: .66rem; text-transform: uppercase; letter-spacing: .1em;
+  color: var(--defense); font-weight: 700; margin-bottom: .25rem;
+}
+.anslist .codeblock { margin-left: 0; }
+
+/* the cheat sheet */
+.spine { counter-reset: sp; list-style: none; padding: 0; margin: 1.25rem 0 0; display: grid; gap: 1rem; }
+.spine > li { counter-increment: sp; position: relative; padding-left: 2.2rem; }
+.spine > li::before {
+  content: counter(sp); position: absolute; left: 0; top: .05rem;
+  width: 1.5rem; height: 1.5rem; border-radius: 100px;
+  background: var(--accent-soft); color: var(--accent);
+  font-size: .72rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+.spine > li > b { display: block; margin-bottom: .15rem; }
+.spine > li > span { display: block; color: var(--fg-muted); font-size: .93rem; max-width: var(--measure); }
+
+.cheat-part {
+  display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap;
+  margin: 2.4rem 0 .4rem; font-size: 1.02rem;
+}
+.cheat-ch { display: block; }
+.cheat-ch > b { display: block; font-family: var(--font-mono); font-size: .78rem; color: var(--accent); }
+.cheat-ch > span { display: block; font-size: .82rem; color: var(--fg-muted); margin-top: .1rem; }
+.cheat-ch:hover { text-decoration: none; }
+.cheat-ch:hover > span { color: var(--fg); }
+.cheat-stage {
+  display: block; font-size: .66rem; color: var(--fg-faint);
+  text-transform: uppercase; letter-spacing: .08em; margin-top: .15rem;
+}
+.cheat-chapters td:first-child { width: 11rem; }
+.cheat-surfaces td:first-child { width: 2.8rem; }
+.cheat-surfaces td:nth-child(2) { width: 11rem; }
+.cheat-surfaces td:last-child, .cheat-controls td:last-child { text-align: right; white-space: nowrap; }
+.cheat-controls td:first-child { width: 14rem; }
+.num { font-family: var(--font-mono); color: var(--fg-faint); }
+/* Three text columns need the full width; below that the table scrolls in its
+   own wrapper rather than squeezing the prose. */
+@media (max-width: 720px) {
+  .cheat-chapters table, .cheat-controls table { min-width: 34rem; }
+}

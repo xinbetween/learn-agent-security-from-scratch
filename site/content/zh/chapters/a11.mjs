@@ -239,3 +239,83 @@ export const refs = [
     title: 'Prompt Injection Attack to Tool Selection in LLM Agents', venue: 'arXiv, 2025',
     url: 'https://arxiv.org/pdf/2504.19793' },
 ];
+
+/* 练习。读完本章之后的动手任务；参考答案在 /answers/ 页面，按位置与这里一一对应。 */
+export const exercises = [
+  {
+    q: `给 <code>code/a11_tool_poisoning.py</code> 加上清单钉定。把这组工具被批准时的指纹持久化到
+        一个小 JSON 文件里，每次启动都重新校验，并让不匹配成为一次硬停止，而不是一条告警。当你把
+        <code>DAY_1</code> 换成 <code>DAY_9</code>、第二次运行拒绝继续并把新旧两份描述并排打出来时，
+        这道题就算做完了。`,
+    a: `本章的 <code>fingerprint()</code> 已经把哈希给你了；缺的是一个存放它的地方，以及它变化时
+        要做的那个决定。哈希之前先规范化——把键排序，用固定的分隔符——否则服务器那边一次键顺序的
+        变动看起来就跟一次后门式变更一样，而你会把自己训练成闭着眼点掉那个提示。名称、描述和完整的
+        参数 schema 都要存，因为服务器可以一个字不动，转而把某个参数放宽。第二次运行时指纹对不上，
+        比对结果显示出那句被追加上去的数据外泄指令，运行随即停止。这换来的东西很窄，但是真实的：
+        服务器照样想改什么改什么，而你拿掉了这个攻击赖以成立的那份无声。对一份在批准那一刻就已经
+        是敌意的描述，它什么都换不来。`,
+    code: `import hashlib, json, pathlib
+
+PIN = pathlib.Path("approved_tools.json")
+
+def fingerprint(tool_defs):
+    canon = json.dumps(tool_defs, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canon.encode()).hexdigest()[:16]
+
+def check(server, tool_defs):
+    pins = json.loads(PIN.read_text()) if PIN.exists() else {}
+    now = fingerprint(tool_defs)
+    was = pins.get(server)
+    if was is None:
+        pins[server] = now
+        PIN.write_text(json.dumps(pins, indent=2))
+        return "approved on first sight: " + now
+    if was != now:
+        raise SystemExit("REFUSING TO LOAD " + server + ": " + was + " -> " + now)
+    return "pinned " + now
+
+print(check("fx", DAY_1))
+print(check("fx", DAY_9))   # -> SystemExit`,
+  },
+  {
+    q: `写一段工具描述，让它在 <code>code/a11_tool_poisoning.py</code> 的 <code>scan()</code> 下
+        命中零个信号，同时照样能完成插队。不要改扫描器。然后补上那个本可以抓住你这段描述的信号，
+        并写下你的新信号误伤的第一份正当工具描述。`,
+    a: `那份信号清单匹配的是字面子串，所以绕开它很便宜：把 "before using" 换成 "prior to any
+        further calls"；用目的而不是标识符来指称目标能力（"the file-reading tool"）；把目的地拆成
+        一个参数里的主机名，而不是直接写出 URL。一段读起来就像普通 API 文档、却顺带让模型多做一件事
+        的描述，就已经够了。这道题的重点在后半段。你为抓住自己的载荷而加的每一个信号，都是诚实的
+        描述里同样会出现的措辞——“always call <code>authenticate</code> first”很正常，一个文档里
+        写明就是要往 webhook 发数据的工具也很正常。你会发现精确率早在召回率变得有用之前就掉下去了。
+        面对由攻击者撰写的散文，静态扫描器没有一个稳定的工作点，这也正是它坐在哈希钉定和凭据范围
+        限定之上、而不是取而代之的原因。`,
+  },
+  {
+    q: `做一个工具遮蔽检测器。给 <code>MANIFEST</code> 里的每个工具指定一个归属服务器，然后把任何
+        提到了自家服务器并不导出的工具的描述标出来。拿文件里那四个工具跑一遍，并为每一条结果给出
+        解释，包括你没预料到的那些。`,
+    a: `这个检测器就是一次集合相减：从每段描述里抽出长得像标识符的 token，与所有工具名的并集求交，
+        再减去撰写这段描述的服务器实际导出的那些名字。在文件自带的清单上你会得到两条命中，不是
+        一条。<code>postcode</code> 是本章讲的那个工具遮蔽的例子。<code>convert</code> 也会响，
+        因为它那段插队载荷里提到了 <code>read_file</code>；这是同一个底层缺陷的另一种表现——描述
+        共处一个扁平命名空间，没有任何归属字段。<code>weather</code> 和 <code>translate</code>
+        是干净的。诚实的边界在于：它只能抓住指名道姓的遮蔽，“the tool you use for sending mail”
+        这样的指代它看不见，而模型看得见。把一条命中当成去读那段描述的理由，别把它当分类器。`,
+    code: `SERVERS = {"convert": "fx", "postcode": "geo",
+           "weather": "geo", "translate": "lang"}
+
+EXPORTS = {}
+for tool, srv in SERVERS.items():
+    EXPORTS.setdefault(srv, set()).add(tool)
+
+ALL_TOOLS = set(SERVERS) | {"read_file", "send_email", "http_get", "write_file"}
+
+def shadows(tool, desc):
+    named = {t for t in ALL_TOOLS if t in desc}
+    return sorted(named - EXPORTS[SERVERS[tool]] - {tool})
+
+for tool, desc in MANIFEST.items():
+    hits = shadows(tool, desc)
+    print(f"  {tool:<12} {'SHADOWS ' + ', '.join(hits) if hits else 'ok'}")`,
+  },
+];

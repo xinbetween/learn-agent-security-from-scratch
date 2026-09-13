@@ -242,3 +242,80 @@ export const refs = [
     venue: 'CNCF', url: 'https://spiffe.io/' },
   { authors: 'W3C', title: 'Decentralized Identifiers (DIDs) v1.1', venue: 'W3C', url: 'https://www.w3.org/TR/did-1.1/' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `<code>Token.sign()</code> in <code>code/a22_identity.py</code> produces a signature that
+        nothing ever verifies. Write <code>verify(signed)</code> that returns a <code>Token</code> or
+        raises, and change the enforcement path so it accepts only the signed string. Success check: a
+        hand-constructed <code>Token</code> carrying <code>repo.admin</code> is rejected, and the four
+        <code>ATTEMPTS</code> rows for the legitimate task token are unchanged.`,
+    a: `Until something verifies it, the signature is decoration and the whole file's security rests on
+        the agent politely choosing not to construct its own <code>Token</code> object — which is
+        exactly the assumption a compromised agent breaks. The property "you can only ever narrow"
+        lives in the verifier, not in <code>attenuate</code>: attenuation is just the function honest
+        callers use, while the verifier is what makes minting impossible. Use
+        <code>hmac.compare_digest</code> rather than <code>==</code> so the comparison is not timing
+        dependent, and stop truncating the digest to sixteen hex characters — sixty-four bits is
+        probably enough against forgery and there is no reason to accept the argument. Verify before
+        parsing, then parse, then check expiry and scope, in that order.`,
+    code: `def verify(signed: str) -> Token:
+    body, _, mac = signed.rpartition(".")
+    want = hmac.new(SECRET, body.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(mac, want):
+        raise ValueError("bad signature")
+    d = json.loads(body)
+    return Token(d["sub"], d["act"], frozenset(d["scp"]),
+                 frozenset(d["res"]), d["exp"], tuple(d["chain"]))
+
+# the agent mints itself an admin token and presents it
+forged = Token("alice", "research-agent", frozenset({"repo.admin"}),
+               frozenset({"*"}), time.time() + 3600)
+try:
+    verify(forged.sign().rsplit(".", 1)[0] + ".0000000000000000")
+    bad("FORGED TOKEN ACCEPTED")
+except ValueError:
+    ok("unsigned and mis-signed tokens never reach permits()")`,
+  },
+  {
+    q: `<code>permits</code> compares resources with exact string equality, so a token scoped to
+        <code>drive://projects/q3-research</code> refuses
+        <code>drive://projects/q3-research/notes.md</code>. Implement hierarchical matching so a grant
+        covers its children, then add the test that
+        <code>drive://projects/q3-research-secret</code> is still denied.`,
+    a: `The obvious fix, <code>resource.startswith(granted)</code>, is A23's suffix trick in different
+        clothes: <code>q3-research-secret</code> starts with <code>q3-research</code> and is somebody
+        else's folder. The correct predicate is <code>r == g or r.startswith(g + "/")</code>, which
+        makes the separator part of the test rather than an accident of the strings. Exact equality was
+        not a bug, it was just too narrow to use, and the usual repair is where the bug gets
+        introduced — which is the argument for parsing the resource identifier into scheme and path
+        segments and comparing segment lists, so that the boundary cannot be forgotten. Whatever you
+        choose, the test for the sibling-prefix case belongs in the file next to it.`,
+    code: `def covers(granted: str, requested: str) -> bool:
+    if granted == "*":
+        return True
+    return requested == granted or requested.startswith(granted + "/")
+
+assert covers("drive://projects/q3-research", "drive://projects/q3-research")
+assert covers("drive://projects/q3-research", "drive://projects/q3-research/notes.md")
+assert not covers("drive://projects/q3-research", "drive://projects/q3-research-secret")
+assert not covers("drive://projects/q3-research", "drive://finance/salaries.xlsx")`,
+  },
+  {
+    q: `The task token verifies offline, which means nothing in the file can revoke it before it
+        expires. Add a revocation check — an epoch counter per subject, or a deny-list keyed on the
+        delegation chain — and measure the exposure window using the file's own lifetimes. State what
+        the check costs you.`,
+    a: `Offline attenuation and revocation pull in opposite directions: checking a deny-list is a round
+        trip to the issuer, and avoiding that round trip is the reason macaroon-style tokens exist at
+        all. With no check, your exposure window is exactly the TTL — ten minutes for the task token in
+        the file, two for the sub-agent — which is precisely why the advice is "mint it at the start of
+        the run" rather than "issue it daily". An epoch counter per subject is the cheap middle: one
+        integer, heavily cacheable, revokes every token for a principal at once but cannot revoke just
+        one agent, while a deny-list on chain prefix can kill one agent and all its descendants at the
+        cost of a lookup on every call. You cannot have unrevokable-and-revokable, so pick the window
+        you can defend in an incident review and make the TTL match it.`,
+  },
+];

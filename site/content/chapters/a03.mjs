@@ -263,3 +263,83 @@ export const refs = [
     title: 'SoK: Bridging Research and Practice in LLM Agent Security',
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `Add three agents your own organisation actually runs to <code>CONFIGS</code> in
+        <code>code/a03_trifecta.py</code>, then add a <code>cheapest_cut</code> property that names the
+        leg you would remove and the capability that removal costs. You are done when the script prints
+        a cut and a price for every configuration.`,
+    a: `Forcing the property to return a price is what stops this being a scoring game. Most people
+        write "cut egress" for everything because the chapter says so, then discover on the second
+        configuration that the egress is the agent's own answer text, which is the product. Expect at
+        least one of your three to come out with no cuttable leg; the honest entry there is a gate on
+        the irreversible actions plus a smaller dataset, not a fictional cut. Record the two-leg
+        configurations separately and write down which leg you are relying on being absent, because
+        that sentence is what your change review has to defend the next time somebody adds a tool. A
+        two-leg agent is one pull request away from a three-leg agent.`,
+    code: `@property
+def cheapest_cut(self):
+    if not self.exploitable:
+        return f"already {self.legs}/3 -- keep it that way: no new {self._missing()}"
+    if "one hard-coded recipient" in self.egress or "answer" not in self.egress:
+        return f"egress -- costs: {self.egress}"
+    if self.private_data:
+        return f"private data -- run under a service identity; costs: {self.private_data}"
+    return "nothing cuttable -- gate the irreversible actions instead (A24)"
+
+def _missing(self):
+    return ", ".join(n for n, v in (("private data", self.private_data),
+                                    ("untrusted input", self.untrusted_input),
+                                    ("egress", self.egress)) if not v)`,
+  },
+  {
+    q: `Model the composition failure the chapter warns about. Give each configuration a
+        <code>talks_to</code> field and write <code>composite</code>, which unions the legs across
+        everything reachable from a starting agent. Verify that an agent with private data and
+        untrusted input but no network, delegating to an agent with network and no data, scores three
+        legs.`,
+    a: `Agent A scores two on its own, agent B scores one, and the pair scores three — a complete
+        trifecta assembled from two components that each pass the test. The gotcha is direction:
+        starting the traversal from B returns one leg, because the edge as written is one-way. Model
+        channels in both directions unless you can demonstrate the reply path does not exist, since B's
+        output is almost always read back by A or by a human. The second gotcha is what counts as an
+        edge. A declared RPC call is the easy case; a shared Slack channel, a ticket queue, a Drive
+        folder and a log index are all edges too, and none of them appear on an architecture diagram.
+        Score the graph, not the node.`,
+    code: `LEGS = ("private_data", "untrusted_input", "egress")
+
+def composite(nodes, start):
+    by, seen, stack = {n.name: n for n in nodes}, set(), [start]
+    held = {leg: "" for leg in LEGS}
+    while stack:
+        n = by[stack.pop()]
+        if n.name in seen:
+            continue
+        seen.add(n.name)
+        for leg in LEGS:
+            held[leg] = held[leg] or getattr(n, leg)
+        stack += [p for p in n.talks_to if p not in seen]
+    return held, sum(bool(v) for v in held.values())
+
+A = Node("A", private_data="the mailbox", untrusted_input="inbound email", talks_to=("B",))
+B = Node("B", egress="outbound HTTP")
+assert composite([A, B], "A")[1] == 3, "A alone is 2/3; the pair is a trifecta"`,
+  },
+  {
+    q: `Take one agent in your estate that somebody has described as having "no network access" and
+        enumerate six ways bytes can still leave it, where the outbound request is made by something
+        other than the agent. Each row must name the actual process or service that makes the request.`,
+    a: `The rows people find quickly are the rendered image and the link in the output. The rows that
+        matter are the ones nobody owns: the sync daemon on the folder the agent writes to, the log
+        shipper that forwards an error message containing a secret to a third-party sink, the CI job
+        that commits and pushes the working tree, the search indexer that reads the same share, and the
+        peer agent that has the network access this one lacks. You are done when each row names a
+        config file or a running service you can point at, not a hypothetical. The honest limit is that
+        this enumeration is never complete — new consumers appear without anyone telling you — so the
+        deliverable is a deny-by-default egress design plus a renderer that refuses remote images. The
+        list's value is finding the two channels that survive that design.`,
+  },
+];

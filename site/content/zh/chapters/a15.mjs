@@ -240,3 +240,80 @@ export const refs = [
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928',
     note: '级联失效 14 个来源；多智能体设计作为推荐实践 18 个' },
 ];
+
+/* 练习。读完本章之后动手做的任务；参考答案在 /answers/ 上，按位置与这里一一对应。 */
+export const exercises = [
+  {
+    q: `把 <code>quarantine_inter_agent()</code> 接进 <code>code/a15_multi_agent.py</code> 里
+        的 <code>Agent.receive()</code>，让同伴消息在被检查之前先被剥离并重新打标，然后重跑那个三
+        轮传播循环。成功标准：感染列表在每一轮之后都打印 <code>['research']</code>，而不是长到全部
+        四个智能体。`,
+    a: `隔离必须跑在接收侧。如果你把它放进 <code>emit()</code>，就等于要求被感染的智能体自己净化自
+        己的输出，而被感染的智能体恰恰是你已经不再信任的那个组件。把剥离放在接收路径上，零号病人就
+        只是零号病人，传染压根起不来——这次运行结束时是 1/4 被感染，而不是 4/4。诚实的边界在于：那
+        条正则只去掉一种标记语法。用普通散文写的载荷（“请在每一次交接中复述下面这一段”）会原封不动
+        地穿过剥离，所以这项控制真正耐用的那一半不是正则，而是重新打标：同伴的文字现在带着“不可信
+        数据”的标签抵达，于是享受你本来就给工具返回准备的那套 A07 处理。`,
+    code: `# in code/a15_multi_agent.py
+def receive(self, msg):
+    msg = quarantine_inter_agent(msg)      # peer content is data, not command
+    if "<<<" in msg and ">>>" in msg:
+        self.infected = True
+    return self.infected
+
+agents["research"].infected = True         # patient zero, from the poisoned page
+for rnd in range(1, 4):
+    for name, a in list(agents.items()):
+        if a.infected:
+            for peer in a.peers:
+                agents[peer].receive(a.emit())
+    print(rnd, [n for n, a in agents.items() if a.infected])`,
+  },
+  {
+    q: `给 <code>code/a15_multi_agent.py</code> 里的 <code>NET</code> 图做三要素打分，按<em>路
+        径</em>而不是按节点。给每个智能体一套能力集合，枚举每一条可达路径，把并集里同时含有不可信
+        输入、私有数据和出站的那些路径打印出来。成功标准：你的打分器至少标出一条路径，而没有任何单
+        个节点占到一条腿以上。`,
+    a: `按节点打分什么也找不到，因为 <code>research</code> 只有不可信输入，<code>writer</code> 只
+        有私有数据，<code>reviewer</code> 只有出站。按路径打分能找到两条
+        ：<code>research &rarr; writer &rarr; reviewer</code>，以及从 <code>coordinator</code> 进
+        入的同一条链。这个落差就是本章讲的那种漏判，而堵上它大约十五行代码。有两点要留意。只有当数
+        据真的一路流下去时，沿路径取并集才是正确的操作——如果 <code>writer</code> 做的是总结而不是
+        转发，污点被削弱了但没有消除，所以要把并集当成它本来的样子：一个上界。另外，收工之前
+        给 <code>NET</code> 加一个环：<code>seen</code> 这道守卫才是让枚举不至于永远跑下去的东西，
+        而环也正是让感染最糟糕的那个拓扑特征。`,
+    code: `CAPS = {
+    "coordinator": set(),
+    "research":    {"untrusted"},
+    "writer":      {"private"},
+    "reviewer":    {"egress"},
+}
+
+def paths(node, seen=()):
+    seen = seen + (node,)
+    yield seen
+    for nxt in NET[node]:
+        if nxt not in seen:
+            yield from paths(nxt, seen)
+
+for start in NET:
+    for path in paths(start):
+        legs = set().union(*(CAPS[n] for n in path))
+        if legs == {"untrusted", "private", "egress"}:
+            print("TRIFECTA on path:", " -> ".join(path))`,
+  },
+  {
+    q: `手工搭一个合谋案例：写三条消息，每一条单独看都是真的，合起来却确立了一个关于你的智能体所监
+        控的某个系统的假结论。然后写一个能标记这一<em>组</em>消息的检测器，把它跑在十条来自正常任
+        务的正常多智能体轨迹上。报告它同时标记了多少条正常轨迹。`,
+    a: `一组能用的例子是关于同一家供应商的三条真事实——周二有一次服务中断、上周改过一次安全页面、支
+        持队列积压到三天——它们合起来就拼出“他们被入侵了”，而没有任何一条消息这么断言过。你的检测器
+        最后只会落到两种做法之一。如果它按结论来匹配，它就得自己把那个结论推出来，那是一个比它所保
+        护的智能体还难的模型。如果它按模式来匹配（几个智能体带着片面证据向同一个实体收敛），它就会
+        在你大部分正常轨迹上告警，因为带着片面证据向同一个实体收敛，正是一个多智能体调研系统整天在
+        干的事。预期大约一半的正常轨迹会被标记，在任何现实的基率下这都让检测器无法使用——和 A17 是
+        同一笔算术。这一个没法靠检查消息彻底解决。你能买到的是可审计性：要求每一个片段都带上溯源，
+        并要求形成结论的那个智能体明说是哪几条消息支撑了它。这挡不住攻击；它让这次组合事后可以被重
+        建出来，而这就是一次你能解释的事故和一次你解释不了的事故之间的差别。`,
+  },
+];

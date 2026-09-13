@@ -272,3 +272,75 @@ export const refs = [
     title: 'Securing Agentic AI: A Comprehensive Threat Model and Mitigation Framework for Generative AI Agents',
     venue: 'arXiv, 2025', url: 'https://arxiv.org/abs/2504.19956' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `Map every finding in <code>code/a05_threat_model.py</code> onto A04's six threat surfaces and
+        print, for each framework, the surfaces it produced nothing for. You are done when you can
+        state each lens's blind columns from the output rather than from the chapter's prose.`,
+    a: `The matrix reproduces the "weak at" column as data. STRIDE lands nothing under internal
+        threats, because it has no vocabulary for a backdoored or hallucinating model — it was written
+        for software that does what it is told. OWASP covers direct, indirect and internal well and is
+        thin on oversight and compound. MAESTRO is the only lens that reaches all six, which is what
+        its layer structure is for. ATLAS clusters in direct, indirect and internal because those are
+        where observed adversary techniques live. NIST maps to no surface at all, and that is not a
+        defect: its findings are control questions rather than threats, so a matrix built from threat
+        surfaces cannot see them. One gotcha when you build it: importing
+        <code>a04_threat_taxonomy</code> executes the whole module, since it has no main guard — add
+        one, or copy the six surface names across. The output is the argument for the chapter's
+        recommendation. You do not need five lenses; you need one lens and a written list of what it
+        cannot see.`,
+    code: `SURFACES = ["Direct threats", "Indirect threats", "Internal threats",
+            "Resource threats", "Oversight failures", "Compound threats"]
+
+MAPPING = {   # (framework, category) -> surface. Fill in one row per finding.
+    ("STRIDE (1999, general software)", "Spoofing"): "Direct threats",
+    ("STRIDE (1999, general software)", "Repudiation"): "Oversight failures",
+    ("STRIDE (1999, general software)", "Denial of service"): "Resource threats",
+    ("OWASP Top 10 for LLM Applications", "LLM01 Prompt injection"): "Indirect threats",
+    ("OWASP Top 10 for LLM Applications", "LLM04 Data poisoning"): "Internal threats",
+    ("MAESTRO (agent-specific, 7 layers)", "L7 Agent ecosystem"): "Compound threats",
+    # ... and so on, for all 26 findings in FRAMEWORKS
+}
+
+covered = {fw: set() for fw in FRAMEWORKS}
+for (fw, cat), surface in MAPPING.items():
+    covered[fw].add(surface)
+
+for fw, hit in covered.items():
+    blind = [s for s in SURFACES if s not in hit]
+    print(f"  {fw:<38} blind to: {', '.join(blind) or 'nothing'}")`,
+  },
+  {
+    q: `Timebox thirty minutes and run STRIDE against an agent you operate — the system, not the model.
+        Then settle the repudiation row empirically: pick one write that agent made last month and try
+        to find the request that caused it. Stop the clock at five minutes.`,
+    a: `The empirical half is the exercise. You are looking for a chain from the artefact to a request
+        id to the prompt and the tool calls that produced it, and most deployments break at the first
+        link, because the write carries the agent's service identity and nothing else. If you cannot
+        close the chain in five minutes, that is your best finding of the day — better than the
+        injection findings, because it is the difference between a one-hour incident and a one-week
+        one, and it is cheap to fix before an incident and impossible to fix during. Stamp every side
+        effect with a correlation id and retain the trajectory for as long as you retain the artefact.
+        Expect the thirty minutes to yield four to six findings, most of them unglamorous: an
+        unauthenticated caller, a token whose lifetime nobody chose, a queue anyone can write to. That
+        is the correct result. Run the AI-specific lens afterwards, or it absorbs all the attention.`,
+  },
+  {
+    q: `Take two threats you already know are real for your system — one from A01 to A04, one from a
+        published incident — and check from a blank sheet which of the five lenses actually generates
+        each. Where none does, write the extra question and add it permanently to your primary lens.`,
+    a: `The one that usually survives all five is EchoLeak-shaped exfiltration through the rendering
+        client. OWASP's insecure-output-handling entry gets close but reads as "sanitise your output",
+        which sends people to escaping rather than to the client's network stack; MAESTRO reaches it at
+        L3 or L7 only if you already knew to look downstream. The question that catches it is "what
+        fetches, renders or executes our output, and with whose network access?" — and once written
+        down it also catches the sync daemon and the peer agent from A03. That is the general shape:
+        a framework is a memory aid built from other people's incidents, so the questions with the best
+        hit rate on your system are the ones you add after your own. Keep the added list to three or
+        four questions. A lens with forty appended questions is a lens nobody runs, and an unrun lens
+        finds nothing at all.`,
+  },
+];

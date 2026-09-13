@@ -40,7 +40,7 @@ const lineCount = async (p) => {
 const contentDir = (code) => code === 'en' ? 'site/content' : `site/content/${code}`;
 
 const REQUIRED = ['curriculum.mjs', 'glossary.mjs', 'threatmap.mjs', 'defensemap.mjs',
-                 'timeline.mjs', 'projects/index.mjs', 'projects/capstone.mjs'];
+                 'timeline.mjs', 'cheatsheet.mjs', 'projects/index.mjs', 'projects/capstone.mjs'];
 
 async function loadLocale(code) {
   const d = contentDir(code);
@@ -68,6 +68,7 @@ async function loadLocale(code) {
     SURFACES: (await imp(`${d}/threatmap.mjs`)).SURFACES,
     CONTROLS: (await imp(`${d}/defensemap.mjs`)).CONTROLS,
     EVENTS: (await imp(`${d}/timeline.mjs`)).EVENTS,
+    CHEATS: await imp(`${d}/cheatsheet.mjs`),
     PROJECT_BODIES: (await imp(`${d}/projects/index.mjs`)).PROJECT_BODIES,
     CAPSTONE_BODY: (await imp(`${d}/projects/capstone.mjs`)).CAPSTONE_BODY,
   };
@@ -104,6 +105,20 @@ function chapterPage(ch, mod, ctx) {
     .map(m => [m[1], m[2].replace(/<[^>]+>/g, '')])
     .filter(([id]) => id !== 'references');
 
+  /* Exercises sit between the prose and the quiz: the quiz checks that the
+     chapter was understood, the exercises ask for it to be used. Answers live
+     on one shared page rather than inline, so the chapter itself stays
+     spoiler-free; every task links to its own anchor over there. */
+  const exHtml = (mod.exercises && mod.exercises.length) ? `
+<section class="prose">
+${C.h2(L.exercises.title, 'exercises')}
+<p>${L.exercises.intro}</p>
+<ol class="exlist">
+${mod.exercises.map((e, i) => `<li id="ex-${i + 1}">${e.q}</li>`).join('')}
+</ol>
+<p class="ex-more"><a href="${href(`/answers/#${ch.id}`, code)}">${L.exercises.answersLink} &rarr;</a></p>
+</section>` : '';
+
   const quizHtml = (mod.quiz && mod.quiz.length) ? `
 <section class="prose">
 ${C.h2(L.chapter.quizTitle, 'check-yourself')}
@@ -138,6 +153,8 @@ ${heads.length > 2 ? `<nav class="toc-inline"><h5>${L.chapter.inThisChapter}</h5
   heads.map(([id, t2]) => `<li><a href="#${id}">${t2}</a></li>`).join('')}</ol></nav>` : ''}
 ${mod.body}
 </article>
+
+${exHtml}
 
 ${quizHtml}
 
@@ -218,7 +235,7 @@ async function build() {
 
     const paths = [
       '/', '/curriculum/', '/projects/', '/capstone/', '/threats/', '/defenses/',
-      '/glossary/', '/timeline/', '/references/', '/sources/', '/setup/',
+      '/glossary/', '/timeline/', '/references/', '/sources/', '/setup/', '/answers/', '/cheatsheet/',
       ...cur.CHAPTERS.map(c => `/chapters/${c.id}/`),
       ...cur.PROJECTS.map(p => `/projects/${p.id}/`),
     ];

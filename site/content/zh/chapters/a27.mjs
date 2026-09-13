@@ -245,3 +245,91 @@ export const refs = [
     title: 'Toward Safe and Responsible AI Agents: A Three-Pillar Model for Transparency, Accountability, and Trustworthiness',
     venue: 'arXiv, 2026', url: 'https://arxiv.org/pdf/2601.06223' },
 ];
+
+/* 练习。读完本章之后动手做的任务；参考答案放在 /zh/answers/，按位置一一对应。 */
+export const exercises = [
+  {
+    q: `把 <code>code/a27_governance.py</code> 里的阶段门禁变成可执行的。写一个
+        <code>gate(phase, metrics)</code> 函数，返回两个列表——你实测的数字没能通过的那些通过标准，
+        以及你系统里目前根本没在度量的那些标准——然后用你 <a href="/zh/chapters/a25/">A25</a> 用例集
+        里的攻击成功率和效用数字，把四个阶段全跑一遍。当你能为每一条没被度量的标准，说出该由什么测量
+        手段来产出它时，你就做完了。`,
+    a: `没被度量的那份清单比没通过的那份更长，而这就是结论。“ASR &lt; 5%”“成本不超过预估的 2 倍”和
+        “审批被推翻的比例 &lt; 10%”都对应着一个你今天就能产出的数字；“100% 的拟执行动作都被人看过”
+        “连续两周没有解释不清的策略拒绝”和“持续审计连续 60 天为绿”则什么都对应不上——除非你建了 A26
+        那份拒绝日志，并且在按计划定期跑用例集。表里大约有一半的标准在第一天是量不出来的，这意味着一次
+        门禁评审是在靠断言、而不是靠证据来做。解法不是把标准放宽，而是意识到一道阶段门禁本身就是一份
+        埋点规格，而埋点是有交付周期的。对回滚那一列也做一遍同样的检查：“一分钟内完成 token 吊销”是
+        一句你今天下午就能拿秒表验证的断言，而大多数团队会发现它是假的。`,
+    code: `# add to code/a27_governance.py
+def gate(phase, metrics):
+    checks = {
+        "ASR < 5% on the internal suite":      lambda m: m["asr"] < 0.05,
+        "cost per task within 2x of estimate": lambda m: m["cost_ratio"] <= 2.0,
+        "approval override rate < 10%":        lambda m: m["override_rate"] < 0.10,
+        "median approval latency < 60s":       lambda m: m["latency_s"] < 60,
+        "no incident in 30 days":              lambda m: m["days_clean"] >= 30,
+    }
+    unmet, unmeasured = [], []
+    for c in phase.exit_criteria:
+        check = checks.get(c)
+        if check is None:
+            unmeasured.append(c)
+        elif not check(metrics):
+            unmet.append(c)
+    return unmet, unmeasured
+
+MEASURED = {"asr": 0.25, "cost_ratio": 1.4, "override_rate": 0.18,
+            "latency_s": 45, "days_clean": 12}
+for p in PHASES:
+    unmet, unmeasured = gate(p, MEASURED)
+    print("PHASE %-11s failed=%d  no instrument=%d" % (p.name, len(unmet), len(unmeasured)))
+    for c in unmeasured:
+        print("     cannot evaluate:", c)`,
+  },
+  {
+    q: `写出那份一页纸的上线决策备忘录，用它把玩具智能体从阶段 1 推到阶段 2；再写一套四级的严重性定级
+        标准，用智能体能够触及什么来定义，而不是用告警有多响。当每一个严重级别都写明了一类不可逆动作
+        或一类数据，以及一个最长遏制时间，并且一位没参与过的同事读完备忘录就能说出什么会卡住这次晋级
+        时，你就做完了。`,
+    a: `备忘录很短，有五个部分：同一次运行里的攻击成功率与效用这一对数字，附上用例清单；那段说明本次
+        评测未覆盖什么的话；阶段 2 的通过标准，每条都配上产出它的测量手段；回滚那一行，写明谁能执行它
+        以及实测要花多久；还有你准备接受的残余风险和接受的理由。再长就没人读了。至于定级标准，锚定在
+        触及范围而不是告警量上，才是它凌晨三点还能用的原因：S1 是一次不可逆的对外动作或凭据泄露，十五
+        分钟内遏制；S2 是一次对受监管数据的越权读取，或一次对共享语料的写入，一小时；S3 是策略拒绝激增
+        或漂移告警，但没有已完成的动作，一个工作日；S4 是单次异常运行，下个迭代处理。注意这套标准悄悄
+        要求了什么——你没法按触及范围分级，除非你知道这次运行绑定了哪些工具、其中哪些是不可逆的，所以
+        它又是 <a href="/zh/chapters/a22/">A22</a> 那套身份工作的一个下游消费者。残余风险那一节最后
+        写，而且别把它打磨圆滑；一份没有已接受风险的备忘录，是一份没人相信的备忘录。`,
+  },
+  {
+    q: `用 <code>code/a27_governance.py</code> 里的处置手册，围绕一份被投毒的共享语料做一次 45 分钟
+        的桌面推演，并按墙上时钟的时间记一份书面时间线。给那十一个步骤逐一标上“今天我们做得到”或
+        “做不到”，每一个“做不到”都写出能修好它的那个设计期决定。当你能用一条查询、而不是靠猜，回答出
+        还有哪些运行检索过那份被投毒的文档时，你就做完了。`,
+    a: `大多数团队都卡在同样的三步上。吊销智能体的 token 而不是用户的，需要一份单独的智能体凭据，而很多
+        部署根本没有。按溯源清除派生记忆，需要一个在几个月前入库时就写下的溯源字段。而影响范围那条查询
+        需要每一次检索都带上文档标识和时间戳，外加一份语料版本历史来说明投毒是什么时候落地的——没有后
+        半截，你能列出谁检索过这份文档，却列不出谁检索到了被投毒的那个版本，于是诚实的答案是一个超集，
+        通知的范围也就比它本该有的更吵。时间线要按墙上时钟的分钟数来写，不要写成清单，因为只有这样才会
+        暴露出串行依赖：没找到源头就没法清除记忆，而没人重放过一条轨迹就找不到源头。真正重要的产出是
+        那份“做不到”清单，每一项旁边配一个设计期的修法；那份清单就是下个季度的待办，而在会议室里做出来
+        比在凌晨三点做出来便宜得多。`,
+    code: `# the blast-radius query the tabletop needs. If this cannot be written
+# against your real logs, the incident has no known bound.
+RETRIEVALS = [
+    {"run": "r1", "user": "alice", "doc": "kb/caching.md", "ts": 1740000010},
+    {"run": "r2", "user": "bob",   "doc": "kb/caching.md", "ts": 1740000920},
+    {"run": "r3", "user": "carol", "doc": "kb/etags.md",   "ts": 1740001400},
+    {"run": "r4", "user": "bob",   "doc": "kb/caching.md", "ts": 1740002200},
+]
+
+def blast_radius(doc, poisoned_since, retrievals=RETRIEVALS):
+    hits = [r for r in retrievals if r["doc"] == doc and r["ts"] >= poisoned_since]
+    return sorted({r["run"] for r in hits}), sorted({r["user"] for r in hits})
+
+runs, users = blast_radius("kb/caching.md", 1740000500)
+print("affected runs ", runs)      # ['r2', 'r4']
+print("notify users  ", users)     # ['bob']`,
+  },
+];

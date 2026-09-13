@@ -44,6 +44,7 @@ export const UI = {
       timeline: 'Timeline',
       glossary: 'Glossary',
       references: 'References',
+      cheatsheet: 'Cheat sheet',
     },
 
     search: {
@@ -84,6 +85,15 @@ export const UI = {
       toCapstone: 'The capstone',
     },
 
+    exercises: {
+      title: 'Exercises',
+      intro: 'Three tasks that need a keyboard, not a highlighter. Work them before you read the answers.',
+      answersLink: 'Answers to these exercises',
+      answerLabel: 'Answer',
+      openChapter: 'Open chapter',
+      count: (n) => `${n} exercises`,
+    },
+
     refs: {
       heading: 'References and credits',
       note: `Every source below is the work of the researchers named. This chapter is a
@@ -101,10 +111,14 @@ numbers. Links go to the authors' own pages wherever one exists.`,
       references: 'Every paper and post the course was built from',
       sources: 'The awesome-lists and surveys behind the reference pages',
       setup: 'Run the code and the site on your machine',
+      answers: (n) => `Model answers to all ${n} exercises`,
+      cheatsheet: 'Every chapter compressed to one page',
     },
     searchWords: {
       references: 'bibliography credits sources authors papers',
       setup: 'python uv ruff node build install clone quickstart',
+      answers: 'exercises solutions worked answers practice drills',
+      cheatsheet: 'cheatsheet summary revision recap crib one page quick reference',
     },
 
     footer: {
@@ -122,6 +136,8 @@ numbers. Links go to the authors' own pages wherever one exists.`,
       creditsHead: 'Credits',
       allReferences: 'All references',
       sourceLists: 'Source lists',
+      cheatsheet: 'Cheat sheet',
+      answers: 'Exercise answers',
     },
   },
 
@@ -145,6 +161,7 @@ numbers. Links go to the authors' own pages wherever one exists.`,
       timeline: '时间线',
       glossary: '术语表',
       references: '参考文献',
+      cheatsheet: '速查表',
     },
 
     search: {
@@ -185,6 +202,15 @@ numbers. Links go to the authors' own pages wherever one exists.`,
       toCapstone: '毕业项目',
     },
 
+    exercises: {
+      title: '练习',
+      intro: '三道题都要动手，光划重点没用。先自己做完，再去看答案。',
+      answersLink: '查看这些练习的参考答案',
+      answerLabel: '参考答案',
+      openChapter: '打开本章',
+      count: (n) => `${n} 道练习`,
+    },
+
     refs: {
       heading: '参考文献与致谢',
       note: `下列每一项成果都属于文中列出的研究者。本章只是对他们工作的教学性归纳；
@@ -201,10 +227,14 @@ numbers. Links go to the authors' own pages wherever one exists.`,
       references: '本课程所依据的全部论文与文章',
       sources: '参考页面背后的清单与综述',
       setup: '在本机运行代码与站点',
+      answers: (n) => `全部 ${n} 道练习的参考答案`,
+      cheatsheet: '把每一章压缩成一页',
     },
     searchWords: {
       references: '参考 文献 致谢 论文 作者 出处',
       setup: '安装 环境 运行 部署 依赖 快速开始 python node',
+      answers: '练习 答案 参考答案 题解 动手',
+      cheatsheet: '速查 速查表 总结 复习 提纲 一页 快查',
     },
 
     footer: {
@@ -221,6 +251,8 @@ numbers. Links go to the authors' own pages wherever one exists.`,
       creditsHead: '致谢',
       allReferences: '全部参考文献',
       sourceLists: '资料来源',
+      cheatsheet: '速查表',
+      answers: '练习答案',
     },
   },
 };

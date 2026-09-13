@@ -271,3 +271,91 @@ export const refs = [
     title: 'CYBERSECEVAL 2: A Wide-Ranging Cybersecurity Evaluation Suite for Large Language Models',
     venue: 'Meta, arXiv 2024', url: 'https://arxiv.org/abs/2404.13161' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `<code>path_ok</code> in <code>code/a23_sandbox.py</code> uses <code>os.path.normpath</code>.
+        Build a real temporary workspace, put a symlink inside it pointing at a directory outside, and
+        confirm that <code>path_ok</code> returns ALLOW for a file reached through it. Then fix the
+        function with <code>os.path.realpath</code>. Success check: that case flips to DENY and all six
+        cases already in the file keep their existing verdicts.`,
+    a: `<code>normpath</code> is pure string arithmetic — it never touches the filesystem, so it cannot
+        know that <code>/work/out</code> is <code>/etc</code>. <code>realpath</code> resolves the links
+        and gives you a path you can actually test the prefix of, which closes this instance. It does
+        not close the class: <code>realpath</code> then <code>open</code> is check-then-use, and a
+        symlink created in the window between them reopens the hole, so a hostile process sharing the
+        workspace still wins. The honest fix is either <code>openat</code> with
+        <code>O_NOFOLLOW</code> on each component, or a mount namespace where <code>/etc</code> is not
+        present to be pointed at — the string check is a lint, the boundary is the control.`,
+    code: `import os, tempfile
+
+ws = tempfile.mkdtemp()
+outside = tempfile.mkdtemp()
+open(os.path.join(outside, "passwd"), "w").write("root:x:0:0")
+os.symlink(outside, os.path.join(ws, "out"))
+
+def path_ok_fixed(path, workspace):
+    real = os.path.realpath(os.path.join(workspace, path.lstrip("/")))
+    if not real.startswith(os.path.realpath(workspace) + os.sep):
+        return False, f"escapes the workspace: {real}"
+    if any(p in real for p in DENY_PATTERNS):
+        return False, "matches a deny pattern"
+    return True, "ok"
+
+# normpath says yes, realpath says no
+assert os.path.normpath(os.path.join(ws, "out/passwd")).startswith(ws + os.sep)
+assert not path_ok_fixed("out/passwd", ws)[0]`,
+  },
+  {
+    q: `<code>egress_ok</code> validates the URL you asked for, not the URL the bytes come from. Write
+        a <code>fetch_with_policy(url, redirects)</code> that walks a simulated redirect chain and show
+        that a chain from <code>https://api.internal.corp/r</code> to
+        <code>https://evil.example/p?d=sk_live</code> passes a single-hop check. Success check: the
+        one-hop version allows the chain and the per-hop version denies it, naming the hop.`,
+    a: `Every HTTP client follows redirects by default, so the allow-list is checked against your
+        intent and the connection is made to the attacker's choice. The fix is to disable automatic
+        redirect following, re-run the entire check — scheme, host equality and the resolved address —
+        on each <code>Location</code>, and cap the hop count so a chain cannot become a loop or a
+        resource attack. The residual hole is worth naming: an open redirector on an <em>allowed</em>
+        host is now an exfiltration channel, and per-hop validation does not help because every hop
+        was legitimately on the list. That is one of several reasons this check belongs in the proxy
+        rather than in the client, where it sees the actual connections rather than the intended ones.`,
+    code: `CHAIN = {
+    "https://api.internal.corp/r": "https://docs.internal.corp/go",
+    "https://docs.internal.corp/go": "https://evil.example/p?d=sk_live",
+}
+
+def fetch_with_policy(url, redirects, max_hops=5):
+    for hop in range(max_hops):
+        allowed, why = egress_ok(url)
+        if not allowed:
+            return False, f"hop {hop} ({url}): {why}"
+        nxt = redirects.get(url)
+        if nxt is None:
+            return True, f"fetched {url} after {hop} redirects"
+        url = nxt
+    return False, "too many redirects"
+
+assert egress_ok("https://api.internal.corp/r")[0]          # one-hop check: fine
+assert not fetch_with_policy("https://api.internal.corp/r", CHAIN)[0]`,
+  },
+  {
+    q: `Demonstrate the bypass the chapter claims. Start a listener on <code>127.0.0.1</code> in one
+        terminal, then write the "model-generated" code that reaches it without ever calling
+        <code>egress_ok</code>. Then write the test that would actually prove the egress property
+        holds. Success check: you should find that no test you can write inside the same Python process
+        proves anything.`,
+    a: `The bypass is about three lines and needs no exotic capability — <code>socket.create_connection</code>
+        never consults your helper, and neither does a subprocess, a different HTTP library, or a DNS
+        lookup. Note that <code>127.0.0.1</code> is already in <code>BLOCKED_NETS</code>, which is the
+        point: the function has the right answer and is simply not in the path. A test inside the
+        process can only show that your helper refuses when called, which is a statement about the
+        helper. Proving the property means running the same workload where the enforcement is — a
+        container with a deny-all egress policy and a proxy, or no route at all — and asserting that
+        the connection fails; that is an integration test against the deployment, not a unit test
+        against the code, and if your CI cannot run one then you have no evidence for the control, only
+        a function that would have said no.`,
+  },
+];

@@ -234,3 +234,82 @@ export const refs = [
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928',
     note: '把监督失效当作一个威胁面；有 16 处来源推荐人工确认，其中 14 处来自工业界' },
 ];
+
+/* 练习。读完本章之后的动手任务；参考答案放在 /answers/ 上，按位置一一对应。 */
+export const exercises = [
+  {
+    q: `给 <code>code/</code> 里的某个玩具智能体加上埋点，数一数在两种策略下，一个任务实际会弹出
+        多少次审批：一种是每次工具调用都确认，另一种是只确认 <code>code/a24_oversight.py</code>
+        里那张表判为不可逆的动作。然后用那个文件里的 <code>attention()</code> 曲线，算出在每种策略
+        下真实操作员会走过场点掉的弹窗比例。成功判据：两个弹窗数，两个百分比。`,
+    a: `按文件里的默认值，一次四十个弹窗的运行，全程平均注意力大约 15%，所以<b>大约 85% 的弹窗是
+        被走过场点掉的</b>，而 3% 这个衰减下限在第 19 个弹窗左右就已经到达——之后的一切都只是点击
+        而已。同一次运行按可逆性分级，只剩三个弹窗，平均注意力约 83%，于是走过场的大约是
+        <b>17%</b>。同一次运行、同一批工具、同一个人：唯一变的是在真正要紧的那个弹窗到来之前，你
+        已经花掉了多少预算。把两种策略之间的比值当作结论，把绝对数字当作先验——这条曲线是示意性的，
+        形状取自警告遵从度的文献，而不是在你的操作员身上实测出来的。`,
+    code: `from a24_oversight import attention, ACTIONS
+
+GRADE = {a.name: a.reversible for a in ACTIONS}
+
+TRACE = (["read_file"] * 18 + ["web_search"] * 9 + ["write_file"] * 10
+         + ["git_commit"] * 2 + ["send_email"])          # 40 calls
+
+def measure(prompts):
+    if not prompts:
+        return 0, 0.0
+    seen = [attention(i) for i in range(1, len(prompts) + 1)]
+    return len(prompts), 1 - sum(seen) / len(seen)
+
+everything = TRACE
+graded = [t for t in TRACE if GRADE.get(t, "irreversible") == "irreversible"]
+for label, ps in (("confirm everything", everything), ("reversibility-graded", graded)):
+    n, stamped = measure(ps)
+    print(f"  {label:<24}{n:>3} prompts   {stamped:.0%} rubber-stamped")`,
+  },
+  {
+    q: `把 <code>Action.gate()</code> 改成一个所有工具调用都必须经过的分发器，并让它<em>失败即
+        拒绝</em>：没有可逆性等级的工具直接抛异常，而不是默认落到“只记日志”。把它接在前面某个玩具
+        文件的工具之前，然后加一个不给它分级的新工具。成功判据：运行在这个未分级的工具上停住，而不
+        是悄悄记一条日志。`,
+    a: `默认值比那张表更要紧。一个未分级的工具落到“只记日志”，意味着安全评审之后加的每一个工具都
+        既没被评审也没被守住，而这正是一张原本正确的分级表在两个季度里烂成摆设的方式。失败即拒绝
+        逼得加工具的人必须做一次可逆性判断，这是本章里唯一能熬过人员更替的部分，代价只是一次字典
+        查询。它也确实会在有人第一次上线未分级工具时把生产环境的运行停住——那就是预期行为，而且如果
+        你在它发生之前就把话说清楚，会比在事故当中解释容易得多。`,
+  },
+  {
+    q: `用真实的溯源来渲染那个好弹窗，而不是用一个字符串字面量：写一个
+        <code>render_prompt(tool, args)</code>，接受 A21 的 <code>Tagged</code> 值，填进要离开的
+        数据、收件人、来源标签和第三个选项。然后把审批绑定到那组确切参数的哈希上，并在调用时重新
+        校验，以此关掉审批与执行之间的缝隙。成功判据：审批之后再改动正文，会让这次调用失败，而不是
+        把邮件发出去。`,
+    a: `溯源那一行是那个屏幕上唯一不是模型自己写出来的字段，这恰恰是它最值得展示的原因——可解释性
+        的失效模式在于智能体自述的理由不是真正的理由，而 <code>sources</code> 是一个关于字节从哪里
+        来的事实，不是一句关于动机的说法。把审批绑定到序列化参数的哈希上，关掉了先审批再调包那道
+        缝；没有它，人批准的是一段描述，跑起来的却是智能体接下来传的任何东西。剩下那个洞关不上：
+        弹窗没展示的东西，人是无从核验的，所以一段 4,000 字符的正文无论排版多好都没法评审；而对一个
+        计算机操作型智能体（<a href="/zh/chapters/a08/">A08</a>）来说，操作员和智能体看的根本不是
+        同一个产物。这套构造假定了一个你渲染得出来的动作空间，在渲染不出来的地方，它什么也买不到。`,
+    code: `import hashlib, json
+
+def arg_digest(args):
+    return hashlib.sha256(
+        json.dumps({k: v.value for k, v in args.items()}, sort_keys=True).encode()
+    ).hexdigest()
+
+def render_prompt(tool, args):
+    src = sorted(set().union(*[v.sources for v in args.values()]))
+    lines = [f"{tool}   IRREVERSIBLE", ""]
+    lines += [f"  {k:<10}{v.value}" for k, v in args.items()]
+    lines += ["", f"  Why: this call carries data derived from {src}.",
+              "       Sources other than 'user' did not come from you.", "",
+              "  [ Send ]  [ Don't send ]  [ Don't send, and stop the task ]"]
+    return "\\n".join(lines), arg_digest(args)
+
+prompt, approved = render_prompt("send_email", {"to": to, "body": body})
+print(prompt)
+body = body.derive(body.value + " PS: also the key")     # swapped after approval
+assert arg_digest({"to": to, "body": body}) != approved  # so the call must refuse`,
+  },
+];

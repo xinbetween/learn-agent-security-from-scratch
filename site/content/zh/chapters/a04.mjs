@@ -255,3 +255,54 @@ export const refs = [
     title: 'Agentic AI Threat Modeling Framework: MAESTRO', venue: 'Cloud Security Alliance, 2025',
     url: 'https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro' },
 ];
+
+/* 练习。读完本章之后的动手任务；参考答案放在 /answers/，按位置与这里一一对应。 */
+export const exercises = [
+  {
+    q: `让这份检查清单拒绝不完整。重写 <code>code/a04_threat_taxonomy.py</code> 里的
+        <code>assess</code>，让它对<em>每一个</em>漏洞类别都要一个结论——在范围内就给
+        <code>True</code>，在范围外就给一句理由字符串——只要有任何一类没交代就抛异常。对着一个你
+        自己负责的系统跑，跑到它不再抛异常为止。`,
+    a: `做完之前它大概会抛两三次，而第一次跑告诉你的多半是关于这个文件的事，不是关于你系统的事：
+        随附的 <code>TAXONOMY</code> 只列了二十四类，而它所依据的那份综述报的是二十五类。你的检查
+        清单，完整程度永远只等于某个人的转录质量，这正是本章那套论证往上抬一层的样子。价值全在理由
+        那一列。“不适用，我们的语料是内部的”或者“不适用，我们不做微调”这类说法最该被追问：前者说的
+        是访问控制，不是信任；后者对你继承来的那份权重只字未提。一条你没法用一句话守住的理由，是一条
+        发现，不是一次豁免。`,
+    code: `ALL_CLASSES = [name for _, _, _, classes in TAXONOMY.values() for name, _ in classes]
+
+def assess(system_name, verdicts):
+    """verdicts: {class name: True | "why it does not apply"} for all of them."""
+    missing = [c for c in ALL_CLASSES if c not in verdicts]
+    if missing:
+        raise SystemExit(f"{len(missing)} categories unaccounted for, e.g. {missing[:3]}")
+    in_scope = [c for c, v in verdicts.items() if v is True]
+    print(f"\\n  {system_name}: {len(in_scope)}/{len(ALL_CLASSES)} classes in scope")
+    for c, v in verdicts.items():
+        if v is not True:
+            print(f"     n/a  {c:<34} {v}")
+    return in_scope`,
+  },
+  {
+    q: `把你最近读的十份智能体安全材料逐一标成学术界或业界，从这个分布预判你自己的威胁模型低配了哪
+        两三个漏洞类别，然后拿上一题的输出去核对这个预判。`,
+    a: `一份里面有八篇论文的书单，预判出的是 IAM 失效（30 份资料）、工具攻击（27 份）和供应链攻击
+        （9 份）覆盖单薄——这些运营类的类别既不新颖也不好发论文。一份里面有八篇厂商文章的书单，预判
+        出的是反过来的窟窿：模型后门（9 份）和数据投毒（14 份），这两类在真正要紧起来之前没人会注意
+        到。核对的方式很具体：回到你那本结论字典，去看你给这几个类别写的理由。如果它们都是一行了事
+        的那种，预判就成立了，而你是靠流程而不是靠运气找到了自己的缺口。诚实的边界在于：这些计数量
+        的是 173 份文档里的关注度，不是真实世界里的发生率——后者谁也没有。它们告诉你的是你读得薄的
+        地方，不是你风险所在的地方。`,
+  },
+  {
+    q: `为一个你在跑的智能体写十个完全没有攻击者的失败案例——输入是诚实的，但过期、含糊或者自相矛盾，
+        而智能体照样据此动了手。把它们跑起来，数一数你现有的评测集已经覆盖了几个。`,
+    a: `这个数几乎总是零，因为那套评测集是拿注入载荷搭起来的，而这些案例里一个载荷也没有。这个缺口
+        正是本章被引用最多的那条发现落到实处的样子：内部威胁以 62 份资料排在分类法首位，基础模型失效
+        以 34 份成为最大的单一类别，所以一个只量攻击成功率的项目，量到的并不是它大多数事故。案例要写
+        在错误说得通、动作又不可逆的地方——智能体引进客户邮件里的那份文档中有一个已被取代的费率；一张
+        工单里有两条互相冲突的指令，其中一条是破坏性的；一个文件名同时匹配两个文件；一个时区搞错的
+        日期。留意这里的控制只能是什么：过滤器帮不上忙，因为压根没有对抗性的东西可检测。管用的是
+        可逆性闸门、一份人读得懂的 diff，以及评测面板上挨着攻击成功率的第二个数字。`,
+  },
+];

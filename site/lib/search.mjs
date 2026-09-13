@@ -104,5 +104,19 @@ export function buildSearchIndex({ cur, loaded, TERMS, SURFACES, CONTROLS, EVENT
   add('page', '/sources/', L.footer.sourceLists, L.searchKicker.sources, 'Awesome-Agent-Security, Awesome Agent Skills Security, Awesome AI Agent Papers, SoK');
   add('page', '/setup/', L.footer.setup, L.searchKicker.setup, L.searchWords.setup);
 
+  // exercises and their answers. One entry per chapter block rather than one
+  // per task, so a search for a topic lands on the whole set for that chapter
+  // instead of scattering three near-identical hits.
+  const exCh = cur.CHAPTERS.filter(c => (loaded.get(c.id)?.exercises || []).length);
+  const exTotal = exCh.reduce((a, c) => a + loaded.get(c.id).exercises.length, 0);
+  if (exTotal) {
+    add('page', '/answers/', L.footer.answers, L.searchKicker.answers(exTotal), L.searchWords.answers);
+    for (const ch of exCh) {
+      const ex = loaded.get(ch.id).exercises;
+      add('page', `/answers/#${ch.id}`, `${L.exercises.title} · ${ch.title}`,
+          `${L.footer.answers} · ${ch.id.toUpperCase()}`, ex.map(e => `${e.q} ${e.a}`).join(' '));
+    }
+  }
+
   return idx;
 }

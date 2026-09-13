@@ -276,3 +276,106 @@ export const refs = [
     title: 'Toward Safe and Responsible AI Agents: A Three-Pillar Model for Transparency, Accountability, and Trustworthiness',
     venue: 'arXiv, 2026', url: 'https://arxiv.org/pdf/2601.06223' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `Make the phase gates in <code>code/a27_governance.py</code> executable. Write a
+        <code>gate(phase, metrics)</code> function that returns two lists — the exit criteria your
+        measured numbers fail, and the criteria nothing in your system currently measures — and run it
+        over all four phases with the attack-success and utility numbers from your
+        <a href="/chapters/a25/">A25</a> suite. You are done when you can name, for every unmeasured
+        criterion, the instrument that would produce it.`,
+    a: `The unmeasured list is longer than the failed list, and that is the finding. "ASR &lt; 5%",
+        "cost within 2x" and "override rate &lt; 10%" all map to a number you can produce today; "100%
+        of proposed actions reviewed", "0 unexplained policy denials over 2 weeks" and "continual
+        auditing green for 60 days" map to nothing at all unless you built A26's denial log and are
+        running the suite on a schedule. Roughly half the criteria in the table are unmeasurable on day
+        one, which means a gate review would be conducted on assertion rather than evidence. The fix is
+        not to soften the criteria — it is to notice that a phase gate is a specification for
+        instrumentation, and that the instrumentation has a lead time. Do the same pass on the rollback
+        column: "token revocation in under 60s" is a claim you can test with a stopwatch this afternoon,
+        and most teams discover it is false.`,
+    code: `# add to code/a27_governance.py
+def gate(phase, metrics):
+    checks = {
+        "ASR < 5% on the internal suite":      lambda m: m["asr"] < 0.05,
+        "cost per task within 2x of estimate": lambda m: m["cost_ratio"] <= 2.0,
+        "approval override rate < 10%":        lambda m: m["override_rate"] < 0.10,
+        "median approval latency < 60s":       lambda m: m["latency_s"] < 60,
+        "no incident in 30 days":              lambda m: m["days_clean"] >= 30,
+    }
+    unmet, unmeasured = [], []
+    for c in phase.exit_criteria:
+        check = checks.get(c)
+        if check is None:
+            unmeasured.append(c)
+        elif not check(metrics):
+            unmet.append(c)
+    return unmet, unmeasured
+
+MEASURED = {"asr": 0.25, "cost_ratio": 1.4, "override_rate": 0.18,
+            "latency_s": 45, "days_clean": 12}
+for p in PHASES:
+    unmet, unmeasured = gate(p, MEASURED)
+    print("PHASE %-11s failed=%d  no instrument=%d" % (p.name, len(unmet), len(unmeasured)))
+    for c in unmeasured:
+        print("     cannot evaluate:", c)`,
+  },
+  {
+    q: `Write the one-page deployment decision memo that would move the toy agent from phase 1 to phase
+        2, and a severity rubric of four levels defined by what the agent can reach rather than by how
+        loud the alert was. You are done when every severity level names an irreversible action or data
+        class and a maximum time to containment, and when a colleague who was not involved can read the
+        memo and state what would block promotion.`,
+    a: `The memo is short and has five parts: the attack-success and utility pair on the same run with
+        the case list attached, the paragraph saying what the evaluation does not cover, the phase-2
+        exit criteria with the instrument for each, the rollback line with the name of the person who
+        can execute it and the measured time it takes, and the residual risks you are accepting with the
+        reason. Anything longer is not read. For the rubric, anchoring on reach rather than on alert
+        volume is what makes it usable at three in the morning: S1 is an irreversible external action or
+        credential exposure, contain in fifteen minutes; S2 is an unauthorised read of regulated data or
+        a write to a shared corpus, one hour; S3 is a policy denial spike or drift alert with no
+        completed action, one working day; S4 is a single anomalous run, next sprint. Note what the
+        rubric quietly requires — you cannot classify by reach unless you know which tools were bound to
+        the run and which of them are irreversible, so the rubric is another consumer of
+        <a href="/chapters/a22/">A22</a>'s identity work. Write the residual-risk section last and do
+        not sand it down; a memo with no accepted risks is a memo nobody believes.`,
+  },
+  {
+    q: `Run a 45-minute tabletop on a poisoned shared corpus using the playbook in
+        <code>code/a27_governance.py</code>, keeping a written timeline with wall-clock times. Mark each
+        of the eleven steps "we could do this today" or "we could not", and for every "could not" name
+        the design-time decision that would fix it. You are done when you have answered, with a query
+        rather than a guess, which other runs retrieved the poisoned document.`,
+    a: `Most teams stall at the same three steps. Revoking the agent's token rather than the user's
+        needs a separate agent credential, which many deployments do not have. Purging derived memory by
+        provenance needs a provenance field written at ingestion time, months earlier. And the blast
+        radius query needs a document identifier and a timestamp on every retrieval, plus a corpus
+        version history to say when the poison landed — without the second half you can list who
+        retrieved the document but not who retrieved the poisoned version, so the honest answer is a
+        superset and the notification is louder than it needs to be. Write the timeline in wall-clock
+        minutes, not as a checklist, because that is what exposes the serial dependencies: you cannot
+        purge memory until you have identified the source, and you cannot identify the source until
+        someone has replayed a trajectory. The output that matters is the "could not" list with a
+        design-time fix beside each item; that list is next quarter's backlog, and it is cheaper to
+        produce in a meeting room than at three in the morning.`,
+    code: `# the blast-radius query the tabletop needs. If this cannot be written
+# against your real logs, the incident has no known bound.
+RETRIEVALS = [
+    {"run": "r1", "user": "alice", "doc": "kb/caching.md", "ts": 1740000010},
+    {"run": "r2", "user": "bob",   "doc": "kb/caching.md", "ts": 1740000920},
+    {"run": "r3", "user": "carol", "doc": "kb/etags.md",   "ts": 1740001400},
+    {"run": "r4", "user": "bob",   "doc": "kb/caching.md", "ts": 1740002200},
+]
+
+def blast_radius(doc, poisoned_since, retrievals=RETRIEVALS):
+    hits = [r for r in retrievals if r["doc"] == doc and r["ts"] >= poisoned_since]
+    return sorted({r["run"] for r in hits}), sorted({r["user"] for r in hits})
+
+runs, users = blast_radius("kb/caching.md", 1740000500)
+print("affected runs ", runs)      # ['r2', 'r4']
+print("notify users  ", users)     # ['bob']`,
+  },
+];

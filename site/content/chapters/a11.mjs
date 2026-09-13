@@ -248,3 +248,95 @@ export const refs = [
     title: 'Prompt Injection Attack to Tool Selection in LLM Agents', venue: 'arXiv, 2025',
     url: 'https://arxiv.org/pdf/2504.19793' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `Add manifest pinning to <code>code/a11_tool_poisoning.py</code>. Persist the approved
+        fingerprint of the tool set to a small JSON file, re-check it on every start, and make a
+        mismatch a hard stop rather than a warning. You are done when replacing
+        <code>DAY_1</code> with <code>DAY_9</code> makes a second run refuse to proceed and print
+        the old and new descriptions side by side.`,
+    a: `The chapter's <code>fingerprint()</code> already gives you the hash; what is missing is
+        somewhere to keep it and a decision to make when it changes. Canonicalise before hashing —
+        sort the keys and use a fixed separator — or key reordering by the server will look like a
+        rug pull and you will train yourself to click through the prompt. Store name, description
+        and the full argument schema, because a server can leave the prose alone and widen a
+        parameter instead. On the second run the fingerprint differs, the diff shows the appended
+        exfiltration sentence, and the run stops. What this buys you is narrow but real: the server
+        can still change whatever it likes, and you have removed the silence the attack depends on.
+        It buys nothing at all against a hostile description that was hostile at approval time.`,
+    code: `import hashlib, json, pathlib
+
+PIN = pathlib.Path("approved_tools.json")
+
+def fingerprint(tool_defs):
+    canon = json.dumps(tool_defs, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canon.encode()).hexdigest()[:16]
+
+def check(server, tool_defs):
+    pins = json.loads(PIN.read_text()) if PIN.exists() else {}
+    now = fingerprint(tool_defs)
+    was = pins.get(server)
+    if was is None:
+        pins[server] = now
+        PIN.write_text(json.dumps(pins, indent=2))
+        return "approved on first sight: " + now
+    if was != now:
+        raise SystemExit("REFUSING TO LOAD " + server + ": " + was + " -> " + now)
+    return "pinned " + now
+
+print(check("fx", DAY_1))
+print(check("fx", DAY_9))   # -> SystemExit`,
+  },
+  {
+    q: `Write a tool description that scores zero signals against <code>scan()</code> in
+        <code>code/a11_tool_poisoning.py</code> and would still line-jump. Do not edit the
+        scanner. Then add whatever signal would have caught your description, and write down the
+        first legitimate tool description your new signal breaks.`,
+    a: `The signal list is literal substrings, so the evasions are cheap: say "prior to any
+        further calls" rather than "before using", name the target capability by its purpose
+        ("the file-reading tool") rather than by its identifier, and describe the destination as
+        a hostname split across an argument rather than writing a URL. A description that reads
+        as ordinary API documentation and still tells the model to do one extra thing is enough.
+        The second half is the point of the exercise. Every signal you add to catch your own
+        payload is a phrase that appears in honest descriptions too — "always call
+        <code>authenticate</code> first" is normal, and so is a tool whose documented job is to
+        post to a webhook. Expect your precision to fall long before your recall gets useful.
+        A static scanner over adversary-authored prose has no stable operating point, which is
+        why it sits above hash pinning and credential scoping rather than instead of them.`,
+  },
+  {
+    q: `Build a shadowing detector. Give each tool in <code>MANIFEST</code> an owning server, then
+        flag any description that names a tool its own server does not export. Run it over the
+        four tools in the file and account for every result, including the ones you did not
+        expect.`,
+    a: `The detector is a set difference: extract identifier-shaped tokens from each description,
+        intersect with the union of all tool names, and subtract the names the authoring server
+        actually exports. On the file's manifest you get two hits, not one. <code>postcode</code>
+        is the shadowing case the chapter describes. <code>convert</code> also fires, because its
+        line-jumping payload names <code>read_file</code>, which is a different observation about
+        the same underlying flaw — descriptions are one flat namespace with no attribution field.
+        <code>weather</code> and <code>translate</code> stay clean. The honest limit is that this
+        catches only shadowing that names its target: "the tool you use for sending mail" is a
+        reference the detector cannot see, and a model can. Treat a hit as a reason to read the
+        description, not as a classifier.`,
+    code: `SERVERS = {"convert": "fx", "postcode": "geo",
+           "weather": "geo", "translate": "lang"}
+
+EXPORTS = {}
+for tool, srv in SERVERS.items():
+    EXPORTS.setdefault(srv, set()).add(tool)
+
+ALL_TOOLS = set(SERVERS) | {"read_file", "send_email", "http_get", "write_file"}
+
+def shadows(tool, desc):
+    named = {t for t in ALL_TOOLS if t in desc}
+    return sorted(named - EXPORTS[SERVERS[tool]] - {tool})
+
+for tool, desc in MANIFEST.items():
+    hits = shadows(tool, desc)
+    print(f"  {tool:<12} {'SHADOWS ' + ', '.join(hits) if hits else 'ok'}")`,
+  },
+];

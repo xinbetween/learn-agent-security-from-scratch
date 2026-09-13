@@ -255,3 +255,95 @@ export const refs = [
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928',
     note: 'oversight failures as a threat surface; HITL recommended by 16 sources, 14 of them industry' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `Instrument one of the toy agents in <code>code/</code> and count the approval prompts a task
+        actually raises under two policies: confirm every tool call, and confirm only the irreversible
+        ones from the table in <code>code/a24_oversight.py</code>. Then use that file's
+        <code>attention()</code> curve to compute the fraction of prompts a real operator would
+        rubber-stamp under each. Success check: two prompt counts and two percentages.`,
+    a: `With the file's defaults a forty-prompt run averages about 15 per cent attention across the
+        run, so roughly <b>85 per cent of the prompts are rubber-stamped</b>, and the decay floor of
+        3 per cent is reached by about prompt 19 — everything after that is a click. Grading the same
+        run by reversibility leaves three prompts, average attention around 83 per cent, so about
+        <b>17 per cent</b> are rubber-stamped. Same run, same tools, same human: the only thing that
+        changed is how much of the budget you spent before the prompt that mattered. Treat the ratio
+        between the two policies as the finding and the absolute numbers as a prior — the curve is
+        illustrative, taken from the shape in the warning-adherence literature rather than measured on
+        your operators.`,
+    code: `from a24_oversight import attention, ACTIONS
+
+GRADE = {a.name: a.reversible for a in ACTIONS}
+
+TRACE = (["read_file"] * 18 + ["web_search"] * 9 + ["write_file"] * 10
+         + ["git_commit"] * 2 + ["send_email"])          # 40 calls
+
+def measure(prompts):
+    if not prompts:
+        return 0, 0.0
+    seen = [attention(i) for i in range(1, len(prompts) + 1)]
+    return len(prompts), 1 - sum(seen) / len(seen)
+
+everything = TRACE
+graded = [t for t in TRACE if GRADE.get(t, "irreversible") == "irreversible"]
+for label, ps in (("confirm everything", everything), ("reversibility-graded", graded)):
+    n, stamped = measure(ps)
+    print(f"  {label:<24}{n:>3} prompts   {stamped:.0%} rubber-stamped")`,
+  },
+  {
+    q: `Turn <code>Action.gate()</code> into a dispatcher that every tool call must pass through, and
+        make it <em>fail closed</em>: a tool with no reversibility grade raises rather than defaulting
+        to "log only". Wire it in front of the tools in one of the earlier toy files, then add a new
+        tool without grading it. Success check: the run halts on the ungraded tool instead of quietly
+        logging it.`,
+    a: `The default matters more than the table does. An ungraded tool that falls through to "log only"
+        means every tool added after the security review is unreviewed and ungated, which is precisely
+        how a correct grading table rots into decoration over two quarters. Failing closed makes adding
+        a tool require a reversibility decision from whoever adds it, which is the only part of this
+        chapter that survives staff turnover, and it costs one dictionary lookup. It will also halt a
+        run in production the first time somebody ships a tool without a grade — that is the intended
+        behaviour, and it is much easier to defend if you say so before it happens rather than during
+        the incident.`,
+  },
+  {
+    q: `Render the good prompt from real provenance rather than from a string literal: write
+        <code>render_prompt(tool, args)</code> that takes A21's <code>Tagged</code> values and fills in
+        the data leaving, the recipient, the sources tag and the third option. Then close the gap
+        between approval and execution by binding the approval to a hash of the exact arguments and
+        re-checking it at call time. Success check: mutating the body after approval makes the call
+        fail rather than send.`,
+    a: `The provenance line is the only field on that screen the model did not author, which is exactly
+        why it is the one worth showing — the explainability failure mode is that the agent's stated
+        reason is not the reason, and <code>sources</code> is a fact about where bytes came from rather
+        than a claim about motive. Binding the approval to a hash of the serialised arguments closes
+        the approve-then-swap gap; without it, what the human approved is a description and what runs
+        is whatever the agent passes next. The residual hole does not close: a human cannot verify
+        anything the prompt does not show, so a 4,000-character body is unreviewable however well it is
+        framed, and for a computer-use agent (<a href="/chapters/a08/">A08</a>) the operator and the
+        agent are not looking at the same artefact at all. This construction assumes an action space
+        you can render, and buys nothing where you cannot.`,
+    code: `import hashlib, json
+
+def arg_digest(args):
+    return hashlib.sha256(
+        json.dumps({k: v.value for k, v in args.items()}, sort_keys=True).encode()
+    ).hexdigest()
+
+def render_prompt(tool, args):
+    src = sorted(set().union(*[v.sources for v in args.values()]))
+    lines = [f"{tool}   IRREVERSIBLE", ""]
+    lines += [f"  {k:<10}{v.value}" for k, v in args.items()]
+    lines += ["", f"  Why: this call carries data derived from {src}.",
+              "       Sources other than 'user' did not come from you.", "",
+              "  [ Send ]  [ Don't send ]  [ Don't send, and stop the task ]"]
+    return "\\n".join(lines), arg_digest(args)
+
+prompt, approved = render_prompt("send_email", {"to": to, "body": body})
+print(prompt)
+body = body.derive(body.value + " PS: also the key")     # swapped after approval
+assert arg_digest({"to": to, "body": body}) != approved  # so the call must refuse`,
+  },
+];

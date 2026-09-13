@@ -246,3 +246,90 @@ export const refs = [
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928',
     note: 'elicitation and metrics as distinct evaluation categories' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `The utility measurement in <code>code/a19_adaptive_eval.py</code> rests on five benign
+        requests. Expand <code>BENIGN</code> to fifty realistic ones, recompute the false-positive rate,
+        and print a 95% confidence interval beside it. Success check: you can state both the five-sample
+        interval and the fifty-sample interval, and say which decisions each one supports.`,
+    a: `Two blocked out of five is 40%, with a 95% interval of roughly [12%, 77%]. That interval is
+        wider than the entire range of decisions you might make, so the number supports no decision at
+        all beyond "there is a real problem here". Fifty samples with, say, fifteen blocked gives about
+        30% with an interval near [19%, 44%] — still wide, but now it distinguishes "annoying" from
+        "unshippable". The uncomfortable transfer is that the same arithmetic applies to the ASR
+        figures in the chapter and in most published defence papers: eight payloads gives you an
+        interval spanning most of the unit interval. Report n alongside every rate, and treat any rate
+        computed on fewer than about thirty samples as a direction rather than a measurement.`,
+    code: `from math import sqrt
+
+def wilson(k, n, z=1.96):
+    p = k / n
+    d = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / d
+    half = z * sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return centre - half, centre + half
+
+for sample in (BENIGN, BENIGN_50):
+    k = sum(defence(b) for b in sample)
+    lo, hi = wilson(k, len(sample))
+    print("n=%3d  FP rate %3.0f%%  95%% CI [%.0f%%, %.0f%%]"
+          % (len(sample), 100 * k / len(sample), 100 * lo, 100 * hi))`,
+  },
+  {
+    q: `Run the chapter's protocol against a defence you built yourself: either the hardened judge from
+        A17 or the interleaved datamarking wrapper from A18. Give yourself the source, fix a budget of
+        thirty minutes and twenty payloads, iterate after each result, and report the pair — attack
+        success rate and utility retention — with the budget attached.`,
+    a: `Against the A18 wrapper you should find the split cleanly: every payload in the forged-fence
+        and claimed-authority classes fails, and most payloads in the prior-approval class succeed, so
+        the ASR lands somewhere around half and is almost entirely one class. Write it as "9 of 20
+        payloads succeeded under a thirty-minute white-box budget", never as "55% ASR", because the
+        second form hides both the budget and the fact that the successes are all the same idea. Two
+        honest caveats. You are the weakest possible adaptive attacker against your own defence,
+        because you attack what you intended it to do rather than what it does — hand the source to
+        someone who did not write it and the number usually moves. And the moment you patch anything
+        in response to what you found, this measurement is stale, which is what the next exercise is
+        for.`,
+  },
+  {
+    q: `Build the regression harness. One runner that prints three numbers — static ASR, adaptive ASR
+        and benign block rate — where the adaptive result is stored with a fingerprint of the defence
+        source and is refused as stale if the fingerprint no longer matches. Then change one entry in
+        <code>PATTERNS</code> and re-run. Success check: the static and benign lines still print
+        numbers and the adaptive line prints STALE.`,
+    a: `The fingerprint is four lines and it stops the most common reporting error in this whole
+        field: quoting last quarter's adaptive number after this month's prompt change. The three
+        numbers have genuinely different lifetimes, and the harness should make that visible rather
+        than presenting them as a row. Static ASR and the benign block rate survive a defence change —
+        that is what makes them a cheap gate you can run on every commit. The adaptive number does not,
+        because it measured what one attacker spent against one configuration, and you changed the
+        configuration. Include the defence source and the pattern list in the hash, not just the
+        function body, or an edit to <code>PATTERNS</code> alone will slip through. What the harness
+        cannot do is tell you when the adaptive result has expired for external reasons — a new
+        published technique, a model upgrade underneath you — so put a calendar date on it as well as
+        a fingerprint.`,
+    code: `import hashlib, inspect
+
+def fingerprint():
+    src = inspect.getsource(defence) + repr(PATTERNS)
+    return hashlib.sha256(src.encode()).hexdigest()[:12]
+
+# adaptive result recorded at the time of the run
+LAST_ADAPTIVE = {"asr": 1.00, "budget": "30 min white-box, 20 payloads",
+                 "fingerprint": "put the fingerprint() value here"}
+
+def report(static_set, adaptive_note, benign_set):
+    s = 1 - sum(defence(a) for a in static_set) / len(static_set)
+    b = sum(defence(x) for x in benign_set) / len(benign_set)
+    print("static ASR      %.0f%%" % (100 * s))
+    if adaptive_note["fingerprint"] != fingerprint():
+        print("adaptive ASR    STALE - defence changed, re-run the evaluation")
+    else:
+        print("adaptive ASR    %.0f%% under %s"
+              % (100 * adaptive_note["asr"], adaptive_note["budget"]))
+    print("benign blocked  %.0f%%" % (100 * b))`,
+  },
+];

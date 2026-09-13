@@ -256,3 +256,64 @@ export const refs = [
     title: 'Securing Agentic AI: A Comprehensive Threat Model and Mitigation Framework for Generative AI Agents',
     venue: 'arXiv, 2025', url: 'https://arxiv.org/abs/2504.19956' },
 ];
+
+/* 练习。读完本章之后的动手任务；参考答案放在 /answers/，按位置与这里一一对应。 */
+export const exercises = [
+  {
+    q: `把 <code>code/a05_threat_model.py</code> 里的每一条发现映射到 A04 的六个威胁面上，然后为每个
+        框架打印出它一条也没产出的那些面。当你能从输出、而不是从本章正文说出每个视角的盲区列时，你就
+        做完了。`,
+    a: `这张矩阵把那张表的“短板”一列变成了数据。STRIDE 在内部威胁下一条也落不下来，因为它没有描述
+        一个被下了后门或正在幻觉的模型的词汇——它是为“让干什么就干什么”的软件写的。OWASP 把直接、
+        间接和内部覆盖得不错，在监督和复合上很薄。MAESTRO 是唯一一个六个面全够得着的视角，它那套
+        分层结构就是为这个存在的。ATLAS 聚在直接、间接和内部，因为已观测到的对手技术就住在那几个面
+        里。NIST 一个面也映射不上，而这不是缺陷：它的发现是控制措施问题，不是威胁，所以一张按威胁面
+        搭起来的矩阵根本看不见它们。搭的时候有个坑：<code>a04_threat_taxonomy</code> 没有 main 保护，
+        import 它会把整个模块跑一遍——要么给它加一个，要么把那六个面的名字抄过来。这份输出就是本章
+        那条建议的论据。你不需要五个视角；你需要一个视角，外加一份写下来的、它看不见什么的清单。`,
+    code: `SURFACES = ["Direct threats", "Indirect threats", "Internal threats",
+            "Resource threats", "Oversight failures", "Compound threats"]
+
+MAPPING = {   # (framework, category) -> surface. Fill in one row per finding.
+    ("STRIDE (1999, general software)", "Spoofing"): "Direct threats",
+    ("STRIDE (1999, general software)", "Repudiation"): "Oversight failures",
+    ("STRIDE (1999, general software)", "Denial of service"): "Resource threats",
+    ("OWASP Top 10 for LLM Applications", "LLM01 Prompt injection"): "Indirect threats",
+    ("OWASP Top 10 for LLM Applications", "LLM04 Data poisoning"): "Internal threats",
+    ("MAESTRO (agent-specific, 7 layers)", "L7 Agent ecosystem"): "Compound threats",
+    # ... and so on, for all 26 findings in FRAMEWORKS
+}
+
+covered = {fw: set() for fw in FRAMEWORKS}
+for (fw, cat), surface in MAPPING.items():
+    covered[fw].add(surface)
+
+for fw, hit in covered.items():
+    blind = [s for s in SURFACES if s not in hit]
+    print(f"  {fw:<38} blind to: {', '.join(blind) or 'nothing'}")`,
+  },
+  {
+    q: `给自己定三十分钟，对一个你在运营的智能体跑一遍 STRIDE——跑系统，不是跑模型。然后用经验把抵赖
+        那一行结掉：挑一次这个智能体上个月做过的写入，去把引发它的那个请求找出来。五分钟到就停表。`,
+    a: `经验的那一半才是这个练习。你要找的是一条从产物到请求 id、再到 prompt 和产生它的那些工具调用
+        的链路，而多数部署在第一环就断了，因为那次写入带的只有智能体的服务身份，别的什么都没有。如果
+        你五分钟之内闭合不了这条链，那就是你这一天最好的发现——比那些注入发现更好，因为它决定的是
+        一次事件持续一小时还是一周，而它在事前修很便宜，在事中修根本修不了。给每一个副作用打上关联
+        id，并把轨迹保留得和产物一样久。这三十分钟大概会产出四到六条发现，多数并不光鲜：一个未认证
+        的调用方、一个没人挑过生命周期的 token、一条谁都能写的队列。这才是正确的结果。AI 专属的那个
+        视角放到后面跑，否则它会把注意力全吸走。`,
+  },
+  {
+    q: `挑两个你已经确知对自己系统成立的威胁——一个来自 A01 到 A04，一个来自公开事件——从一张白纸
+        开始，核对五个视角里到底哪一个真能生成它们。凡是一个也生成不出来的，就把那条补充问题写下来，
+        永久加进你的主视角。`,
+    a: `通常能从五个视角底下全身而退的，是 EchoLeak 那种经由渲染客户端的数据外泄。OWASP 那条不安全
+        的输出处理挨得很近，但读起来像是“把你的输出清洗一下”，于是把人引向了转义，而不是客户端的
+        网络栈；MAESTRO 在 L3 或 L7 够得着它，前提是你本来就知道要往下游看。能抓住它的那个问题是：
+        “是什么在抓取、渲染或执行我们的输出，用的又是谁的网络访问？”——这句话一旦写下来，A03 里那个
+        同步守护进程和那个对端智能体也一并被抓住了。这就是普遍的形状：框架是一份用别人的事故攒出来
+        的备忘录，所以在你自己的系统上命中率最高的问题，是你在自己出过事之后加上去的那些。补充的清单
+        控制在三四个问题以内。一个后面挂了四十个问题的视角，是一个没人会跑的视角，而一个不跑的视角
+        什么也找不到。`,
+  },
+];

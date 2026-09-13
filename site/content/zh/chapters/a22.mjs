@@ -227,3 +227,70 @@ export const refs = [
     venue: 'CNCF', url: 'https://spiffe.io/' },
   { authors: 'W3C', title: 'Decentralized Identifiers (DIDs) v1.1', venue: 'W3C', url: 'https://www.w3.org/TR/did-1.1/' },
 ];
+
+/* 练习。读完本章之后的动手任务；参考答案放在 /answers/ 上，按位置一一对应。 */
+export const exercises = [
+  {
+    q: `<code>code/a22_identity.py</code> 里的 <code>Token.sign()</code> 产出一个签名，却没有任何
+        东西去验证它。写一个 <code>verify(signed)</code>，要么返回一个 <code>Token</code>，要么抛
+        异常，并改掉强制路径，让它只接受签过名的字符串。成功判据：一个手工构造、带着
+        <code>repo.admin</code> 的 <code>Token</code> 被拒绝，而合法任务 token 那四行
+        <code>ATTEMPTS</code> 记录保持不变。`,
+    a: `在有东西去验证它之前，签名只是装饰，整个文件的安全性都压在“智能体会客客气气地不去自己构造
+        一个 <code>Token</code> 对象”这个假设上——而这恰恰是一个被攻陷的智能体会打破的假设。“你只能
+        收窄”这条性质活在验证器里，不在 <code>attenuate</code> 里：削权只是诚实的调用方会用的那个
+        函数，验证器才是让凭空铸造成为不可能的东西。用 <code>hmac.compare_digest</code> 而不是
+        <code>==</code>，让比较不依赖时间；另外别再把摘要截断成十六个十六进制字符——六十四位大概
+        够挡住伪造，但没有理由接受这个说法。先验签，再解析，然后按顺序检查有效期和 scope。`,
+    code: `def verify(signed: str) -> Token:
+    body, _, mac = signed.rpartition(".")
+    want = hmac.new(SECRET, body.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(mac, want):
+        raise ValueError("bad signature")
+    d = json.loads(body)
+    return Token(d["sub"], d["act"], frozenset(d["scp"]),
+                 frozenset(d["res"]), d["exp"], tuple(d["chain"]))
+
+# the agent mints itself an admin token and presents it
+forged = Token("alice", "research-agent", frozenset({"repo.admin"}),
+               frozenset({"*"}), time.time() + 3600)
+try:
+    verify(forged.sign().rsplit(".", 1)[0] + ".0000000000000000")
+    bad("FORGED TOKEN ACCEPTED")
+except ValueError:
+    ok("unsigned and mis-signed tokens never reach permits()")`,
+  },
+  {
+    q: `<code>permits</code> 用字符串完全相等来比较资源，所以一个限定在
+        <code>drive://projects/q3-research</code> 上的 token 会拒绝
+        <code>drive://projects/q3-research/notes.md</code>。实现层级匹配，让一次授权覆盖它的子资源，
+        然后补上那个测试：<code>drive://projects/q3-research-secret</code> 仍然被拒绝。`,
+    a: `最容易想到的那个修法 <code>resource.startswith(granted)</code>，就是 A23 那个后缀花招换了
+        身衣服：<code>q3-research-secret</code> 确实以 <code>q3-research</code> 开头，却是别人的
+        目录。正确的谓词是 <code>r == g or r.startswith(g + "/")</code>，它把分隔符变成检查的一
+        部分，而不是字符串碰巧的产物。完全相等不是 bug，只是窄到没法用，而通常那次修补恰恰是 bug
+        被引入的地方——这就是把资源标识符解析成 scheme 和路径段、再逐段比较的理由，这样那条边界就
+        没法被忘掉。无论你选哪种做法，那个同级前缀的测试都该紧挨着写在同一个文件里。`,
+    code: `def covers(granted: str, requested: str) -> bool:
+    if granted == "*":
+        return True
+    return requested == granted or requested.startswith(granted + "/")
+
+assert covers("drive://projects/q3-research", "drive://projects/q3-research")
+assert covers("drive://projects/q3-research", "drive://projects/q3-research/notes.md")
+assert not covers("drive://projects/q3-research", "drive://projects/q3-research-secret")
+assert not covers("drive://projects/q3-research", "drive://finance/salaries.xlsx")`,
+  },
+  {
+    q: `任务 token 是离线验证的，也就是说文件里没有任何东西能在它过期之前把它吊销。加一道吊销
+        检查——按主体计的 epoch 计数器，或者以委派链为键的拒绝清单——并用文件里自己的有效期算出
+        暴露窗口。说清这道检查让你付出了什么。`,
+    a: `离线削权和吊销是朝两个方向拉的：查一次拒绝清单就是一次到签发方的往返，而避开这次往返正是
+        macaroon 式 token 存在的全部理由。不做检查，你的暴露窗口恰好就是 TTL——文件里任务 token 是
+        十分钟，子智能体是两分钟——这也正是那条建议为什么说“在运行开始时把它铸出来”，而不是“每天
+        签发一次”。按主体计的 epoch 计数器是便宜的折中：一个整数，非常好缓存，能一次吊销某个主体的
+        全部 token，却没法只吊销一个智能体；而按链前缀做的拒绝清单能干掉一个智能体和它所有的后代，
+        代价是每次调用都要查一次。既不可吊销又可吊销是做不到的，所以挑一个你在事故复盘上守得住的
+        窗口，让 TTL 和它对齐。`,
+  },
+];

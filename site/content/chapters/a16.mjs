@@ -234,3 +234,106 @@ export const refs = [
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928',
     note: 'compute misuse at 13 sources; rate limiting recommended by 9' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `Add a per-tool result-size cap to <code>Budget</code> in
+        <code>code/a16_resource_attacks.py</code>, then run the MCP amplifier against it: a tool whose
+        result grows 15% every round, starting at 800 bytes. Record which cap fires, at which step,
+        and what has been spent by then. Compare against the same run with only the 50,000-token
+        per-run cap. Success check: you can state both step numbers and both spend figures.`,
+    a: `A 4 KB result cap fires at about step 12, by which point the run has spent roughly two cents.
+        The 50,000-token per-run cap fires at about step 25, by which point the run has spent about
+        fifteen cents — roughly seven times more, for the same attack. That ratio is the whole
+        argument for the size cap: it bounds the <em>growth per round</em>, so it fires while the
+        attack is still cheap, whereas every other cap in <code>Budget</code> bounds a total and can
+        only fire after the attacker has already run up most of the bill. One implementation detail
+        decides whether this works: check the size before the result is appended to the context, not
+        after. If you append and then charge, you have already paid for the round you are rejecting,
+        and you will pay it again on every retry.`,
+    code: `class Budget:
+    def __init__(self, ..., max_result_bytes=4096):
+        self.max_result_bytes = max_result_bytes
+        ...
+
+    def charge(self, tokens=0, tool_call=False, result_bytes=0):
+        if result_bytes > self.max_result_bytes:
+            return "TOOL RESULT TOO LARGE: %d > %d" % (result_bytes,
+                                                       self.max_result_bytes)
+        ...                                   # existing checks unchanged
+
+b = Budget(max_steps=100, max_tokens=50_000, max_cost=100.0, max_tool_calls=100)
+size = 800
+for step in range(1, 60):
+    size = int(size * 1.15)                   # the amplifier grows each round
+    stop = b.charge(tokens=size // 4, tool_call=True, result_bytes=size)
+    if stop:
+        print("step", step, stop, "spend so far $%.2f" % cost(b.tokens))
+        break`,
+  },
+  {
+    q: `<code>Budget</code> is per run, so an attacker just starts more runs. Write an
+        <code>IdentityBudget</code> with requests per minute, concurrent runs and daily spend, put it
+        in front of the agent, and fire 1,000 runs at it where each run halts at its own per-run cap of
+        $0.15. Success check: report the uncapped total and the capped total.`,
+    a: `Uncapped, 1,000 runs at $0.15 is $150 from one identity, with every single run perfectly
+        well behaved by the per-run budget. With the toy limits below the rate cap admits 20 and the
+        bill stops at $3.00. This is denial of wallet in its entirety, and the fix is the dozen lines
+        of bookkeeping shown here. Two things to get right. Key the budget on the authenticated
+        identity, not on IP or session — both are free for the attacker to rotate. And keep the counter
+        outside the agent process: a limiter that lives inside the run it is limiting is not a limiter,
+        because the thousand runs are a thousand processes.`,
+    code: `class IdentityBudget:
+    def __init__(self, max_rpm=20, max_concurrent=3, max_daily_spend=5.00):
+        self.max_rpm = max_rpm
+        self.max_concurrent = max_concurrent
+        self.max_daily_spend = max_daily_spend
+        self.spent = 0.0
+        self.running = 0
+        self.this_minute = 0
+
+    def admit(self):
+        if self.running >= self.max_concurrent:
+            return "concurrency"
+        if self.this_minute >= self.max_rpm:
+            return "rate"
+        if self.spent >= self.max_daily_spend:
+            return "daily spend"
+        self.running += 1
+        self.this_minute += 1
+        return None
+
+    def finish(self, spend):
+        self.running -= 1
+        self.spent += spend
+
+ib = IdentityBudget()
+admitted = refused = 0
+for _ in range(1000):                      # the attacker fires 1000 runs
+    if ib.admit():
+        refused += 1
+        continue
+    admitted += 1
+    ib.finish(0.15)                        # each run halts at its per-run cap
+print(admitted, "admitted,", refused, "refused, spend $%.2f" % ib.spent)`,
+  },
+  {
+    q: `Instrument the run loop to record tokens and cost per request, then simulate the overthinking
+        attack: same correct answers, six times the reasoning tokens. Set an alert threshold on cost
+        per request, run it over a few hundred benign requests with realistic variance, and report the
+        false-positive rate your threshold produces.`,
+    a: `The point of the exercise is that the correctness monitor stays flat throughout — the attack
+        does not change any answer — so the only moving number is the one on the cost meter. Then the
+        arithmetic bites. Benign cost per request has a long right tail (a genuinely large document,
+        a task that needed nine tool calls), so a threshold at three times the median will fire on
+        something like 2% of benign traffic. At a million requests a day that is 20,000 alerts against
+        a handful of attacks, which is the A17 precision problem arriving in a different dashboard.
+        Per-request thresholds do not work. What does work is the aggregate: cost per identity per day,
+        compared against that identity's own history, where a sustained 6x shift is visible and a single
+        expensive task is not. Be plain about the residual — you cannot tell an overthinking attack
+        from an expensive legitimate request by looking at one request, and no threshold will change
+        that.`,
+  },
+];

@@ -208,3 +208,95 @@ export const refs = [
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928',
     note: '算力滥用 13 个来源；速率限制被 9 个来源推荐' },
 ];
+
+/* 练习。读完本章之后动手做的任务；参考答案在 /answers/ 上，按位置与这里一一对应。 */
+export const exercises = [
+  {
+    q: `给 <code>code/a16_resource_attacks.py</code> 里的 <code>Budget</code> 加一个按工具的返回大
+        小上限，然后拿 MCP 放大器打它：一个返回每轮增长 15%、从 800 字节起步的工具。记下是哪一道上
+        限触发的、在第几步触发，以及到那时已经花掉了多少。再和只有 50,000 token 按运行上限的同一次
+        运行做对比。成功标准：两个步数和两个花费数字你都说得出来。`,
+    a: `4 KB 的返回上限大约在第 12 步触发，到那时这次运行花掉大约两美分。50,000 token 的按运行上限
+        大约在第 25 步触发，到那时已经花掉大约十五美分——同一个攻击，代价大了约七倍。这个比例就是大
+        小上限的全部理由：它框住的是<em>每轮的增量</em>，所以它在攻击还便宜的时候就触发，
+        而 <code>Budget</code> 里其他每一道上限框的都是总量，只能在攻击者已经把账单跑掉大半之后才
+        触发。有一个实现细节决定它管不管用：在返回被追加进上下文<em>之前</em>检查大小，而不是之后
+        。如果你先追加再计费，你已经为这一轮付过钱了，而你要拒绝的正是这一轮；每次重试你还得再付一
+        遍。`,
+    code: `class Budget:
+    def __init__(self, ..., max_result_bytes=4096):
+        self.max_result_bytes = max_result_bytes
+        ...
+
+    def charge(self, tokens=0, tool_call=False, result_bytes=0):
+        if result_bytes > self.max_result_bytes:
+            return "TOOL RESULT TOO LARGE: %d > %d" % (result_bytes,
+                                                       self.max_result_bytes)
+        ...                                   # existing checks unchanged
+
+b = Budget(max_steps=100, max_tokens=50_000, max_cost=100.0, max_tool_calls=100)
+size = 800
+for step in range(1, 60):
+    size = int(size * 1.15)                   # the amplifier grows each round
+    stop = b.charge(tokens=size // 4, tool_call=True, result_bytes=size)
+    if stop:
+        print("step", step, stop, "spend so far $%.2f" % cost(b.tokens))
+        break`,
+  },
+  {
+    q: `<code>Budget</code> 是按运行的，所以攻击者多起几个运行就是了。写一
+        个 <code>IdentityBudget</code>，带上每分钟请求数、并发运行数和每日花费，把它放到智能体前面
+        ，然后朝它打 1,000 个运行，每个运行都在自己 $0.15 的按运行上限处停下。成功标准：报出没有上
+        限时的总额和有上限时的总额。`,
+    a: `没有上限时，1,000 个运行乘 $0.15 就是一个身份花掉 $150，而按按运行预算来看，每一个运行都规
+        规矩矩。用下面这套玩具限额，速率上限只放进 20 个，账单停在 $3.00。这就是钱包耗尽的全部，而
+        修法就是这里这十来行记账代码。有两件事要做对。预算要按已认证的身份来记，而不是按 IP 或会
+        话——这两样攻击者换起来都不要钱。还有，把计数器放在智能体进程之外：一个住在它所限制的那次运
+        行内部的限流器不叫限流器，因为那一千个运行就是一千个进程。`,
+    code: `class IdentityBudget:
+    def __init__(self, max_rpm=20, max_concurrent=3, max_daily_spend=5.00):
+        self.max_rpm = max_rpm
+        self.max_concurrent = max_concurrent
+        self.max_daily_spend = max_daily_spend
+        self.spent = 0.0
+        self.running = 0
+        self.this_minute = 0
+
+    def admit(self):
+        if self.running >= self.max_concurrent:
+            return "concurrency"
+        if self.this_minute >= self.max_rpm:
+            return "rate"
+        if self.spent >= self.max_daily_spend:
+            return "daily spend"
+        self.running += 1
+        self.this_minute += 1
+        return None
+
+    def finish(self, spend):
+        self.running -= 1
+        self.spent += spend
+
+ib = IdentityBudget()
+admitted = refused = 0
+for _ in range(1000):                      # the attacker fires 1000 runs
+    if ib.admit():
+        refused += 1
+        continue
+    admitted += 1
+    ib.finish(0.15)                        # each run halts at its per-run cap
+print(admitted, "admitted,", refused, "refused, spend $%.2f" % ib.spent)`,
+  },
+  {
+    q: `给运行循环加上埋点，记录每次请求的 token 数和花费，然后模拟过度思考攻击：答案照样正确，推
+        理 token 是原来的六倍。在每请求成本上设一个告警阈值，把它跑在几百个带有现实波动的正常请求
+        上，报出你这个阈值产生的假正例率。`,
+    a: `这道练习的要点在于：正确性监控从头到尾一动不动——这个攻击不改变任何答案——所以唯一在动的数字
+        就是成本计量表上的那个。接着算术开始咬人。正常请求的每请求成本有一条很长的右尾（一份真的很
+        大的文档，一个需要九次工具调用的任务），所以一个设在中位数三倍处的阈值，会在大约 2% 的正常
+        流量上触发。每天一百万次请求，那就是 20,000 条告警，对上区区几次攻击，这正是 A17 那个精确
+        率问题换了一块看板出现。按请求设阈值行不通。行得通的是聚合量：每个身份每天的花费，拿它和这
+        个身份自己的历史比，持续 6 倍的抬升看得见，而单个昂贵任务看不见。把残余风险说明白——只看一
+        次请求，你分不出过度思考攻击和一次昂贵的合法请求，而且没有任何阈值能改变这一点。`,
+  },
+];

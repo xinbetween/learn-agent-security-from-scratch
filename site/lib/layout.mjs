@@ -34,10 +34,10 @@ const nav = (active, code) => {
   const items = [
     ['/curriculum/', L.nav.curriculum, false],
     ['/projects/', L.nav.projects, false],
+    ['/cheatsheet/', L.nav.cheatsheet, true],
     ['/threats/', L.nav.threats, true],
     ['/timeline/', L.nav.timeline, true],
     ['/glossary/', L.nav.glossary, true],
-    ['/references/', L.nav.references, true],
   ];
   return items.map(([p, label, small]) =>
     `<a href="${href(p, code)}"${small ? ' class="hide-sm"' : ''}${active === p ? ' aria-current="page"' : ''}>${label}</a>`
@@ -114,6 +114,7 @@ const foot = (code) => {
   <li><a href="${href('/curriculum/', code)}">${L.nav.curriculum}</a></li>
   <li><a href="${href('/projects/', code)}">${L.nav.projects}</a></li>
   <li><a href="${href('/capstone/', code)}">${L.footer.capstone}</a></li>
+  <li><a href="${href('/answers/', code)}">${L.footer.answers}</a></li>
   <li><a href="${href('/setup/', code)}">${L.footer.setup}</a></li>
 </ul></div>
 <div><h5>${L.footer.referenceHead}</h5><ul>
@@ -121,6 +122,7 @@ const foot = (code) => {
   <li><a href="${href('/defenses/', code)}">${L.footer.defenses}</a></li>
   <li><a href="${href('/glossary/', code)}">${L.nav.glossary}</a></li>
   <li><a href="${href('/timeline/', code)}">${L.nav.timeline}</a></li>
+  <li><a href="${href('/cheatsheet/', code)}">${L.footer.cheatsheet}</a></li>
 </ul></div>
 <div><h5>${L.footer.creditsHead}</h5><ul>
   <li><a href="${href('/references/', code)}">${L.footer.allReferences}</a></li>

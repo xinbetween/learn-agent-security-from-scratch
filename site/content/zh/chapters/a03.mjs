@@ -244,3 +244,71 @@ export const refs = [
     title: 'SoK: Bridging Research and Practice in LLM Agent Security',
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928' },
 ];
+
+/* 练习。读完本章之后的动手任务；参考答案放在 /answers/，按位置与这里一一对应。 */
+export const exercises = [
+  {
+    q: `把你自己组织里真的在跑的三个智能体加进 <code>code/a03_trifecta.py</code> 的
+        <code>CONFIGS</code>，再加一个 <code>cheapest_cut</code> 属性，说出你会切哪条腿，以及切掉它
+        要付出哪项能力的代价。当脚本为每一个配置都打印出一个切法和一个代价时，你就做完了。`,
+    a: `逼这个属性返回一个代价，才让这件事不至于沦为打分游戏。多数人会因为本章这么说，就给每一条都
+        写“切出站”，然后在第二个配置上发现出站就是智能体自己的回答文本，而那就是产品本身。你那三个
+        里至少会有一个切不动任何一条腿；这时候诚实的写法是给不可逆的动作加一道闸、外加一份更小的
+        数据集，而不是编一个切法。把两条腿的配置单独记下来，并写清你是在指望哪一条腿缺席，因为下一次
+        有人加工具时，你的变更评审要守的就是这句话。一个两条腿的智能体，离三条腿只差一个 PR。`,
+    code: `@property
+def cheapest_cut(self):
+    if not self.exploitable:
+        return f"already {self.legs}/3 -- keep it that way: no new {self._missing()}"
+    if "one hard-coded recipient" in self.egress or "answer" not in self.egress:
+        return f"egress -- costs: {self.egress}"
+    if self.private_data:
+        return f"private data -- run under a service identity; costs: {self.private_data}"
+    return "nothing cuttable -- gate the irreversible actions instead (A24)"
+
+def _missing(self):
+    return ", ".join(n for n, v in (("private data", self.private_data),
+                                    ("untrusted input", self.untrusted_input),
+                                    ("egress", self.egress)) if not v)`,
+  },
+  {
+    q: `把本章警告过的那种组合失效建出来。给每个配置加一个 <code>talks_to</code> 字段，再写一个
+        <code>composite</code>，把从某个起始智能体出发可达的一切的腿并起来。验证一下：一个有私有
+        数据、会读不可信内容但没有网络的智能体，委派给一个有网络、没有数据的智能体，合起来得三条腿。`,
+    a: `智能体 A 自己得两分，智能体 B 得一分，这一对得三分——一个完整的三元组，由两个单独看都能过关
+        的组件拼出来。坑在方向上：从 B 出发遍历只会返回一条腿，因为这条边照写法是单向的。除非你能
+        证明回路不存在，否则通道要按双向来建模，因为 B 的输出几乎总会被 A 或者某个人读回去。第二个
+        坑是什么才算一条边。一次声明过的 RPC 调用是最容易的情形；一个共享的 Slack 频道、一条工单
+        队列、一个云盘文件夹、一份日志索引，全都是边，而它们没有一个会出现在架构图上。给整张图打分，
+        不是给节点打分。`,
+    code: `LEGS = ("private_data", "untrusted_input", "egress")
+
+def composite(nodes, start):
+    by, seen, stack = {n.name: n for n in nodes}, set(), [start]
+    held = {leg: "" for leg in LEGS}
+    while stack:
+        n = by[stack.pop()]
+        if n.name in seen:
+            continue
+        seen.add(n.name)
+        for leg in LEGS:
+            held[leg] = held[leg] or getattr(n, leg)
+        stack += [p for p in n.talks_to if p not in seen]
+    return held, sum(bool(v) for v in held.values())
+
+A = Node("A", private_data="the mailbox", untrusted_input="inbound email", talks_to=("B",))
+B = Node("B", egress="outbound HTTP")
+assert composite([A, B], "A")[1] == 3, "A alone is 2/3; the pair is a trifecta"`,
+  },
+  {
+    q: `挑一个被人形容成“没有网络访问”的在跑智能体，列举六条字节仍然能从它那里出去的路径，其中发出
+        站请求的是智能体以外的东西。每一行都必须点名那个真正发出请求的进程或服务。`,
+    a: `人们很快就能找到的两行，是渲染出来的图片和输出里的链接。真正要紧的是那些没人认领的行：跑在
+        智能体写入的那个文件夹上的同步守护进程；把一条含机密的错误信息转发到第三方汇聚点的日志转发
+        器；把工作树提交并推送出去的 CI 任务；读同一份共享目录的搜索索引器；以及那个手里有网络访问、
+        正好补上这一个所缺的对端智能体。当每一行都点到一个你指得出来的配置文件或正在运行的服务、而
+        不是一个假想时，你就做完了。诚实的边界在于：这份枚举永远不会完整——新的消费方冒出来时没人会
+        通知你——所以真正的交付物是一套默认拒绝的出站设计，外加一个拒绝加载远程图片的渲染器。这份
+        清单的价值，在于找出那两条能在这套设计下活下来的通道。`,
+  },
+];

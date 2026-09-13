@@ -256,3 +256,83 @@ export const refs = [
     title: 'CYBERSECEVAL 2: A Wide-Ranging Cybersecurity Evaluation Suite for Large Language Models',
     venue: 'Meta, arXiv 2024', url: 'https://arxiv.org/abs/2404.13161' },
 ];
+
+/* 练习。读完本章之后的动手任务；参考答案放在 /answers/ 上，按位置一一对应。 */
+export const exercises = [
+  {
+    q: `<code>code/a23_sandbox.py</code> 里的 <code>path_ok</code> 用的是
+        <code>os.path.normpath</code>。搭一个真实的临时工作区，在里面放一个指向外部目录的符号
+        链接，确认 <code>path_ok</code> 对一个经由它到达的文件返回 ALLOW。然后用
+        <code>os.path.realpath</code> 把这个函数修好。成功判据：这个用例翻成 DENY，而文件里已有的
+        六个用例判定结果全都不变。`,
+    a: `<code>normpath</code> 纯粹是字符串运算——它根本不碰文件系统，所以无从知道
+        <code>/work/out</code> 就是 <code>/etc</code>。<code>realpath</code> 把链接解析开，给你一条
+        真正能拿来测前缀的路径，这就堵上了这一个实例。它堵不上这一类：先 <code>realpath</code> 再
+        <code>open</code> 是典型的检查-再使用，一个在两者之间那个窗口里创建出来的符号链接就能把洞
+        重新打开，所以一个共享这个工作区的敌对进程照样赢。诚实的修法要么是对每一段路径都用带
+        <code>O_NOFOLLOW</code> 的 <code>openat</code>，要么是一个压根不存在 <code>/etc</code> 可供
+        指向的 mount namespace——字符串检查是 lint，边界才是控制。`,
+    code: `import os, tempfile
+
+ws = tempfile.mkdtemp()
+outside = tempfile.mkdtemp()
+open(os.path.join(outside, "passwd"), "w").write("root:x:0:0")
+os.symlink(outside, os.path.join(ws, "out"))
+
+def path_ok_fixed(path, workspace):
+    real = os.path.realpath(os.path.join(workspace, path.lstrip("/")))
+    if not real.startswith(os.path.realpath(workspace) + os.sep):
+        return False, f"escapes the workspace: {real}"
+    if any(p in real for p in DENY_PATTERNS):
+        return False, "matches a deny pattern"
+    return True, "ok"
+
+# normpath says yes, realpath says no
+assert os.path.normpath(os.path.join(ws, "out/passwd")).startswith(ws + os.sep)
+assert not path_ok_fixed("out/passwd", ws)[0]`,
+  },
+  {
+    q: `<code>egress_ok</code> 校验的是你请求的那个 URL，不是字节真正来自的那个 URL。写一个
+        <code>fetch_with_policy(url, redirects)</code>，让它走一条模拟的重定向链，并演示一条从
+        <code>https://api.internal.corp/r</code> 到 <code>https://evil.example/p?d=sk_live</code>
+        的链能通过单跳检查。成功判据：单跳版本放行这条链，逐跳版本拒绝它，并点出是哪一跳。`,
+    a: `每一个 HTTP 客户端默认都会跟随重定向，于是允许清单校验的是你的意图，连接建立的却是攻击者
+        选的地方。修法是关掉自动跟随重定向，在每一个 <code>Location</code> 上把整套检查——scheme、
+        主机相等、解析出的地址——重跑一遍，并给跳数设上限，免得一条链变成死循环或者一次资源攻击。
+        剩下那个洞值得点名：一个位于<em>被允许</em>主机上的开放重定向器，现在就是一条数据外泄通道，
+        而逐跳校验帮不上忙，因为每一跳都合法地在清单上。这也是这道检查该放在代理里而不是客户端里的
+        若干理由之一：在代理上它看到的是真实发生的连接，而不是意图中的连接。`,
+    code: `CHAIN = {
+    "https://api.internal.corp/r": "https://docs.internal.corp/go",
+    "https://docs.internal.corp/go": "https://evil.example/p?d=sk_live",
+}
+
+def fetch_with_policy(url, redirects, max_hops=5):
+    for hop in range(max_hops):
+        allowed, why = egress_ok(url)
+        if not allowed:
+            return False, f"hop {hop} ({url}): {why}"
+        nxt = redirects.get(url)
+        if nxt is None:
+            return True, f"fetched {url} after {hop} redirects"
+        url = nxt
+    return False, "too many redirects"
+
+assert egress_ok("https://api.internal.corp/r")[0]          # one-hop check: fine
+assert not fetch_with_policy("https://api.internal.corp/r", CHAIN)[0]`,
+  },
+  {
+    q: `把本章说的那个绕过演示出来。在一个终端里于 <code>127.0.0.1</code> 上起一个监听器，然后写出
+        那段“模型生成的”代码，让它在完全不调用 <code>egress_ok</code> 的情况下连上去。接着写出那个
+        真能证明出站性质成立的测试。成功判据：你会发现，在同一个 Python 进程里写的任何测试都证明
+        不了什么。`,
+    a: `这个绕过大约三行，不需要任何异乎寻常的能力——<code>socket.create_connection</code> 从来不会
+        去问你那个辅助函数，子进程、另一个 HTTP 库或者一次 DNS 查询也一样。注意
+        <code>127.0.0.1</code> 本来就在 <code>BLOCKED_NETS</code> 里，这正是重点：这个函数给出的
+        答案是对的，只是它压根不在路径上。进程内的测试只能说明你的辅助函数在被调用时会拒绝，那是
+        一句关于辅助函数的陈述。要证明这条性质，就得把同一份工作负载放到强制点所在的地方去跑——一个
+        带全拒绝出站策略和代理的容器，或者干脆没有路由——然后断言连接失败；那是针对部署的集成测试，
+        不是针对代码的单元测试，而如果你的 CI 跑不了这种测试，你手上就没有这项控制的证据，只有一个
+        “本来会说不”的函数。`,
+  },
+];

@@ -282,3 +282,65 @@ export const refs = [
     title: 'Agentic AI Threat Modeling Framework: MAESTRO', venue: 'Cloud Security Alliance, 2025',
     url: 'https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro' },
 ];
+
+/* Exercises. Hands-on tasks for after the chapter; model answers live on
+   /answers/ and are matched to these by position. */
+export const exercises = [
+  {
+    q: `Make the checklist refuse to be incomplete. Rewrite <code>assess</code> in
+        <code>code/a04_threat_taxonomy.py</code> so it takes a verdict for <em>every</em> vulnerability
+        class — either <code>True</code> for in scope, or a justification string for out of scope — and
+        raises if any class is unaccounted for. Run it against a system you own until it stops raising.`,
+    a: `Expect it to raise two or three times before you get through, and expect the first run to tell
+        you something about the file rather than about your system: the shipped <code>TAXONOMY</code>
+        enumerates twenty-four classes, while the review it comes from reports twenty-five. Your
+        checklist is only ever as complete as somebody's transcription, which is the chapter's argument
+        one level up. The value is entirely in the justification column. Claims of the form "not
+        applicable, our corpus is internal" or "not applicable, we do not fine-tune" are the ones to
+        challenge, because the first is an access-control statement rather than a trust statement and
+        the second says nothing about the weights you inherited. A justification you cannot defend in
+        one sentence is a finding, not an exemption.`,
+    code: `ALL_CLASSES = [name for _, _, _, classes in TAXONOMY.values() for name, _ in classes]
+
+def assess(system_name, verdicts):
+    """verdicts: {class name: True | "why it does not apply"} for all of them."""
+    missing = [c for c in ALL_CLASSES if c not in verdicts]
+    if missing:
+        raise SystemExit(f"{len(missing)} categories unaccounted for, e.g. {missing[:3]}")
+    in_scope = [c for c, v in verdicts.items() if v is True]
+    print(f"\\n  {system_name}: {len(in_scope)}/{len(ALL_CLASSES)} classes in scope")
+    for c, v in verdicts.items():
+        if v is not True:
+            print(f"     n/a  {c:<34} {v}")
+    return in_scope`,
+  },
+  {
+    q: `Tag the last ten things you read about agent security as academic or industry, predict from the
+        split which two or three vulnerability classes your own threat model underweights, then check
+        the prediction against the output of the previous exercise.`,
+    a: `A reading list that is eight papers predicts thin coverage of IAM failures (30 sources), tool
+        attacks (27) and supply chain attacks (9) — the operational classes that are neither novel nor
+        publishable. A list that is eight vendor posts predicts the opposite hole: model backdoors (9)
+        and data poisoning (14), which nobody notices until they matter enormously. The check is
+        specific: go back to your verdict dictionary and look at the justifications you wrote for those
+        exact classes. If they are the one-line ones, the prediction held and you have found your gap
+        by process rather than by luck. The honest limit is that these counts measure attention across
+        173 documents, not incidence in the wild, which nobody has. They tell you where your reading is
+        thin. They do not tell you where your risk is.`,
+  },
+  {
+    q: `Write ten failure cases for an agent you run in which there is no attacker at all — the input
+        is honest but stale, ambiguous or self-contradictory, and the agent acts on it anyway. Run
+        them, and count how many your existing evaluation suite already covers.`,
+    a: `The count is almost always zero, because the suite was built out of injection payloads and
+        these cases contain none. That gap is the chapter's most-cited finding made concrete: internal
+        threats lead the taxonomy at 62 sources and foundation-model failure is the single largest
+        class at 34, so a programme that measures only attack success rate is not measuring the
+        majority of its incidents. Write the cases where the mistake is plausible and the action is
+        irreversible — a superseded rate in a document the agent quotes into a customer email, a ticket
+        with two conflicting instructions where one is destructive, a filename that matches two files,
+        a date in the wrong timezone. Note what the control has to be: no filter helps, because there
+        is nothing adversarial to detect. What helps is reversibility gating, a diff a human can read,
+        and a second number on your evaluation dashboard next to attack success rate.`,
+  },
+];

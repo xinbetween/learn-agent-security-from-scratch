@@ -228,3 +228,78 @@ export const refs = [
     venue: 'CMU Software Engineering Institute, 2025', url: 'https://doi.org/10.1184/R1/30610928',
     note: '把诱发与度量作为独立的评估类别' },
 ];
+
+/* 练习。读完本章之后动手做的任务；参考答案在 /answers/ 上，按位置与这里一一对应。 */
+export const exercises = [
+  {
+    q: `<code>code/a19_adaptive_eval.py</code> 里的效用测量建立在五个正常请求之上。
+        把 <code>BENIGN</code> 扩到五十个贴近现实的请求，重算假正例率，并在旁边打印一个 95% 置信区
+        间。成功标准：五样本的区间和五十样本的区间你都说得出来，并且能说清各自支撑得起哪些决策。`,
+    a: `五个里拦掉两个是 40%，95% 区间大约是 [12%, 77%]。这个区间比你可能做出的全部决策的跨度还宽
+        ，所以除了“这里确实有问题”之外，这个数字支撑不起任何决策。五十个样本、比方说拦掉十五个，得
+        到大约 30%，区间接近 [19%, 44%]——仍然很宽，但现在它至少能把“烦人”和“不能上线”区分开。让人
+        不舒服的推论是：同样一笔算术也适用于本章以及多数已发表防御论文里的攻击成功率数字——八
+        个 payload 给你的区间会覆盖单位区间的大部分。每报一个比率就把 n 一起报出来，并且把任何在少
+        于大约三十个样本上算出来的比率当成一个方向，而不是一次测量。`,
+    code: `from math import sqrt
+
+def wilson(k, n, z=1.96):
+    p = k / n
+    d = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / d
+    half = z * sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return centre - half, centre + half
+
+for sample in (BENIGN, BENIGN_50):
+    k = sum(defence(b) for b in sample)
+    lo, hi = wilson(k, len(sample))
+    print("n=%3d  FP rate %3.0f%%  95%% CI [%.0f%%, %.0f%%]"
+          % (len(sample), 100 * k / len(sample), 100 * lo, 100 * hi))`,
+  },
+  {
+    q: `拿本章那套流程去打一个你自己造的防御：A17 里加固过的裁判，或者 A18 里那个逐行穿插数据标记
+        的包装层。把源码交给自己，定下三十分钟、二十个 payload 的预算，每拿到一次结果就迭代一次，
+        然后把那一对数字——攻击成功率和效用保持率——连同预算一起报出来。`,
+    a: `打 A18 那个包装层，你应该会看到界限分得很干净：伪造围栏和冒充权威这两类里每一个 payload 都
+        失败，声称已批准那一类里大部分 payload 成功，于是攻击成功率落在一半上下，而且几乎全部来自
+        同一类。要把它写成“在三十分钟白盒预算下，20 个 payload 中有 9 个成功”，绝不要写成“攻击成功
+        率 55%”，因为后一种写法既藏起了预算，也藏起了这些成功其实都是同一个点子这件事。有两点要诚
+        实交代。面对自己的防御，你是最弱的那种自适应攻击者，因为你打的是你<em>希望</em>它做的事，
+        而不是它<em>实际</em>做的事——把源码交给一个不是作者的人，这个数字通常就变了。还有，你一旦
+        为了应对发现的问题打了任何补丁，这次测量就过期了，而下一道练习讲的正是这件事。`,
+  },
+  {
+    q: `搭出那套回归测试装置。一个 runner 打印三个数字——静态攻击成功率、自适应攻击成功率，以及正常
+        流量的拦截率——其中自适应结果连同一份防御源码的指纹一起存下来，指纹对不上时就以过期为由拒绝
+        给出。然后改动 <code>PATTERNS</code> 里的一条，重跑一遍。成功标准：静态那一行和正常流量那
+        一行照样打印数字，自适应那一行打印 STALE。`,
+    a: `那个指纹只有四行，却挡住了整个领域里最常见的一种报告错误：这个月改了 prompt，还在引用上个
+        季度的自适应数字。这三个数字的有效期是真的不一样，而这套装置应该把这件事显出来，而不是把它
+        们并排成一行了事。静态攻击成功率和正常流量拦截率能扛过一次防御改动——正因如此，它们才是一道
+        你每次提交都能跑的便宜闸门。自适应那个数字扛不过，因为它衡量的是一个攻击者针对一套配置花了
+        多少代价，而你把配置改了。哈希里要把防御源码和模式列表都算进去，不能只算函数体，否则单独改
+        一下 <code>PATTERNS</code> 就会溜过去。这套装置做不到的，是告诉你自适应结果何时因为外部原
+        因失效——一项新发表的技术，或者你脚下的一次模型升级——所以除了指纹之外，再给它标上一个日历日
+        期。`,
+    code: `import hashlib, inspect
+
+def fingerprint():
+    src = inspect.getsource(defence) + repr(PATTERNS)
+    return hashlib.sha256(src.encode()).hexdigest()[:12]
+
+# adaptive result recorded at the time of the run
+LAST_ADAPTIVE = {"asr": 1.00, "budget": "30 min white-box, 20 payloads",
+                 "fingerprint": "put the fingerprint() value here"}
+
+def report(static_set, adaptive_note, benign_set):
+    s = 1 - sum(defence(a) for a in static_set) / len(static_set)
+    b = sum(defence(x) for x in benign_set) / len(benign_set)
+    print("static ASR      %.0f%%" % (100 * s))
+    if adaptive_note["fingerprint"] != fingerprint():
+        print("adaptive ASR    STALE - defence changed, re-run the evaluation")
+    else:
+        print("adaptive ASR    %.0f%% under %s"
+              % (100 * adaptive_note["asr"], adaptive_note["budget"]))
+    print("benign blocked  %.0f%%" % (100 * b))`,
+  },
+];

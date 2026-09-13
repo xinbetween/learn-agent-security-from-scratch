@@ -7,8 +7,8 @@
    locale-independent — layout.mjs adds the prefix. */
 
 export async function buildAll(ctx) {
-  const { cur, C, page, SITE, loaded, TOTAL_LINES, renderRefs, locale, href, COPY,
-          TERMS, SURFACES, CONTROLS, EVENTS, PROJECT_BODIES, CAPSTONE_BODY } = ctx;
+  const { cur, C, page, SITE, loaded, TOTAL_LINES, renderRefs, locale, href, COPY, L,
+          TERMS, SURFACES, CONTROLS, EVENTS, PROJECT_BODIES, CAPSTONE_BODY, CHEATS } = ctx;
   const out = {};
   const nCh = cur.CHAPTERS.length;
 
@@ -424,6 +424,121 @@ ${C.code(`node build.mjs           # → dist/
 node build.mjs --serve   # → dist/ and http://localhost:8080`, { lang: 'sh', file: 'terminal' })}
 <p>${COPY.setup.siteP}</p>
 </article></div>`});
+
+  /* ========================================================== answers ==== */
+  /* One page for every exercise in the course. The answers deliberately do not
+     sit under the exercises on the chapter page: a reader scrolling past the
+     last section should not have the question spoiled by its own solution.
+     Anchors are stable — #a07 for a chapter, #a07-2 for one task — so a
+     chapter can link straight at its own block. */
+  const exCh = cur.CHAPTERS.filter(c => (loaded.get(c.id)?.exercises || []).length);
+  const exTotal = exCh.reduce((a, c) => a + loaded.get(c.id).exercises.length, 0);
+
+  out['/answers/'] = page({
+    title: COPY.answers.title, path: '/answers/', locale,
+    description: COPY.answers.description,
+    body: `<div class="wrap">
+<header class="chap-head"><div class="chap-kicker"><span class="chap-part">${COPY.answers.kicker}</span></div>
+<h1>${COPY.answers.h1}</h1><p class="sub">${COPY.answers.sub(exTotal)}</p></header>
+<div class="prose-wide">
+<p class="lede">${COPY.answers.intro}</p>
+
+<nav class="toc-inline"><h5>${COPY.answers.jump}</h5><ol>${
+  cur.PARTS.filter(pt => exCh.some(c => c.part === pt.id))
+    .map(pt => `<li><a href="#part-${pt.id}">${pt.title}</a></li>`).join('')}</ol></nav>
+
+${cur.PARTS.filter(pt => exCh.some(c => c.part === pt.id)).map(pt => `
+<section class="part">
+  <div class="part-head"><span class="part-num">${pt.id}</span><h2 id="part-${pt.id}">${pt.title}</h2>
+  <span class="chap-part">${pt.range}</span></div>
+  ${exCh.filter(c => c.part === pt.id).map(c => {
+    const ex = loaded.get(c.id).exercises;
+    return `<section class="ansch" id="${c.id}">
+    <div class="ansch-head">
+      <h3>${c.id.toUpperCase()} · ${c.title}</h3>
+      <a class="ansch-link" href="${href(`/chapters/${c.id}/#exercises`)}">${L.exercises.openChapter} &rarr;</a>
+    </div>
+    <ol class="anslist">${ex.map((e, i) => `<li id="${c.id}-${i + 1}">
+      <div class="ans-q">${e.q}</div>
+      <div class="ans-a"><span class="ans-lbl">${L.exercises.answerLabel}</span>${e.a}</div>
+      ${e.code ? C.code(e.code, { lang: 'py' }) : ''}
+    </li>`).join('')}</ol>
+  </section>`;
+  }).join('')}
+</section>`).join('')}
+</div></div>`});
+
+  /* ======================================================= cheatsheet ==== */
+  /* One page that stands in for all 27 chapters. Only SPINE and KEYS are
+     written for this page; the surfaces, the controls and the chapter list are
+     read from the same collections the threat map, the defence map and the
+     curriculum use, so the cheat sheet cannot quietly disagree with them. */
+  const boundItems = CONTROLS.flatMap(g => g.items.filter(i => i[2] === 'bound').map(i => [g, i]));
+  const nRaise = CONTROLS.flatMap(g => g.items).filter(i => i[2] === 'raise').length;
+  const nSupport = CONTROLS.flatMap(g => g.items).filter(i => i[2] === 'support').length;
+  const nControls = CONTROLS.flatMap(g => g.items).length;
+  const nClasses = SURFACES.reduce((a, s) => a + s.classes.length, 0);
+
+  out['/cheatsheet/'] = page({
+    title: COPY.cheatsheet.title, path: '/cheatsheet/', locale,
+    description: COPY.cheatsheet.description,
+    bodyClass: 'cheat',
+    body: `<div class="wrap">
+<header class="chap-head"><div class="chap-kicker"><span class="chap-part">${COPY.cheatsheet.kicker}</span></div>
+<h1>${COPY.cheatsheet.h1}</h1><p class="sub">${COPY.cheatsheet.sub(nCh)}</p></header>
+<div class="prose-wide">
+<p class="lede">${COPY.cheatsheet.intro}</p>
+
+<section class="part">
+  <div class="part-head"><h2 id="spine">${COPY.cheatsheet.spineH2}</h2></div>
+  <p class="part-blurb">${COPY.cheatsheet.spineSub}</p>
+  <ol class="spine">${CHEATS.SPINE.map(([t, b]) => `<li><b>${t}</b><span>${b}</span></li>`).join('')}</ol>
+</section>
+
+<section class="part">
+  <div class="part-head"><h2 id="chapters">${COPY.cheatsheet.chaptersH2}</h2></div>
+  ${cur.PARTS.map(pt => {
+    const chs = cur.CHAPTERS.filter(c => c.part === pt.id && CHEATS.KEYS[c.id]);
+    if (!chs.length) return '';
+    return `<h3 id="part-${pt.id}" class="cheat-part">${L.chapter.part(pt.id, pt.title)}
+      <span class="chap-part">${pt.range}</span></h3>
+    <div class="cheat-chapters">${C.table(COPY.cheatsheet.chapterCols, chs.map(c => [
+      `<a class="cheat-ch" href="${href(`/chapters/${c.id}/`)}"><b>${c.id.toUpperCase()}</b>
+        <span>${c.title}</span></a>`,
+      CHEATS.KEYS[c.id].claim,
+      CHEATS.KEYS[c.id].counter,
+    ]))}</div>`;
+  }).join('')}
+</section>
+
+<section class="part">
+  <div class="part-head"><h2 id="surfaces">${COPY.cheatsheet.surfacesH2}</h2></div>
+  <p class="part-blurb">${COPY.cheatsheet.surfaceSub(nClasses)}</p>
+  <div class="cheat-surfaces">${C.table(COPY.cheatsheet.surfaceCols, SURFACES.map(sf => [
+    `<span class="part-num" style="color:var(--attack);border-color:var(--attack)">${sf.n}</span>`,
+    `<a href="${href(`/threats/#${C.slug(sf.n + ' ' + sf.title)}`)}"><b>${sf.title}</b></a>`,
+    sf.blurb,
+    `<span class="num">${sf.classes.length}</span>`,
+  ]))}</div>
+</section>
+
+<section class="part">
+  <div class="part-head"><h2 id="controls">${COPY.cheatsheet.controlsH2}</h2></div>
+  <p class="part-blurb">${COPY.cheatsheet.controlsSub(boundItems.length, nControls)}</p>
+  <div class="cheat-controls">${C.table(COPY.cheatsheet.controlCols, boundItems.map(([g, i]) => [
+    `<a href="${href(`/defenses/#${C.slug(i[0])}`)}"><b>${i[0]}</b></a>
+     <span class="cheat-stage">${g.stage}</span>`,
+    i[1],
+    i[3] ? `<a href="${href(`/chapters/${i[3]}/`)}">${i[3].toUpperCase()}</a>` : '&mdash;',
+  ]))}</div>
+  <p class="note">${COPY.cheatsheet.controlsMore(nRaise, nSupport, href('/defenses/'))}</p>
+</section>
+
+<section class="part">
+  <div class="part-head"><h2 id="next">${COPY.cheatsheet.outroH2}</h2></div>
+  <p>${COPY.cheatsheet.outro(href('/answers/'), href('/curriculum/'), href('/glossary/'))}</p>
+</section>
+</div></div>`});
 
   return out;
 }

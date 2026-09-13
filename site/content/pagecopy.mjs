@@ -366,4 +366,49 @@ plain ES modules exporting <code>meta</code>, <code>body</code>, <code>quiz</cod
       s3: 'stop it, then prove it', s4: 'all of it',
     },
   },
+  answers: {
+    title: `Exercise answers`,
+    description: `Model answers to every exercise in the course, chapter by chapter, with the reasoning and the check that proves it worked.`,
+    kicker: `Reference`,
+    h1: `Exercise answers`,
+    sub: (n) => `${n} worked answers, one section per chapter.`,
+    intro: `Every chapter ends with three tasks that need a keyboard. The answers live here rather than
+under the exercises themselves, so that scrolling to the end of a chapter never spoils its own
+questions. Each answer gives the reasoning and the check that proves the thing worked, not just the
+result. Where the honest answer is that the problem does not fully close, it says so.`,
+    jump: `Jump to a part`,
+  },
+  cheatsheet: {
+    title: `Cheat sheet`,
+    description: `The whole course on one page: the six through-lines, all 27 chapters as a claim and a counter, the six threat surfaces, and the controls that actually bound the damage.`,
+    kicker: `Reference`,
+    h1: `Cheat sheet`,
+    sub: (n) => `Six through-lines, ${n} chapters, and the controls worth the name.`,
+    intro: `This is the page to reread before a design review, not the page to learn from. Every line
+compresses a chapter that argues for it, and the chapter is one click away. If a line here sounds
+obvious, the chapter is where it stops being obvious.`,
+
+    spineH2: `The six that survive`,
+    spineSub: `If you keep nothing else, keep these.`,
+
+    chaptersH2: `Every chapter, as a claim and a counter`,
+    chapterCols: [`Chapter`, `What it establishes`, `What you do about it`],
+
+    surfacesH2: `The six threat surfaces`,
+    surfaceSub: (n) => `${n} vulnerability classes, grouped by where they enter.`,
+    surfaceCols: [`&nbsp;`, `Surface`, `What lands here`, `Classes`],
+
+    controlsH2: `Controls that bound the damage`,
+    controlsSub: (bound, total) => `${bound} of the ${total} controls in the defence map still hold
+when the model is fully compromised. The rest raise the attacker's cost, which is worth buying and
+is not the same thing.`,
+    controlCols: [`Control`, `What it does`, `Chapter`],
+    controlsMore: (raise, support, link) => `The other ${raise} cost-raising and ${support} supporting
+controls are on the <a href="${link}">defence map</a>.`,
+
+    outroH2: `Where to go next`,
+    outro: (answers, curriculum, glossary) => `Work the exercises and check yourself against the
+<a href="${answers}">answers</a>. Read the argument in the <a href="${curriculum}">curriculum</a>.
+Look a term up in the <a href="${glossary}">glossary</a>.`,
+  },
 };
