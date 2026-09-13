@@ -539,7 +539,10 @@ ol.reflist .venue { color: var(--fg-faint); }
   background: var(--accent-soft); color: var(--accent);
   font-size: .72rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
 }
-.steps > li > b { display: block; margin-bottom: .1rem; }
+/* Only the step's own title becomes a block. Without `:first-child` this also
+   caught bold terms inside the step's prose, breaking a sentence across three
+   lines and stranding the trailing full stop on a line of its own. */
+.steps > li > b:first-child { display: block; margin-bottom: .1rem; }
 
 details.disc { border: 1px solid var(--border); border-radius: var(--radius); padding: .7rem .9rem; margin: 1.25rem 0; background: var(--panel); }
 details.disc > summary { cursor: pointer; font-size: .875rem; font-weight: 600; color: var(--fg-muted); }
