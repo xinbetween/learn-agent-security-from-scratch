@@ -38,6 +38,7 @@ const nav = (active, code) => {
     ['/threats/', L.nav.threats, true],
     ['/timeline/', L.nav.timeline, true],
     ['/glossary/', L.nav.glossary, true],
+    ['/references/', L.nav.references, true],
   ];
   return items.map(([p, label, small]) =>
     `<a href="${href(p, code)}"${small ? ' class="hide-sm"' : ''}${active === p ? ' aria-current="page"' : ''}>${label}</a>`
@@ -138,9 +139,74 @@ const foot = (code) => {
  * page({ title, description, path, body, locale, bodyClass, head, scripts })
  * `path` is locale-independent (/curriculum/); the locale base is applied here.
  */
-export function page({ title, description, path, body, locale = 'en', bodyClass = '', head = '', scripts = [] }) {
+const MENU_ICON = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>`;
+
+const TICK_ICON = `<svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5"/></svg>`;
+
+/* The chapter rail. Rendered on every page except the home page, which has
+   its own full-bleed hero and no reading position to hold.
+
+   The read ticks and the progress meter are inert markup here: the whole of
+   the progress feature lives in localStorage, so a static page cannot know the
+   state at build time. app.js fills it in on load, and the sidebar reads
+   correctly with JavaScript off — every chapter is still one link away. */
+const sidebar = (cur, path, code) => {
+  const L = t(code);
+  const active = path.startsWith('/chapters/') ? path.slice(10, -1) : '';
+  return `<aside class="sidenav" id="sidenav" data-sidenav aria-label="${esc(L.side.title)}"
+  data-prog-tpl="${esc(L.side.progress('{d}', '{t}'))}"
+  data-prog-none="${esc(L.side.progressNone(cur.CHAPTERS.length))}"
+  data-reset-confirm="${esc(L.side.resetConfirm)}"
+  data-chapter-url="${href('/chapters/__ID__/', code)}">
+  <div class="sidenav-top">
+    <div class="sideprog">
+      <div class="sideprog-bar" role="presentation"><i data-progress-bar style="width:0%"></i></div>
+      <div class="sideprog-row">
+        <span data-progress-text>${esc(L.side.progressNone(cur.CHAPTERS.length))}</span>
+        <button type="button" class="sideprog-reset" data-progress-reset hidden
+                title="${esc(L.side.reset)}">${esc(L.side.reset)}</button>
+      </div>
+    </div>
+    <a class="sideprog-resume" data-progress-resume href="${href('/chapters/a01/', code)}" hidden>${esc(L.side.resume)}</a>
+  </div>
+  <nav class="sidenav-list">
+${cur.PARTS.map(pt => {
+  const chs = cur.CHAPTERS.filter(c => c.part === pt.id);
+  if (!chs.length) return '';
+  return `    <div class="sidepart">
+      <h5>${esc(L.chapter.part(pt.id, pt.title))}</h5>
+      <ul>${chs.map(c => `<li${active === c.id ? ' class="on"' : ''}>
+        <a href="${href(`/chapters/${c.id}/`, code)}" data-ch="${c.id}"${
+          active === c.id ? ' aria-current="page"' : ''}><span class="cid">${c.id.toUpperCase()}</span><span class="ct">${esc(c.title)}</span></a>
+        <button type="button" class="ctick" data-ch-tick="${c.id}" aria-pressed="false"
+                aria-label="${esc(L.side.markToggle)}" title="${esc(L.side.markToggle)}">${TICK_ICON}</button>
+      </li>`).join('')}</ul>
+    </div>`;
+}).join('\n')}
+  </nav>
+  <nav class="sidenav-list sidemore">
+    <div class="sidepart">
+      <h5>${esc(L.side.more)}</h5>
+      <ul>${[
+        ['/curriculum/', L.nav.curriculum], ['/projects/', L.nav.projects],
+        ['/capstone/', L.footer.capstone], ['/cheatsheet/', L.nav.cheatsheet],
+        ['/answers/', L.footer.answers], ['/threats/', L.nav.threats],
+        ['/defenses/', L.footer.defenses], ['/glossary/', L.nav.glossary],
+        ['/timeline/', L.nav.timeline], ['/references/', L.nav.references],
+      ].map(([u, label]) => `<li${path === u ? ' class="on"' : ''}><a href="${href(u, code)}"${
+        path === u ? ' aria-current="page"' : ''}><span class="ct">${esc(label)}</span></a></li>`).join('')}</ul>
+    </div>
+  </nav>
+  <p class="sidenav-note">${esc(L.side.storedLocally)}</p>
+</aside>`;
+};
+
+export function page({ title, description, path, body, locale = 'en', bodyClass = '', head = '',
+                       scripts = [], cur = null }) {
   const loc = localeOf(locale);
   const L = t(locale);
+  // the home page keeps its full-bleed hero and has no reading position to hold
+  const side = !!cur && path !== '/';
   const full = path === '/' ? L.siteTitle : `${title} · ${L.siteTitle}`;
   const desc = description || L.siteDescription;
   const canonical = SITE.url + href(path, locale);
@@ -175,9 +241,12 @@ ${alternates}
 <script>(function(){try{var t=localStorage.getItem('as-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 ${head}
 </head>
-<body class="${bodyClass}">
+<body class="${bodyClass}${side ? ' has-side' : ''}">
 <a class="skip" href="#main">${esc(L.skipToContent)}</a>
 <header class="topbar"><div class="topbar-inner">
+  ${side ? `<button type="button" class="iconbtn menubtn" data-side-toggle aria-controls="sidenav"
+      aria-expanded="false" aria-label="${esc(L.side.open)}" title="${esc(L.side.open)}"
+      data-label-open="${esc(L.side.open)}" data-label-close="${esc(L.side.close)}">${MENU_ICON}</button>` : ''}
   <a class="brand" href="${href('/', locale)}"><span class="brand-mark">▲</span> ${esc(L.brand)}</a>
   <nav class="topnav">
     ${nav(path, locale)}
@@ -188,10 +257,16 @@ ${head}
     <a class="iconbtn" href="${SITE.repo}" aria-label="${esc(L.footer.source)}" title="${esc(L.footer.source)}" rel="noopener">${GITHUB_ICON}</a>
   </nav>
 </div></header>
+<div class="shell">
+${side ? sidebar(cur, path, locale) : ''}
+<div class="shell-main">
 <main id="main">
 ${body}
 </main>
 ${foot(locale)}
+</div>
+</div>
+${side ? '<div class="side-scrim" data-side-close hidden></div>' : ''}
 ${searchDialog(locale)}
 <script src="${JS_URL}"></script>
 ${scripts.map(s => `<script src="${s}"></script>`).join('\n')}

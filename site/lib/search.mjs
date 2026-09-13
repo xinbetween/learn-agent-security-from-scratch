@@ -42,7 +42,8 @@ export function sections(html = '') {
   return out;
 }
 
-export function buildSearchIndex({ cur, loaded, TERMS, SURFACES, CONTROLS, EVENTS, PROJECT_BODIES, CAPSTONE_BODY, L, base = '' }) {
+export function buildSearchIndex({ cur, loaded, TERMS, SURFACES, CONTROLS, EVENTS, PROJECT_BODIES,
+                                  CAPSTONE_BODY, CHEATS, L, base = '' }) {
   const idx = [];
   // `base` is the locale prefix ('' for English, '/zh' for Chinese) so a hit
   // always navigates within the language the reader is already reading.
@@ -103,6 +104,12 @@ export function buildSearchIndex({ cur, loaded, TERMS, SURFACES, CONTROLS, EVENT
   add('page', '/references/', L.nav.references, L.searchKicker.references, L.searchWords.references);
   add('page', '/sources/', L.footer.sourceLists, L.searchKicker.sources, 'Awesome-Agent-Security, Awesome Agent Skills Security, Awesome AI Agent Papers, SoK');
   add('page', '/setup/', L.footer.setup, L.searchKicker.setup, L.searchWords.setup);
+  if (CHEATS) {
+    // the through-lines are the part of the cheat sheet worth finding by name;
+    // the per-chapter rows would only shadow the chapters themselves
+    add('page', '/cheatsheet/', L.nav.cheatsheet, L.searchKicker.cheatsheet,
+        `${L.searchWords.cheatsheet} ${CHEATS.SPINE.map(x => x[0]).join(', ')}`);
+  }
 
   // exercises and their answers. One entry per chapter block rather than one
   // per task, so a search for a topic lands on the whole set for that chapter

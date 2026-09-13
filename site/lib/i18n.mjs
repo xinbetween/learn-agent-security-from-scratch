@@ -85,6 +85,23 @@ export const UI = {
       toCapstone: 'The capstone',
     },
 
+    side: {
+      title: 'Chapters',
+      open: 'Open the chapter menu',
+      close: 'Close the chapter menu',
+      progress: (d, t) => `${d} of ${t} read`,
+      progressNone: (t) => `${t} chapters`,
+      resume: 'Pick up where you left off',
+      markRead: 'Mark this chapter as read',
+      marked: 'Read',
+      markToggle: 'Mark as read',
+      reset: 'Reset progress',
+      resetConfirm: 'Clear the record of which chapters you have read? This cannot be undone.',
+      storedLocally: 'Progress is kept in this browser only. Nothing is sent anywhere.',
+      onThisPage: 'On this page',
+      more: 'Elsewhere',
+    },
+
     exercises: {
       title: 'Exercises',
       intro: 'Three tasks that need a keyboard, not a highlighter. Work them before you read the answers.',
@@ -200,6 +217,23 @@ numbers. Links go to the authors' own pages wherever one exists.`,
       next: '下一章 →',
       toCurriculum: '课程大纲',
       toCapstone: '毕业项目',
+    },
+
+    side: {
+      title: '章节',
+      open: '打开章节菜单',
+      close: '关闭章节菜单',
+      progress: (d, t) => `已读 ${d} / ${t}`,
+      progressNone: (t) => `共 ${t} 章`,
+      resume: '从上次读到的地方继续',
+      markRead: '把本章标记为已读',
+      marked: '已读',
+      markToggle: '标记为已读',
+      reset: '清除阅读记录',
+      resetConfirm: '确定要清除已读章节的记录吗？此操作无法撤销。',
+      storedLocally: '阅读进度只存在这台浏览器里，不会上传到任何地方。',
+      onThisPage: '本页目录',
+      more: '其他页面',
     },
 
     exercises: {

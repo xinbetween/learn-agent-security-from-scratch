@@ -148,9 +148,9 @@ ${q.options.map((o, j) => `<button class="opt" data-correct="${j === q.answer ? 
   </div>
 </header>
 
+<div class="chapgrid">
+<div class="chapcol">
 <article class="prose">
-${heads.length > 2 ? `<nav class="toc-inline"><h5>${L.chapter.inThisChapter}</h5><ol>${
-  heads.map(([id, t2]) => `<li><a href="#${id}">${t2}</a></li>`).join('')}</ol></nav>` : ''}
 ${mod.body}
 </article>
 
@@ -161,12 +161,27 @@ ${quizHtml}
 <div class="prose-wide">
 ${renderRefs(mod.refs, mod.refsNote, L)}
 
+<div class="readmark">
+  <button type="button" class="readbtn" data-read-toggle="${ch.id}" aria-pressed="false"
+          data-label-mark="${C.esc(L.side.markToggle)}" data-label-done="${C.esc(L.side.marked)}">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.5 12 13 4.5"/></svg>
+    <span data-read-label>${L.side.markToggle}</span>
+  </button>
+</div>
+
 <nav class="pager">
 ${prev ? `<a href="${href(`/chapters/${prev.id}/`, code)}" class="prev"><span class="dir">${L.chapter.prev}</span><span class="nm">${prev.id.toUpperCase()} · ${prev.title}</span></a>`
        : `<a href="${href('/curriculum/', code)}" class="prev"><span class="dir">←</span><span class="nm">${L.chapter.toCurriculum}</span></a>`}
 ${next ? `<a href="${href(`/chapters/${next.id}/`, code)}" class="next"><span class="dir">${L.chapter.next}</span><span class="nm">${next.id.toUpperCase()} · ${next.title}</span></a>`
        : `<a href="${href('/capstone/', code)}" class="next"><span class="dir">${L.chapter.next}</span><span class="nm">${L.chapter.toCapstone}</span></a>`}
 </nav>
+</div>
+</div>
+<aside class="chaprail">
+${heads.length > 2 ? `<nav class="toc-inline"><h5>${L.chapter.inThisChapter}</h5><ol>${
+  heads.map(([id, t2]) => `<li><a href="#${id}">${t2}</a></li>`).join('')}</ol></nav>` : ''}
+</aside>
 </div>
 </div>`;
 
@@ -177,6 +192,7 @@ ${next ? `<a href="${href(`/chapters/${next.id}/`, code)}" class="next"><span cl
     locale: code,
     body,
     scripts: mod.scripts || [],
+    cur,
   });
 }
 
@@ -219,7 +235,8 @@ async function build() {
     }
 
     const ctx = {
-      ...ctx0, C, page, SITE, TOTAL_LINES,
+      // every standalone page gets the chapter rail too, so `cur` rides along
+      ...ctx0, C, page: (o) => page({ cur, ...o }), SITE, TOTAL_LINES,
       locale: loc.code, href: (p) => href(p, loc.code),
       renderRefs: (refs, note) => renderRefs(refs, note, L),
     };

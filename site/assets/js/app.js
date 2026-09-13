@@ -366,4 +366,160 @@
       });
     });
   }
+
+  /* --------------------------------------------------- rail and progress
+     Two features that share one piece of state.
+
+     The drawer: below 1200px the chapter rail is off-canvas, so the topbar
+     grows a button that slides it in over the content.
+
+     Progress: which chapters have been read, kept in localStorage under
+     as-progress-v1 and nowhere else. The markup ships inert — every tick is
+     unpressed and the meter reads zero — and this fills it in on load, so the
+     page is still correct with JavaScript off or storage blocked. A chapter
+     marks itself read when the reader actually reaches the foot of it, which
+     is what finishing a chapter looks like; the tick and the button are there
+     for the reader who disagrees. */
+  var PKEY = 'as-progress-v1';
+  var side = document.querySelector('[data-sidenav]');
+
+  function loadProg() {
+    try {
+      var raw = localStorage.getItem(PKEY);
+      var v = raw ? JSON.parse(raw) : null;
+      if (!v || typeof v !== 'object') return { read: {}, last: '' };
+      return { read: (v.read && typeof v.read === 'object') ? v.read : {}, last: v.last || '' };
+    } catch (e) { return { read: {}, last: '' }; }
+  }
+  function saveProg(p) {
+    try { localStorage.setItem(PKEY, JSON.stringify(p)); } catch (e) {}
+  }
+
+  function paintProgress() {
+    if (!side) return;
+    var p = loadProg();
+    var ids = [], done = 0;
+    side.querySelectorAll('[data-ch-tick]').forEach(function (b) {
+      var id = b.getAttribute('data-ch-tick');
+      ids.push(id);
+      var on = !!p.read[id];
+      if (on) done++;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var li = b.closest('li');
+      if (li) li.classList.toggle('read', on);
+    });
+    var total = ids.length;
+    var bar = side.querySelector('[data-progress-bar]');
+    if (bar) bar.style.width = total ? (done / total * 100).toFixed(1) + '%' : '0%';
+    var txt = side.querySelector('[data-progress-text]');
+    if (txt) {
+      txt.textContent = done
+        ? (side.getAttribute('data-prog-tpl') || '{d}/{t}').replace('{d}', done).replace('{t}', total)
+        : (side.getAttribute('data-prog-none') || '');
+    }
+    var reset = side.querySelector('[data-progress-reset]');
+    if (reset) reset.hidden = !done;
+
+    // resume points at the last chapter opened, not the last one finished
+    var resume = side.querySelector('[data-progress-resume]');
+    if (resume) {
+      var tpl = side.getAttribute('data-chapter-url') || '';
+      // Only useful when the reader is not already in a chapter: inside one,
+      // it would just point back at the chapter they came from.
+      var here = document.querySelector('[data-read-toggle]');
+      var show = !!p.last && !!tpl && !here;
+      if (show) resume.href = tpl.replace('__ID__', p.last);
+      resume.hidden = !show;
+    }
+
+    document.querySelectorAll('[data-read-toggle]').forEach(function (b) {
+      var on = !!p.read[b.getAttribute('data-read-toggle')];
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      var lbl = b.querySelector('[data-read-label]');
+      if (lbl) lbl.textContent = b.getAttribute(on ? 'data-label-done' : 'data-label-mark') || lbl.textContent;
+    });
+  }
+
+  function setRead(id, on) {
+    var p = loadProg();
+    if (on) p.read[id] = Date.now(); else delete p.read[id];
+    saveProg(p);
+    paintProgress();
+  }
+
+  document.addEventListener('click', function (e) {
+    var tick = e.target.closest('[data-ch-tick]');
+    if (tick) {
+      e.preventDefault();
+      var tid = tick.getAttribute('data-ch-tick');
+      setRead(tid, tick.getAttribute('aria-pressed') !== 'true');
+      return;
+    }
+    var rb = e.target.closest('[data-read-toggle]');
+    if (rb) {
+      setRead(rb.getAttribute('data-read-toggle'), rb.getAttribute('aria-pressed') !== 'true');
+      return;
+    }
+    var rs = e.target.closest('[data-progress-reset]');
+    if (rs) {
+      var msg = side && side.getAttribute('data-reset-confirm');
+      if (!msg || confirm(msg)) { try { localStorage.removeItem(PKEY); } catch (er) {} paintProgress(); }
+    }
+  });
+
+  /* drawer */
+  function setDrawer(open) {
+    if (!side) return;
+    var btn = document.querySelector('[data-side-toggle]');
+    var scrim = document.querySelector('[data-side-close]');
+    side.classList.toggle('open', open);
+    if (scrim) scrim.hidden = !open;
+    document.body.classList.toggle('side-open', open);
+    if (btn) {
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var lab = btn.getAttribute(open ? 'data-label-close' : 'data-label-open');
+      if (lab) { btn.setAttribute('aria-label', lab); btn.title = lab; }
+    }
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-side-toggle]')) { setDrawer(!side.classList.contains('open')); return; }
+    if (e.target.closest('[data-side-close]')) { setDrawer(false); return; }
+    // following a link from the drawer should not leave it hanging open
+    if (side && side.classList.contains('open') && e.target.closest('.sidenav a')) setDrawer(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && side && side.classList.contains('open')) setDrawer(false);
+  });
+
+  window.addEventListener('DOMContentLoaded', function () {
+    paintProgress();
+
+    var here = document.querySelector('[data-read-toggle]');
+    if (!here) return;
+    var id = here.getAttribute('data-read-toggle');
+
+    // opening a chapter is what "where you left off" means
+    var p = loadProg();
+    if (p.last !== id) { p.last = id; saveProg(p); }
+
+    // reaching the foot of the chapter marks it read, once
+    if ('IntersectionObserver' in window) {
+      var foot = document.querySelector('.readmark');
+      if (foot) {
+        var io = new IntersectionObserver(function (entries) {
+          if (!entries.some(function (x) { return x.isIntersecting; })) return;
+          io.disconnect();
+          if (!loadProg().read[id]) setRead(id, true);
+        }, { rootMargin: '0px 0px -10% 0px' });
+        io.observe(foot);
+      }
+    }
+
+    // keep the current chapter in view in a long rail
+    var cur = side && side.querySelector('li.on');
+    if (cur && side.scrollHeight > side.clientHeight) {
+      var top = cur.offsetTop - side.clientHeight / 2;
+      side.scrollTop = top > 0 ? top : 0;
+    }
+  });
 })();
