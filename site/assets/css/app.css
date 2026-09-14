@@ -397,7 +397,11 @@ pre code { background: none; border: 0; padding: 0; white-space: pre; font-size:
 .sim-out {
   background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius);
   padding: .8rem .9rem; font-family: var(--font-mono); font-size: .78rem;
-  line-height: 1.6; overflow-x: auto; min-height: 3rem; white-space: pre-wrap; word-break: break-word;
+  line-height: 1.6; overflow-x: auto; min-height: 3rem;
+  /* These panes print padded columns. `pre-wrap` folded any row wider than
+     the box onto a second line, which broke the alignment the padding
+     exists to create, so rows scroll instead of wrapping. */
+  white-space: pre;
 }
 .sim-out .ok   { color: var(--defense); }
 .sim-out .bad  { color: var(--attack); font-weight: 600; }
@@ -889,3 +893,12 @@ html[lang^="zh"] h1, html[lang^="zh"] h2, html[lang^="zh"] h3 { letter-spacing: 
   .sidenav.open { transform: none; }
   @media (prefers-reduced-motion: reduce) { .sidenav { transition: none; } }
 }
+
+/* A chapter's prose keeps its 42rem measure, but a simulator prints padded
+   columns and does not: at the measure the pane holds about 80 characters and
+   most of these tables are wider than that. Inside a chapter the article
+   spans the column and each child is pulled back to the measure, except the
+   simulator, which may use the room the wide shell created. */
+.chapcol > .prose { max-width: none; }
+.chapcol > .prose > * { max-width: var(--measure); }
+.chapcol > .prose > .sim { max-width: min(100%, 62rem); }

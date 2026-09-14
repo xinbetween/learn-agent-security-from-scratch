@@ -33,7 +33,7 @@ registerSim('a06filter', function (el) {
       if (!b) through++;
       h += '  ' + r[0].padEnd(17) +
         (b ? '<span class="ok">已拦截       </span>' : '<span class="bad">直达模型     </span>') +
-        '  <span class="dim">' + simUtil.esc(r[1].slice(0, 52)) + '</span>' +
+        '  <span class="dim">' + simUtil.esc(r[1].length > 64 ? r[1].slice(0, 63) + '\u2026' : r[1]) + '</span>' +
         (mode === 'clf' ? '  <span class="dim">评分 ' + r[2].toFixed(2) + '</span>' : '') + '\n';
     });
     h += '\n  <span class="hl">' + through + '/' + A.length + '</span> 条抵达了模型。';
