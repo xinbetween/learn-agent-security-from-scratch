@@ -1,11 +1,13 @@
 """
-Run every chapter file and report which ones passed.
+Run every chapter file and every project solution, and report which passed.
 
-Each file ends in assertions that verify the claims made in its chapter. If
-they all pass, the course's claims held on your machine.
+Each file ends in assertions that verify the claims made in the chapter or the
+project brief it belongs to. If they all pass, the course's claims held on your
+machine.
 
     python code/run_all.py
-    python code/run_all.py --quiet     # only the summary
+    python code/run_all.py --quiet       # only the summary
+    python code/run_all.py --chapters    # skip the project solutions
 """
 
 from __future__ import annotations
@@ -22,18 +24,23 @@ GREEN, RED, DIM, RESET, BOLD = "\033[32m", "\033[31m", "\033[2m", "\033[0m", "\0
 def main() -> int:
     quiet = "--quiet" in sys.argv
     files = sorted(HERE.glob("a[0-9][0-9]_*.py"))
+    # The reference solutions are held to the same standard as the chapters:
+    # they run, and their assertions pass, or the build is broken.
+    if "--chapters" not in sys.argv:
+        files += sorted((HERE / "solutions").glob("*.py"))
     results = []
 
     for f in files:
+        label = f.name if f.parent == HERE else f"{f.parent.name}/{f.name}"
         t0 = time.perf_counter()
-        proc = subprocess.run([sys.executable, f.name], cwd=HERE,
+        proc = subprocess.run([sys.executable, str(f.relative_to(HERE))], cwd=HERE,
                               capture_output=True, text=True, timeout=600)
         ms = (time.perf_counter() - t0) * 1000
         passed = proc.returncode == 0
-        results.append((f.name, passed, ms, proc.stderr))
+        results.append((label, passed, ms, proc.stderr))
 
         mark = f"{GREEN}pass{RESET}" if passed else f"{RED}FAIL{RESET}"
-        print(f"  {mark}  {f.name:<32} {ms:7.0f} ms")
+        print(f"  {mark}  {label:<32} {ms:7.0f} ms")
         if not passed and not quiet:
             print(f"{DIM}{proc.stderr.strip()[-1200:]}{RESET}")
 

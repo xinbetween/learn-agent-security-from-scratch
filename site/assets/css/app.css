@@ -902,3 +902,13 @@ html[lang^="zh"] h1, html[lang^="zh"] h2, html[lang^="zh"] h3 { letter-spacing: 
 .chapcol > .prose { max-width: none; }
 .chapcol > .prose > * { max-width: var(--measure); }
 .chapcol > .prose > .sim { max-width: min(100%, 62rem); }
+
+/* the reference solution on a project page */
+.soln { margin-top: 3rem; }
+.soln-meta {
+  display: flex; align-items: baseline; gap: .9rem; flex-wrap: wrap;
+  font-size: .8rem; color: var(--fg-faint);
+}
+.soln-meta code { font-size: .8rem; }
+.soln details.disc > summary { font-size: .85rem; }
+.soln details.disc .codeblock { margin-bottom: 0; }

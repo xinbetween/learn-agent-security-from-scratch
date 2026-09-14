@@ -102,6 +102,16 @@ export const UI = {
       more: 'Elsewhere',
     },
 
+    solutions: {
+      title: 'Reference solution',
+      intro: 'One way to satisfy the brief, not the only one. It runs, its assertions pass, and it is held to the same standard as the chapter files: standard library only, no API key, no network.',
+      spoiler: 'Work the project first. Reading the solution before you have tried it costs you the thing the project was for.',
+      lines: (n) => `${n} lines`,
+      show: 'Show the full source',
+      runIt: 'Run it',
+      leaves: 'What it leaves to you',
+    },
+
     exercises: {
       title: 'Exercises',
       intro: 'Three tasks that need a keyboard, not a highlighter. Work them before you read the answers.',
@@ -234,6 +244,16 @@ numbers. Links go to the authors' own pages wherever one exists.`,
       storedLocally: '阅读进度只存在这台浏览器里，不会上传到任何地方。',
       onThisPage: '本页目录',
       more: '其他页面',
+    },
+
+    solutions: {
+      title: '参考实现',
+      intro: '这是满足项目要求的一种写法，不是唯一一种。它能直接跑通，断言全部通过，标准和正文章节的代码一致：只用标准库，不需要 API key，不联网。',
+      spoiler: '先自己把项目做一遍。还没动手就来看答案，项目本身的意义也就没了。',
+      lines: (n) => `${n} 行`,
+      show: '展开完整源码',
+      runIt: '运行方式',
+      leaves: '留给你自己做的部分',
     },
 
     exercises: {

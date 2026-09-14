@@ -8,9 +8,30 @@
 
 export async function buildAll(ctx) {
   const { cur, C, page, SITE, loaded, TOTAL_LINES, renderRefs, locale, href, COPY, L,
-          TERMS, SURFACES, CONTROLS, EVENTS, PROJECT_BODIES, CAPSTONE_BODY, CHEATS } = ctx;
+          TERMS, SURFACES, CONTROLS, EVENTS, PROJECT_BODIES, CAPSTONE_BODY, CHEATS, SOLUTIONS } = ctx;
   const out = {};
   const nCh = cur.CHAPTERS.length;
+
+  /* A project brief is graded work, so the worked answer sits behind a
+     disclosure rather than in the reading flow, and the framing comes out of
+     the file's own docstring — the file stays the one place that says what it
+     covers and what it leaves alone. */
+  const solutionSection = (key) => {
+    const s = SOLUTIONS && SOLUTIONS[key];
+    if (!s) return '';
+    return `<section class="prose-wide soln">
+${C.h2(L.solutions.title, 'solution')}
+<p>${L.solutions.intro}</p>
+${C.callout('warn', L.solutions.title, `<p style="margin-bottom:0">${L.solutions.spoiler}</p>`)}
+<p class="soln-meta"><code>${C.esc(s.file)}</code><span>${L.solutions.lines(s.lines)}</span>
+  <a href="${SITE.repo}/blob/main/${s.file}" rel="noopener">GitHub</a></p>
+${s.paras.map(x => `<p>${C.esc(x)}</p>`).join('\n')}
+${s.run.length ? C.code(s.run.join('\n'), { lang: 'sh', file: 'terminal' }) : ''}
+${C.detail(L.solutions.show, C.code(s.src, { lang: 'py', file: s.file }))}
+</section>`;
+  };
+
+
 
   /* ============================================================ home ==== */
   const heroDiagram = C.svg(760, 340, `
@@ -192,6 +213,10 @@ ${cur.PROJECTS.map(p => {
   <div class="pl">${COPY.projects.finalProject} · ${cur.CAPSTONE.hours}</div>
   <div class="pt">${cur.CAPSTONE.title}</div><div class="pd">${cur.CAPSTONE.desc}</div></a>
 
+${Object.keys(SOLUTIONS || {}).length
+  ? C.callout('note', L.solutions.title, `<p style="margin-bottom:0">${L.solutions.intro} ${L.solutions.spoiler}</p>`)
+  : ''}
+
 ${C.h2(COPY.projects.flowH2, 'flow')}
 ${C.figure(C.svg(760, 200, `
   ${C.box(10, 60, 108, 50, 'P1', COPY.diagrams.flow.p1, 'd-sunk')}
@@ -223,6 +248,7 @@ ${C.figure(C.svg(760, 200, `
 <div class="chap-meta"><span><b>${p.hours}</b></span><span>${COPY.projects.prereq} <b>${part.range}</b></span></div>
 </header>
 <article class="prose">${b.body}</article>
+${solutionSection(p.id)}
 <div class="prose-wide">${renderRefs(b.refs, b.refsNote)}</div>
 </div>`, scripts: b.scripts || [] });
   }
@@ -238,6 +264,7 @@ ${C.figure(C.svg(760, 200, `
 <div class="chap-meta"><span><b>${cur.CAPSTONE.hours}</b></span>
 <span>${COPY.capstone.prereq} <b>A01–A27</b> ${COPY.capstone.and} <b>P1–P5</b></span></div></header>
 <article class="prose">${CAPSTONE_BODY.body}</article>
+${solutionSection('capstone')}
 <div class="prose-wide">${renderRefs(CAPSTONE_BODY.refs, CAPSTONE_BODY.refsNote)}</div>
 </div>`});
 

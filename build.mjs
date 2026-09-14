@@ -74,7 +74,38 @@ async function loadLocale(code) {
   };
 }
 
+/* ------------------------------------------------------ project solutions */
+/* The reference solutions are ordinary files in code/solutions/, run by
+   run_all.py alongside the chapters. Read them at build time so a page can show
+   the source and the line count without keeping a second copy of either, and
+   take the framing from the module docstring so the file itself stays the one
+   place that says what it covers. */
+async function loadSolutions() {
+  const dir = join(ROOT, 'code', 'solutions');
+  if (!existsSync(dir)) return {};
+  const out = {};
+  const names = (await readdir(dir)).filter(f => f.endsWith('.py')).sort();
+  for (const name of names) {
+    const src = (await readFile(join(dir, name), 'utf8')).replace(/\s+$/, '');
+    const key = name.split('_')[0];                        // p2_injection_lab.py -> p2
+    const m = src.match(/^(?:#![^\n]*\n)?[ru]*("{3}|'{3})([\s\S]*?)\1/);
+    const doc = m ? m[2] : '';
+    const isRun = (l) => /^\s*python3?\s/.test(l);
+    const lines = doc.split('\n');
+    out[key] = {
+      file: `code/solutions/${name}`,
+      src,
+      lines: src.split('\n').length,
+      run: lines.filter(isRun).map(l => l.trim()),
+      paras: lines.filter(l => !isRun(l)).join('\n')
+        .split(/\n\s*\n/).map(x => x.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean),
+    };
+  }
+  return out;
+}
+
 /* ---------------------------------------------------------- ref rendering */
+
 export function renderRefs(refs, note, L = t('en')) {
   if (!refs || !refs.length) return '';
   const items = refs.map(r => {
@@ -212,6 +243,7 @@ async function build() {
   }
 
   const pages = await imp('site/lib/pages.mjs');
+  const SOLUTIONS = await loadSolutions();
   const { buildSearchIndex } = await imp('site/lib/search.mjs');
   const built = [];
   const allPaths = [];
@@ -236,7 +268,7 @@ async function build() {
 
     const ctx = {
       // every standalone page gets the chapter rail too, so `cur` rides along
-      ...ctx0, C, page: (o) => page({ cur, ...o }), SITE, TOTAL_LINES,
+      ...ctx0, C, page: (o) => page({ cur, ...o }), SITE, TOTAL_LINES, SOLUTIONS,
       locale: loc.code, href: (p) => href(p, loc.code),
       renderRefs: (refs, note) => renderRefs(refs, note, L),
     };

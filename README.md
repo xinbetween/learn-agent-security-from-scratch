@@ -130,7 +130,8 @@ cd learn-agent-security-from-scratch
 
 # --- the code (no dependencies, no API key, no network) ---
 python3 code/a01_agent_loop.py     # start here
-python3 code/run_all.py            # all 27 chapters, under a second
+python3 code/run_all.py            # every chapter and every project solution
+python3 code/run_all.py --chapters # just the 27 chapters, under a second
 
 # --- the site (no dependencies either) ---
 node build.mjs --serve             # http://localhost:8080
@@ -206,7 +207,9 @@ code/                       ALL chapter code lives here
   agentlib.py               the shared toy agent: a deterministic stub model,
                             in-memory fake tools, tagged context
   a01..a27_*.py             one runnable file per chapter
-  run_all.py                every chapter, with a summary
+  solutions/                a reference solution per project and the capstone,
+                            held to the same standard: runs, asserts, no deps
+  run_all.py                every chapter and every solution, with a summary
 site/
   content/
     curriculum.mjs          the spine — parts, chapters, projects. Nav, maps,
