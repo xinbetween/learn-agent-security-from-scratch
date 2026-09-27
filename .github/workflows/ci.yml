@@ -9,7 +9,7 @@ on:
 jobs:
   code:
     name: code/ — 27 chapters must pass
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
 
@@ -33,7 +33,7 @@ jobs:
 
   site:
     name: site — build and link check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
 
